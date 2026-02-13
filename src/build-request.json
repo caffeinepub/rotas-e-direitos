@@ -1,0 +1,278 @@
+{
+  "kind": "build_request",
+  "title": "Build ROTAS E DIREITOS MVP (Internet Computer web app) with evidence tracking, loss calculator, appeal generator (template-based), and anonymous collective reporting",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "text": "Create the core app structure for “ROTAS E DIREITOS” as a web app with four main modules accessible from a home dashboard: (1) Evidence Tracker, (2) Loss Calculator, (3) Appeal Generator, (4) Collective Data. Include navigation, module landing pages, and empty-state guidance for first-time users.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "\"ROTAS E DIREITOS\" ... com 4 módulos: rastreador de evidências, calculadora de perdas, gerador automático de recursos e mapa coletivo de desativações"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A user can open the app and see a home dashboard with 4 module entry points.",
+        "Each module has a dedicated route/page with a clear title and description.",
+        "Each module page shows a helpful empty state when there is no data yet."
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Implement authentication using Internet Identity and associate user-owned data to the authenticated principal. Unauthenticated users may browse a read-only overview page but must sign in to create, upload, or export any personal evidence/records.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Ferramenta gratuita que automatiza a defesa de entregadores..."
+        ]
+      },
+      "acceptanceCriteria": [
+        "Users can sign in and sign out via Internet Identity.",
+        "After signing in, creating/viewing personal records only shows the signed-in user’s data.",
+        "Signed-out users cannot upload evidence or generate/export reports."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Evidence Tracker: allow users to add two evidence types—(a) daily selfie photos and (b) platform screenshots/ratings prints—via file upload. For each evidence item, capture: type (selfie/print), upload timestamp, user-provided notes/tags, and optional platform (iFood/Uber/99/Rappi). Provide a chronological timeline view with filters (type, platform, date range).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "MÓDULO 1: RASTREADOR DE EVIDÊNCIAS (PROVA AUTOMÁTICA)",
+          "Selfie Diária com Prova de Vida",
+          "Linha do Tempo de Avaliações"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A signed-in user can upload an image as a Selfie or Print and add notes/tags.",
+        "The timeline lists evidence items newest-first and supports filtering by type and platform.",
+        "Clicking an item opens a detail view with the image preview and stored metadata (timestamp, notes/tags, platform)."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Evidence storage: store evidence metadata in the Motoko backend and store the image files in the frontend using browser storage (IndexedDB) for offline-first access, with an option to export selected evidence items as a single downloadable ZIP file (client-side).",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Arquitetura: Offline-first com sincronização opcional",
+          "Armazenamento local criptografado (SQLite + arquivos)",
+          "Backup Opcional"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Evidence metadata persists across reloads via the backend for the signed-in user.",
+        "Uploaded images persist locally in the browser (IndexedDB) and can be viewed offline after first load.",
+        "User can select multiple evidence items and download them as a ZIP (containing images + a manifest JSON of metadata)."
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Work Session logging (simplified): add a “Start Work Session / End Work Session” control that records session start/end timestamps and periodically fetches weather conditions for the user-selected city/region (no GPS). Store weather samples (timestamp, condition, temperature, city) linked to the session, and show them on a session detail page.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Registro Automático de Condições",
+          "Condição climática a cada 30 min (API gratuita de clima)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "User can start and end a work session; sessions appear in a list.",
+        "While a session is active, the app records periodic weather samples based on a chosen city/region.",
+        "A session detail view shows start/end times and a timeline/table of recorded weather samples."
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Loss Calculator: implement a profile form that collects average daily earnings (BRL), days worked per week (1–7), and deactivation date. Persist the profile per user and compute: weekly loss (daily * days/week), monthly loss (weekly * 4.3), and accumulated loss (daily * days since deactivation). Display results in cards and show a simple 30/60/90-day projection bar chart.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "MÓDULO 2: CALCULADORA DE PERDAS",
+          "Cadastro de Perfil Financeiro",
+          "Cálculo Automático de Perdas"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Form validates required fields and rejects non-positive daily earnings.",
+        "Profile persists and pre-fills on return visits for the signed-in user.",
+        "Results show weekly, monthly, and accumulated loss with correct calculations.",
+        "Projection chart renders for 30/60/90-day scenarios based on the user’s daily average."
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Generate a downloadable PDF report for the Loss Calculator containing: title, anonymous user identifier (e.g., “Courier #<short id>”), period (deactivation date to today), a table of values (daily/weekly/monthly/accumulated), and the projection chart rendered into the PDF. Include a “Download” and “Share” action (Share uses the browser’s share sheet when available, otherwise downloads).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Geração de Relatório PDF",
+          "Botão \"COMPARTILHAR\""
+        ]
+      },
+      "acceptanceCriteria": [
+        "User can download a PDF that includes the specified sections and values.",
+        "The PDF includes the projection chart image.",
+        "Share action works on supported browsers; fallback behavior downloads the PDF."
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Appeal Generator (no external AI): implement a step-by-step form with: platform selection (iFood/Uber/99/Rappi), stated reason category (documents expired/selfie invalid/low rating/dangerous conduct/fraud suspicion/multiple accounts/other), user’s free-text explanation, and evidence selection (checkbox list from saved evidence). Generate a professional appeal text using predefined templates that vary by platform + reason, and allow the user to edit the generated text before exporting.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "MÓDULO 3: GERADOR AUTOMÁTICO DE RECURSOS (IA JURÍDICA)",
+          "Formulário Inteligente",
+          "Templates por motivo + plataforma"
+        ]
+      },
+      "acceptanceCriteria": [
+        "User can complete a multi-step flow and reach a generated appeal draft.",
+        "Generated text changes based on selected platform and reason category.",
+        "User can edit the appeal text and export it as a .txt download."
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Appeal sending (web-compatible): provide a “Send via Email” action that opens the user’s email client using a mailto: link with pre-filled recipient and subject for each platform. Include the edited appeal text in the email body and present a clear instruction to attach exported evidence ZIP/PDF manually (since web mailto cannot reliably attach files).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Envio Automatizado",
+          "Intent.ACTION_SENDTO com mailto:"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Clicking “Send via Email” opens the default mail client with correct recipient + subject for the chosen platform.",
+        "Email body includes the current edited appeal text.",
+        "UI clearly instructs the user how to attach the downloaded ZIP/PDF manually."
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Collective Data (anonymous reporting, no precise location): after generating an appeal, prompt the user to optionally submit an anonymous report containing only: platform, region/city selection (e.g., Fortaleza, Caucaia, Maracanaú), neighborhood selection from a predefined list, reason category, and date. Never collect name, phone, documents, or photos in the collective dataset. Store collective records in the Motoko backend and expose aggregated statistics.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "MÓDULO 4: COLETIVO DE DADOS (MAPA DE DESATIVAÇÕES)",
+          "Compartilhamento Anônimo",
+          "Dados enviados: plataforma, bairro..., motivo, data",
+          "NUNCA: nome, telefone, foto, documento"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After appeal generation, the app shows an opt-in prompt with “Share” and “Not now” actions and a “Don’t ask again” checkbox.",
+        "If the user shares, only the allowed anonymous fields are stored; no personal identifiers or images are included.",
+        "A public/unauthenticated page can display aggregated counts by platform, reason, and time period."
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "text": "Collective Data visualization (no maps): build a “Collective Insights” page that shows charts/tables for anonymous reports (counts by platform, counts by reason, trend over last 30/90 days) with filters (platform, reason, period, region/city).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "Mapa de Calor (Heatmap)",
+          "Filtros: Por plataforma, por motivo, por período"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Insights page renders at least: platform distribution, reason distribution, and time trend.",
+        "Filters update the displayed aggregates.",
+        "No map UI is shown."
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "text": "Apply a coherent, accessible visual theme suitable for an Android-entry-level audience but implemented on the web: dark-first UI, large touch-friendly controls, plain language, and Portuguese-only content inside the app. Ensure consistent typography, spacing, and component styling across modules (avoid a blue/purple primary palette).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "DESIGN:\n- Tema escuro como padrão\n- Botões grandes e acessíveis\n- Textos simples, sem juridiquês\n- Suporte a português apenas"
+        ]
+      },
+      "acceptanceCriteria": [
+        "App uses a dark theme by default with high-contrast text and large tap targets.",
+        "Portuguese is the only in-app language (labels, instructions, headings).",
+        "Primary color palette is not blue/purple and is applied consistently across pages."
+      ]
+    }
+  ],
+  "constraints": [
+    "Backend must remain a single Motoko actor (no multi-service architecture).",
+    "Do not edit files under frontend immutable paths: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
+    "Do not implement native Android/Kotlin features; deliver as React + Motoko Internet Computer app.",
+    "No third-party auth providers besides Internet Identity.",
+    "No integrations with OpenAI/Gemini or any external LLM services.",
+    "No Firebase (Firestore/Storage/Auth) integration.",
+    "No GPS/geolocation or map/Google Maps features."
+  ],
+  "nonGoals": [
+    "Native Android (Kotlin/CameraX/ML Kit/WorkManager) implementation.",
+    "Automatic face detection / proof-of-life checks.",
+    "Automatic screenshot date extraction from EXIF/MediaStore and on-device OCR.",
+    "Encrypted local file storage using mobile keystore equivalents.",
+    "Email sending with automatic attachments (use mailto and manual attachment instructions instead).",
+    "Heatmap map visualization of reports on a geographic map.",
+    "A future web dashboard for unions beyond the in-app aggregated insights page."
+  ],
+  "imageRequirements": {
+    "required": [
+      "App logo: simplified shield + route line icon, dark-theme friendly (logo-rotas-e-direitos.dim_512x512.png)",
+      "Four module icons in a consistent style (evidence, calculator, appeal, collective) (module-icons-sprite.dim_1024x256.png)"
+    ],
+    "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [
+      "Build an offline-first Internet Computer web app to help delivery couriers document evidence, calculate losses, generate appeal letters, and optionally share anonymous deactivation statistics."
+    ],
+    "goalsToRemove": [],
+    "preferencesToAdd": [
+      "User-facing build request text should be in English; in-app UI content should be Portuguese-only."
+    ],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
+  }
+}

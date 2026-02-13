@@ -1,2 +1,3 @@
-# rotas-e-direitos
-Exported from Caffeine project: ROTAS E DIREITOS
+## ROTAS E DIREITOS
+
+To run app build and run docker image: `docker build -t app . docker run -it --network host app`

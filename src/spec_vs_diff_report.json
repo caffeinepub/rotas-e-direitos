@@ -1,0 +1,142 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-02-13T21:38:39.142Z",
+  "summary": "Diff adds a new Motoko backend actor with data types and CRUD-like endpoints (truncated), plus a React/TanStack Router frontend with pages/routes and components for Evidence Tracker (upload, timeline, detail), Loss Calculator (profile form + projection chart), Appeal Generator (wizard, editor, mailto email send), and Collective Insights (filters + charts) along with an opt-in collective share prompt. Several requirements are only partially evidenced or not evidenced in the provided diff summary (notably work sessions/weather, loss PDF export/share, evidence date-range filtering, and collective report date capture).",
+  "missing_requirements": [
+    {
+      "id": "REQ-3",
+      "requirement": "Evidence timeline supports filtering by type, platform, and date range.",
+      "reason": "The provided EvidenceFilters component only includes type and platform filters; no date range filter UI or query parameters are evidenced in the diff summary.",
+      "evidence": [
+        "frontend/src/components/evidence/EvidenceFilters.tsx"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "requirement": "Export selected evidence items as a single downloadable ZIP containing images plus a manifest JSON of metadata.",
+      "reason": "The UI includes an export action that calls exportEvidenceZip, but the diff summary does not show ZIP creation logic nor any manifest JSON generation; the referenced implementation file is not included in the visible diff.",
+      "evidence": [
+        "frontend/src/components/evidence/EvidenceSelectionToolbar.tsx"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "requirement": "Work Session logging with Start/End controls, periodic weather sampling for a selected city/region, session list, and session detail view showing samples.",
+      "reason": "Although backend types include WorkSession and WeatherSample and a route exists for a session detail page, no Start/End session UI, session list UI, periodic weather fetching logic, or weather sampling pipeline is evidenced in the provided frontend diffs, and backend implementation is truncated before showing these behaviors.",
+      "evidence": [
+        "backend/main.mo",
+        "frontend/src/App.tsx"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "requirement": "Generate a downloadable PDF report for the Loss Calculator including an anonymous identifier, values table, and the projection chart rendered into the PDF, with Download and Share actions (Share sheet fallback to download).",
+      "reason": "Only a LossProjectionChart component is shown; no PDF generation, chart-to-image embedding, anonymous identifier creation, or Share/download actions are evidenced in the diff summary.",
+      "evidence": [
+        "frontend/src/components/loss/LossProjectionChart.tsx"
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "requirement": "Anonymous collective report must include platform, region/city, neighborhood, reason category, and date.",
+      "reason": "CollectiveSharePrompt submits platform/region/neighborhood/reason but no date input/selection is evidenced in the prompt UI; the payload shown to submitReport does not include a date field.",
+      "evidence": [
+        "frontend/src/components/collective/CollectiveSharePrompt.tsx"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "Evidence metadata includes region (regiao) and neighborhood (bairro) fields.",
+      "reason": "REQ-3 specifies evidence metadata fields: type, upload timestamp, notes/tags, and optional platform. Region/neighborhood are not requested for evidence items.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "description": "User profile storage (name/email) endpoints and types.",
+      "reason": "No requirement requests capturing or storing a user profile with name/email.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "description": "Loss profile includes a platform field.",
+      "reason": "REQ-6 only requires daily earnings, days worked per week, and deactivation date; platform is not part of the requested loss profile inputs.",
+      "evidence": [
+        "backend/main.mo"
+      ]
+    },
+    {
+      "description": "Footer includes a promotional link to an external site (caffeine.ai).",
+      "reason": "No requirement requests adding external promotional/analytics footer links; this is additional scope not mentioned in the BuildRequest.",
+      "evidence": [
+        "frontend/src/components/AppLayout.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.68,
+  "changed_files": [
+    "all_files_summary.json",
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/index.css",
+    "frontend/index.html",
+    "frontend/src/App.tsx",
+    "frontend/src/components/AppLayout.tsx",
+    "frontend/src/components/AuthGate.tsx",
+    "frontend/src/components/LoginButton.tsx",
+    "frontend/src/components/ProfileSetupModal.tsx",
+    "frontend/src/components/appeal/AppealEditor.tsx",
+    "frontend/src/components/appeal/AppealWizard.tsx",
+    "frontend/src/components/appeal/EvidencePicker.tsx",
+    "frontend/src/components/appeal/SendViaEmailButton.tsx",
+    "frontend/src/components/collective/CollectiveFilters.tsx",
+    "frontend/src/components/collective/CollectiveSharePrompt.tsx",
+    "frontend/src/components/collective/PlatformDistribution.tsx",
+    "frontend/src/components/collective/ReasonDistribution.tsx",
+    "frontend/src/components/collective/TrendChart.tsx",
+    "frontend/src/components/evidence/EvidenceFilters.tsx",
+    "frontend/src/components/evidence/EvidenceSelectionToolbar.tsx",
+    "frontend/src/components/evidence/EvidenceTimeline.tsx",
+    "frontend/src/components/evidence/EvidenceUploadForm.tsx",
+    "frontend/src/components/loss/LossProfileForm.tsx",
+    "frontend/src/components/loss/LossProjectionChart.tsx",
+    "frontend/src/components/loss/LossReportActions.tsx",
+    "frontend/src/components/loss/LossResultsCards.tsx",
+    "frontend/src/components/sessions/WorkSessionControls.tsx",
+    "frontend/src/components/sessions/WorkSessionsList.tsx",
+    "frontend/src/components/sessions/WorkSessionsSection.tsx",
+    "frontend/src/hooks/useActor.ts",
+    "frontend/src/hooks/useAppeals.ts",
+    "frontend/src/hooks/useCollectiveReports.ts",
+    "frontend/src/hooks/useCurrentUser.ts",
+    "frontend/src/hooks/useEvidence.ts",
+    "frontend/src/hooks/useInternetIdentity.ts",
+    "frontend/src/hooks/useLossProfile.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/hooks/useUserProfile.ts",
+    "frontend/src/hooks/useWorkSessions.ts",
+    "frontend/src/index.css",
+    "frontend/src/lib/collectiveOptions.ts",
+    "frontend/src/lib/evidenceIndexedDb.ts",
+    "frontend/src/lib/lossCalculations.ts",
+    "frontend/src/lib/mailto.ts",
+    "frontend/src/lib/pdfReport.ts",
+    "frontend/src/lib/weatherClient.ts",
+    "frontend/src/lib/zipExport.ts",
+    "frontend/src/main.tsx",
+    "frontend/src/pages/AppealGeneratorPage.tsx",
+    "frontend/src/pages/CollectiveInsightsPage.tsx",
+    "frontend/src/pages/Dashboard.tsx",
+    "frontend/src/pages/EvidenceDetailPage.tsx",
+    "frontend/src/pages/EvidenceTrackerPage.tsx",
+    "frontend/src/pages/LossCalculatorPage.tsx",
+    "frontend/src/pages/PublicOverviewPage.tsx",
+    "frontend/src/pages/WorkSessionDetailPage.tsx",
+    "frontend/src/utils/urlParams.ts",
+    "frontend/tailwind.config.js",
+    "project_state.json"
+  ]
+}

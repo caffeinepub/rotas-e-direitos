@@ -1,0 +1,480 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "ROTAS E DIREITOS MVP (Frontend)",
+  "requirements": [
+    {
+      "id": "REQ-1",
+      "summary": "Create app shell with dashboard navigation to four modules, module landing pages, and helpful empty states.",
+      "acceptanceCriteria": [
+        "A user can open the app and see a home dashboard with 4 module entry points.",
+        "Each module has a dedicated route/page with a clear title and description.",
+        "Each module page shows a helpful empty state when there is no data yet."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "create",
+          "description": "Create the main app shell with routing and a home dashboard containing entry points for: Rastreador de Evidências, Calculadora de Perdas, Gerador de Recursos, and Dados Coletivos. Ensure module routes render dedicated pages and show first-time empty-state guidance (Portuguese-only)."
+        },
+        {
+          "path": "frontend/src/components/AppLayout.tsx",
+          "operation": "create",
+          "description": "Add a shared layout (header + navigation + content container) used across module pages; include large touch-friendly navigation controls suitable for entry-level Android users (web)."
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.tsx",
+          "operation": "create",
+          "description": "Implement the home dashboard UI with 4 module cards/buttons, titles/descriptions, and empty-state guidance for first-time users; wire module icon sprite usage. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/EvidenceTrackerPage.tsx",
+          "operation": "create",
+          "description": "Create Evidence Tracker landing page with title/description, initial empty state, and placeholder sections for upload, timeline, and filters."
+        },
+        {
+          "path": "frontend/src/pages/LossCalculatorPage.tsx",
+          "operation": "create",
+          "description": "Create Loss Calculator landing page with title/description, initial empty state, and placeholder sections for profile form and results."
+        },
+        {
+          "path": "frontend/src/pages/AppealGeneratorPage.tsx",
+          "operation": "create",
+          "description": "Create Appeal Generator landing page with title/description, initial empty state, and placeholder sections for multi-step flow and export."
+        },
+        {
+          "path": "frontend/src/pages/CollectiveInsightsPage.tsx",
+          "operation": "create",
+          "description": "Create Collective Data landing/insights page with title/description and empty state; ensure it is accessible for unauthenticated visitors as required later."
+        },
+        {
+          "path": "frontend/public/assets/generated/logo-rotas-e-direitos.dim_512x512.png",
+          "operation": "create",
+          "description": "Add generated app logo asset file at this exact path so it can be referenced by the UI."
+        },
+        {
+          "path": "frontend/public/assets/generated/module-icons-sprite.dim_1024x256.png",
+          "operation": "create",
+          "description": "Add generated module icons sprite asset file at this exact path so it can be referenced by the UI."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Add Internet Identity authentication, associate UI actions with authenticated principal, and allow a read-only overview for signed-out users.",
+      "acceptanceCriteria": [
+        "Users can sign in and sign out via Internet Identity.",
+        "After signing in, creating/viewing personal records only shows the signed-in user’s data.",
+        "Signed-out users cannot upload evidence or generate/export reports."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AuthGate.tsx",
+          "operation": "create",
+          "description": "Implement an auth gating wrapper that uses the existing Internet Identity hook (do not modify immutable hooks) to require sign-in for create/upload/export actions, while allowing signed-out access to a read-only overview route. Use the authorization component’s frontend guidance for login/logout and cache clearing; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/LoginButton.tsx",
+          "operation": "create",
+          "description": "Add a login/logout button using the existing Internet Identity hook and React Query cache clearing per the authorization component guidance. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/PublicOverviewPage.tsx",
+          "operation": "create",
+          "description": "Create a signed-out read-only overview page describing the four modules (Portuguese-only) and linking to the public collective insights view; no personal data creation allowed."
+        },
+        {
+          "path": "frontend/src/hooks/useCurrentUser.ts",
+          "operation": "create",
+          "description": "Create a small helper hook to derive auth state (authenticated/guest), principal short id for anonymous display, and to coordinate React Query cache clearing on logout (without editing immutable hooks)."
+        },
+        {
+          "path": "frontend/src/hooks/useUserProfile.ts",
+          "operation": "create",
+          "description": "Implement React Query hooks for getCallerUserProfile/saveCallerUserProfile and optional first-login profile setup modal logic per the authorization component guidance (do not display the raw principal; ask for name once). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/ProfileSetupModal.tsx",
+          "operation": "create",
+          "description": "Create a first-login profile setup modal (Portuguese-only) to collect a display name and save it via backend actor; prevent modal flash by following authorization component guidance. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Wire routes for signed-out overview vs authenticated modules, add route-level guards (AuthGate) for actions that create/upload/export, and ensure logout returns user to read-only overview."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Evidence Tracker UI: upload selfie/print images with metadata, timeline view with filters, and item detail preview.",
+      "acceptanceCriteria": [
+        "A signed-in user can upload an image as a Selfie or Print and add notes/tags.",
+        "The timeline lists evidence items newest-first and supports filtering by type and platform.",
+        "Clicking an item opens a detail view with the image preview and stored metadata (timestamp, notes/tags, platform)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/evidence/EvidenceUploadForm.tsx",
+          "operation": "create",
+          "description": "Create an evidence upload form (image file input + type selector selfie/print + optional platform selector + notes/tags input). Enforce sign-in via AuthGate; on submit, store metadata via backend actor call and store image file locally (IndexedDB) keyed by returned evidence id."
+        },
+        {
+          "path": "frontend/src/components/evidence/EvidenceFilters.tsx",
+          "operation": "create",
+          "description": "Add timeline filters UI: type, platform, and date range controls (touch-friendly, Portuguese-only)."
+        },
+        {
+          "path": "frontend/src/components/evidence/EvidenceTimeline.tsx",
+          "operation": "create",
+          "description": "Render a newest-first chronological list of evidence with filter application and basic item cards (type, platform, date, notes snippet)."
+        },
+        {
+          "path": "frontend/src/pages/EvidenceDetailPage.tsx",
+          "operation": "create",
+          "description": "Create an evidence detail page that loads metadata from backend and image blob from IndexedDB, showing preview + timestamp + notes/tags + platform; include graceful offline handling when image is available locally."
+        },
+        {
+          "path": "frontend/src/hooks/useEvidence.ts",
+          "operation": "create",
+          "description": "Add React Query hooks for listing evidence (timeline/filter queries), fetching by id, and creating evidence metadata via backend actor methods; ensure queries are scoped to the current authenticated user by relying on backend ownership rules."
+        },
+        {
+          "path": "frontend/src/pages/EvidenceTrackerPage.tsx",
+          "operation": "modify",
+          "description": "Wire Evidence Upload, Filters, Timeline, and empty states (no data yet, signed-out cannot upload)."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Register the evidence detail route and link timeline items to it."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Offline-first evidence images in IndexedDB and client-side ZIP export of selected evidence plus manifest JSON.",
+      "acceptanceCriteria": [
+        "Evidence metadata persists across reloads via the backend for the signed-in user.",
+        "Uploaded images persist locally in the browser (IndexedDB) and can be viewed offline after first load.",
+        "User can select multiple evidence items and download them as a ZIP (containing images + a manifest JSON of metadata)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/evidenceIndexedDb.ts",
+          "operation": "create",
+          "description": "Implement an IndexedDB helper for storing/retrieving evidence image blobs by evidence id, plus basic housekeeping (e.g., delete local blob if user removes it later, if applicable)."
+        },
+        {
+          "path": "frontend/src/lib/zipExport.ts",
+          "operation": "create",
+          "description": "Implement client-side ZIP creation for selected evidence items: include image files (with stable filenames) and a manifest.json containing metadata pulled from backend + local image availability info."
+        },
+        {
+          "path": "frontend/src/components/evidence/EvidenceSelectionToolbar.tsx",
+          "operation": "create",
+          "description": "Add multi-select controls on the evidence timeline (select all/none, selected count) and a “Baixar ZIP” action that is disabled when signed out. Ensure the UI explains ZIP contents and manual sharing guidance where appropriate."
+        },
+        {
+          "path": "frontend/src/components/evidence/EvidenceTimeline.tsx",
+          "operation": "modify",
+          "description": "Add selection checkboxes per item, integrate with the selection toolbar, and support exporting the current selection to ZIP."
+        },
+        {
+          "path": "frontend/src/pages/EvidenceTrackerPage.tsx",
+          "operation": "modify",
+          "description": "Integrate ZIP export flow into the Evidence Tracker page and ensure signed-out users cannot export."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Implement simplified work session logging with periodic weather sampling for a chosen city and a session detail view.",
+      "acceptanceCriteria": [
+        "User can start and end a work session; sessions appear in a list.",
+        "While a session is active, the app records periodic weather samples based on a chosen city/region.",
+        "A session detail view shows start/end times and a timeline/table of recorded weather samples."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/WorkSessionsPage.tsx",
+          "operation": "create",
+          "description": "Add a Work Sessions view (as a section within an existing required module page, not a new top-level module) that lists sessions, shows empty states, and provides Start/End controls (auth-required)."
+        },
+        {
+          "path": "frontend/src/pages/WorkSessionDetailPage.tsx",
+          "operation": "create",
+          "description": "Create a session detail page showing start/end timestamps and a table/timeline of recorded weather samples (Portuguese-only)."
+        },
+        {
+          "path": "frontend/src/components/sessions/WorkSessionControls.tsx",
+          "operation": "create",
+          "description": "Implement Start Work Session / End Work Session controls with a city selector (no GPS). While active, schedule periodic weather polling and persist samples via backend actor calls; require sign-in to operate."
+        },
+        {
+          "path": "frontend/src/lib/weatherClient.ts",
+          "operation": "create",
+          "description": "Implement a simple weather fetcher for a user-selected city/region using a public weather API (no GPS). Map returned data to the app’s weather condition enum and temperatureC; handle rate limits and offline gracefully."
+        },
+        {
+          "path": "frontend/src/hooks/useWorkSessions.ts",
+          "operation": "create",
+          "description": "Add React Query hooks to create/start sessions, end sessions, fetch session detail, and append weather samples by calling backend actor methods; keep UI responsive with optimistic updates where safe."
+        },
+        {
+          "path": "frontend/src/pages/EvidenceTrackerPage.tsx",
+          "operation": "modify",
+          "description": "Add an in-page section or tab for Work Sessions inside the Evidence Tracker module page (to avoid introducing a 5th top-level module) and link to session detail view."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Register the session detail route and wire navigation from the sessions list."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Loss Calculator profile form with persistence, calculations, and a 30/60/90-day projection bar chart.",
+      "acceptanceCriteria": [
+        "Form validates required fields and rejects non-positive daily earnings.",
+        "Profile persists and pre-fills on return visits for the signed-in user.",
+        "Results show weekly, monthly, and accumulated loss with correct calculations.",
+        "Projection chart renders for 30/60/90-day scenarios based on the user’s daily average."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/loss/LossProfileForm.tsx",
+          "operation": "create",
+          "description": "Create a validated profile form (ganho diário BRL, dias/semana 1–7, data de desativação, plataforma) that saves/loads via backend actor and is gated by authentication."
+        },
+        {
+          "path": "frontend/src/lib/lossCalculations.ts",
+          "operation": "create",
+          "description": "Implement pure functions to compute weekly loss, monthly loss (weekly * 4.3), accumulated loss (daily * days since deactivation), and 30/60/90-day projections."
+        },
+        {
+          "path": "frontend/src/components/loss/LossResultsCards.tsx",
+          "operation": "create",
+          "description": "Render calculation results in large, high-contrast cards (Portuguese-only labels) and handle empty/unset profile state."
+        },
+        {
+          "path": "frontend/src/components/loss/LossProjectionChart.tsx",
+          "operation": "create",
+          "description": "Render a simple 30/60/90-day projection bar chart (no blue/purple primary palette). Use existing UI components where possible; verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useLossProfile.ts",
+          "operation": "create",
+          "description": "Add React Query hooks to fetch and persist the signed-in user’s loss profile and expose derived calculations for the UI."
+        },
+        {
+          "path": "frontend/src/pages/LossCalculatorPage.tsx",
+          "operation": "modify",
+          "description": "Integrate profile form, persisted prefill behavior, result cards, and the projection chart; enforce sign-in for saving and exporting."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Generate downloadable and shareable Loss Calculator PDF report including chart image.",
+      "acceptanceCriteria": [
+        "User can download a PDF that includes the specified sections and values.",
+        "The PDF includes the projection chart image.",
+        "Share action works on supported browsers; fallback behavior downloads the PDF."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/pdfReport.ts",
+          "operation": "create",
+          "description": "Implement client-side PDF generation for Loss Calculator report: title, anonymous identifier (e.g., “Entregador #<id curto>”), period (data desativação até hoje), values table, and embedded projection chart image rendered from the UI chart."
+        },
+        {
+          "path": "frontend/src/components/loss/LossReportActions.tsx",
+          "operation": "create",
+          "description": "Add “Baixar PDF” and “Compartilhar” actions; Share uses the browser share sheet when available, otherwise downloads the PDF. Disable actions when signed out and explain why (Portuguese-only)."
+        },
+        {
+          "path": "frontend/src/pages/LossCalculatorPage.tsx",
+          "operation": "modify",
+          "description": "Wire PDF generation and share actions into the Loss Calculator page, ensuring the chart is included in the generated PDF."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Appeal Generator: multi-step form, template-based draft generation by platform+reason, editing, and .txt export with selected evidence references.",
+      "acceptanceCriteria": [
+        "User can complete a multi-step flow and reach a generated appeal draft.",
+        "Generated text changes based on selected platform and reason category.",
+        "User can edit the appeal text and export it as a .txt download."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/appealTemplates.ts",
+          "operation": "create",
+          "description": "Create predefined appeal templates that vary by platform and reason category (Portuguese-only), producing a professional draft without external AI."
+        },
+        {
+          "path": "frontend/src/components/appeal/AppealWizard.tsx",
+          "operation": "create",
+          "description": "Implement a step-by-step flow: platform, reason category, user explanation, evidence selection (from saved evidence), then generate a draft using templates; enforce sign-in for draft generation and exporting."
+        },
+        {
+          "path": "frontend/src/components/appeal/EvidencePicker.tsx",
+          "operation": "create",
+          "description": "Provide a checkbox list of saved evidence (with type/platform/date) for selection into the appeal; load evidence list via existing evidence hooks."
+        },
+        {
+          "path": "frontend/src/components/appeal/AppealEditor.tsx",
+          "operation": "create",
+          "description": "Show the generated appeal text in an editable editor and allow exporting current text as .txt download (client-side)."
+        },
+        {
+          "path": "frontend/src/hooks/useAppeals.ts",
+          "operation": "create",
+          "description": "Add React Query hooks to generate/save appeals via backend actor methods and to list/fetch the caller’s appeals for later retrieval if needed."
+        },
+        {
+          "path": "frontend/src/pages/AppealGeneratorPage.tsx",
+          "operation": "modify",
+          "description": "Integrate the wizard, editor, export action, and empty states; ensure signed-out users can view the page but cannot generate/export."
+        }
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "summary": "Add “Send via Email” (mailto) action with platform-specific recipient/subject and manual attachment instructions.",
+      "acceptanceCriteria": [
+        "Clicking “Send via Email” opens the default mail client with correct recipient + subject for the chosen platform.",
+        "Email body includes the current edited appeal text.",
+        "UI clearly instructs the user how to attach the downloaded ZIP/PDF manually."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/mailto.ts",
+          "operation": "create",
+          "description": "Implement helper to build a mailto link with platform-specific recipient + subject and the current appeal text in the body (URL-encoded)."
+        },
+        {
+          "path": "frontend/src/components/appeal/SendViaEmailButton.tsx",
+          "operation": "create",
+          "description": "Add a “Enviar por E-mail” action that opens the generated mailto link and displays clear Portuguese-only instructions telling the user to attach the exported evidence ZIP/PDF manually (since web mailto cannot attach files reliably)."
+        },
+        {
+          "path": "frontend/src/components/appeal/AppealEditor.tsx",
+          "operation": "modify",
+          "description": "Wire the Send via Email action to the current edited text and selected platform, and show the attachment instructions near the action."
+        }
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "summary": "After appeal generation, prompt opt-in anonymous collective reporting with strict field limits and “don’t ask again”, and ensure public aggregates are viewable signed-out.",
+      "acceptanceCriteria": [
+        "After appeal generation, the app shows an opt-in prompt with “Share” and “Not now” actions and a “Don’t ask again” checkbox.",
+        "If the user shares, only the allowed anonymous fields are stored; no personal identifiers or images are included.",
+        "A public/unauthenticated page can display aggregated counts by platform, reason, and time period."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/collective/CollectiveSharePrompt.tsx",
+          "operation": "create",
+          "description": "Create an opt-in prompt shown after appeal generation with actions “Compartilhar” and “Agora não” plus a “Não perguntar novamente” checkbox persisted locally (localStorage). Ensure the form collects only: platform, region/city, neighborhood (predefined list), reason category, and date; never request name/phone/documents/photos."
+        },
+        {
+          "path": "frontend/src/lib/collectiveOptions.ts",
+          "operation": "create",
+          "description": "Define allowed regions/cities (Fortaleza/Caucaia/Maracanaú) and a predefined neighborhood list used by the collective reporting UI; keep the dataset strictly limited to allowed fields."
+        },
+        {
+          "path": "frontend/src/hooks/useCollectiveReports.ts",
+          "operation": "create",
+          "description": "Add React Query hooks to submit a collective report (only allowed fields) and to fetch public collective reports/aggregates for display on signed-out pages."
+        },
+        {
+          "path": "frontend/src/pages/PublicOverviewPage.tsx",
+          "operation": "modify",
+          "description": "Display a signed-out friendly summary of collective aggregates (counts by platform/reason/period) using the collective reports hook, without requiring authentication."
+        },
+        {
+          "path": "frontend/src/components/appeal/AppealWizard.tsx",
+          "operation": "modify",
+          "description": "After successful appeal generation, trigger the collective reporting prompt flow and pass through the selected platform and reason category to reduce user effort."
+        }
+      ]
+    },
+    {
+      "id": "REQ-11",
+      "summary": "Build Collective Insights charts/tables with filters and trends (no maps).",
+      "acceptanceCriteria": [
+        "Insights page renders at least: platform distribution, reason distribution, and time trend.",
+        "Filters update the displayed aggregates.",
+        "No map UI is shown."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/collective/CollectiveFilters.tsx",
+          "operation": "create",
+          "description": "Add filters for platform, reason, period (30/90 days), and region/city; ensure touch-friendly controls and Portuguese-only labels."
+        },
+        {
+          "path": "frontend/src/components/collective/PlatformDistribution.tsx",
+          "operation": "create",
+          "description": "Render platform distribution chart/table from anonymous aggregates (no map UI). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/collective/ReasonDistribution.tsx",
+          "operation": "create",
+          "description": "Render reason distribution chart/table from anonymous aggregates (no map UI). Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/collective/TrendChart.tsx",
+          "operation": "create",
+          "description": "Render a time trend over last 30/90 days based on anonymous reports timestamps; no map UI. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/pages/CollectiveInsightsPage.tsx",
+          "operation": "modify",
+          "description": "Wire collective filters + charts/tables, ensure filters recompute displayed aggregates, and confirm no map/geolocation UI is present."
+        },
+        {
+          "path": "frontend/src/App.tsx",
+          "operation": "modify",
+          "description": "Ensure Collective Insights route is accessible when signed out (public) and is linked from the dashboard and overview page."
+        }
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "summary": "Apply an accessible dark-first Portuguese-only visual theme with large controls and non-blue/purple primary palette, consistent across modules.",
+      "acceptanceCriteria": [
+        "App uses a dark theme by default with high-contrast text and large tap targets.",
+        "Portuguese is the only in-app language (labels, instructions, headings).",
+        "Primary color palette is not blue/purple and is applied consistently across pages."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "create",
+          "description": "Create/define global Tailwind base styles and CSS variables for a dark-first theme with high-contrast text, large tap targets, and a non-blue/purple primary palette (e.g., green/amber). Keep typography/spacing consistent."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Adjust theme tokens (CSS variable defaults for primary/accent/chart colors) to align with a non-blue/purple palette and ensure dark mode is default-ready."
+        },
+        {
+          "path": "frontend/index.html",
+          "operation": "modify",
+          "description": "Set document language to Portuguese (pt-BR) and ensure any visible metadata aligns with Portuguese-only in-app content."
+        },
+        {
+          "path": "frontend/src/components/AppLayout.tsx",
+          "operation": "modify",
+          "description": "Apply consistent spacing, typography, and large-button patterns across header/navigation; ensure all labels/headings are Portuguese-only and accessible (contrast and focus states)."
+        }
+      ]
+    }
+  ]
+}

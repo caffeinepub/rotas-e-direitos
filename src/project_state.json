@@ -1,0 +1,143 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 3,
+  "summary": "Aplicativo Android nativo (Kotlin) \"ROTAS E DIREITOS\" (MVP offline-first com sincronização opcional) para ajudar entregadores desativados injustamente, com 4 módulos: rastreador de evidências, calculadora de perdas, gerador automático de recursos (IA) e mapa coletivo de desativações (Firebase + Google Maps).",
+  "architectural_notes": [
+    "Plataforma MVP: Android nativo (Kotlin), público-alvo inicial Fortaleza e Região Metropolitana (expansível).",
+    "Arquitetura: offline-first com sincronização/backup opcional (Firebase Storage/Firestore).",
+    "Padrão recomendado: MVVM + Repository; dados locais via Room (tabelas: evidencias, perfil_financeiro, recursos).",
+    "Dependências/SDKs previstas: CameraX, ML Kit (Face Detection + opcional Text Recognition), WorkManager/Foreground Service, MPAndroidChart, iTextPDF, Google Maps SDK, Firebase Auth/Firestore.",
+    "Segurança/privacidade: armazenamento local criptografado (Android Keystore), envio anônimo para dados coletivos sem PII (sem nome/telefone/foto/documento)."
+  ],
+  "known_issues": [],
+  "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- App logo: simplified shield + route line icon, dark-theme friendly (logo-rotas-e-direitos.dim_512x512.png)\n- Four module icons in a consistent style (evidence, calculator, appeal, collective) (module-icons-sprite.dim_1024x256.png)",
+  "existing_features": [
+    {
+      "id": "feature-create-the-core-app-structure-for-rotas-e-direitos-as-a-web-app-with-four-main-modules-accessible-from-a-home-dashboard-1-evidence-tracker-2-loss-calculator-3-appeal-generator-4-collective-data-include-navigation-module-landing-pages-and-empty-state-guidance-for-first-time-users",
+      "title": "Create the core app structure for “ROTAS E DIREITOS” as a web app with four main modules accessible from a home dashboard: (1) Evidence Tracker, (2) Loss Calculator, (3) Appeal Generator, (4) Collective Data. Include navigation, module landing pages, and empty-state guidance for first-time users.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-authentication-using-internet-identity-and-associate-user-owned-data-to-the-authenticated-principal-unauthenticated-users-may-browse-a-read-only-overview-page-but-must-sign-in-to-create-upload-or-export-any-personal-evidence-records",
+      "title": "Implement authentication using Internet Identity and associate user-owned data to the authenticated principal. Unauthenticated users may browse a read-only overview page but must sign in to create, upload, or export any personal evidence/records.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-evidence-tracker-allow-users-to-add-two-evidence-types-a-daily-selfie-photos-and-b-platform-screenshots-ratings-prints-via-file-upload-for-each-evidence-item-capture-type-selfie-print-upload-timestamp-user-provided-notes-tags-and-optional-platform-ifood-uber-99-rappi-provide-a-chronological-timeline-view-with-filters-type-platform-date-range",
+      "title": "Evidence Tracker: allow users to add two evidence types—(a) daily selfie photos and (b) platform screenshots/ratings prints—via file upload. For each evidence item, capture: type (selfie/print), upload timestamp, user-provided notes/tags, and optional platform (iFood/Uber/99/Rappi). Provide a chronological timeline view with filters (type, platform, date range).",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-evidence-storage-store-evidence-metadata-in-the-motoko-backend-and-store-the-image-files-in-the-frontend-using-browser-storage-indexeddb-for-offline-first-access-with-an-option-to-export-selected-evidence-items-as-a-single-downloadable-zip-file-client-side",
+      "title": "Evidence storage: store evidence metadata in the Motoko backend and store the image files in the frontend using browser storage (IndexedDB) for offline-first access, with an option to export selected evidence items as a single downloadable ZIP file (client-side).",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-work-session-logging-simplified-add-a-start-work-session-end-work-session-control-that-records-session-start-end-timestamps-and-periodically-fetches-weather-conditions-for-the-user-selected-city-region-no-gps-store-weather-samples-timestamp-condition-temperature-city-linked-to-the-session-and-show-them-on-a-session-detail-page",
+      "title": "Work Session logging (simplified): add a “Start Work Session / End Work Session” control that records session start/end timestamps and periodically fetches weather conditions for the user-selected city/region (no GPS). Store weather samples (timestamp, condition, temperature, city) linked to the session, and show them on a session detail page.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-loss-calculator-implement-a-profile-form-that-collects-average-daily-earnings-brl-days-worked-per-week-1-7-and-deactivation-date-persist-the-profile-per-user-and-compute-weekly-loss-daily-days-week-monthly-loss-weekly-4-3-and-accumulated-loss-daily-days-since-deactivation-display-results-in-cards-and-show-a-simple-30-60-90-day-projection-bar-chart",
+      "title": "Loss Calculator: implement a profile form that collects average daily earnings (BRL), days worked per week (1–7), and deactivation date. Persist the profile per user and compute: weekly loss (daily * days/week), monthly loss (weekly * 4.3), and accumulated loss (daily * days since deactivation). Display results in cards and show a simple 30/60/90-day projection bar chart.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-a-downloadable-pdf-report-for-the-loss-calculator-containing-title-anonymous-user-identifier-e-g-courier-short-id-period-deactivation-date-to-today-a-table-of-values-daily-weekly-monthly-accumulated-and-the-projection-chart-rendered-into-the-pdf-include-a-download-and-share-action-share-uses-the-browser-s-share-sheet-when-available-otherwise-downloads",
+      "title": "Generate a downloadable PDF report for the Loss Calculator containing: title, anonymous user identifier (e.g., “Courier #<short id>”), period (deactivation date to today), a table of values (daily/weekly/monthly/accumulated), and the projection chart rendered into the PDF. Include a “Download” and “Share” action (Share uses the browser’s share sheet when available, otherwise downloads).",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-appeal-generator-no-external-ai-implement-a-step-by-step-form-with-platform-selection-ifood-uber-99-rappi-stated-reason-category-documents-expired-selfie-invalid-low-rating-dangerous-conduct-fraud-suspicion-multiple-accounts-other-user-s-free-text-explanation-and-evidence-selection-checkbox-list-from-saved-evidence-generate-a-professional-appeal-text-using-predefined-templates-that-vary-by-platform-reason-and-allow-the-user-to-edit-the-generated-text-before-exporting",
+      "title": "Appeal Generator (no external AI): implement a step-by-step form with: platform selection (iFood/Uber/99/Rappi), stated reason category (documents expired/selfie invalid/low rating/dangerous conduct/fraud suspicion/multiple accounts/other), user’s free-text explanation, and evidence selection (checkbox list from saved evidence). Generate a professional appeal text using predefined templates that vary by platform + reason, and allow the user to edit the generated text before exporting.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-appeal-sending-web-compatible-provide-a-send-via-email-action-that-opens-the-user-s-email-client-using-a-mailto-link-with-pre-filled-recipient-and-subject-for-each-platform-include-the-edited-appeal-text-in-the-email-body-and-present-a-clear-instruction-to-attach-exported-evidence-zip-pdf-manually-since-web-mailto-cannot-reliably-attach-files",
+      "title": "Appeal sending (web-compatible): provide a “Send via Email” action that opens the user’s email client using a mailto: link with pre-filled recipient and subject for each platform. Include the edited appeal text in the email body and present a clear instruction to attach exported evidence ZIP/PDF manually (since web mailto cannot reliably attach files).",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-collective-data-anonymous-reporting-no-precise-location-after-generating-an-appeal-prompt-the-user-to-optionally-submit-an-anonymous-report-containing-only-platform-region-city-selection-e-g-fortaleza-caucaia-maracana-neighborhood-selection-from-a-predefined-list-reason-category-and-date-never-collect-name-phone-documents-or-photos-in-the-collective-dataset-store-collective-records-in-the-motoko-backend-and-expose-aggregated-statistics",
+      "title": "Collective Data (anonymous reporting, no precise location): after generating an appeal, prompt the user to optionally submit an anonymous report containing only: platform, region/city selection (e.g., Fortaleza, Caucaia, Maracanaú), neighborhood selection from a predefined list, reason category, and date. Never collect name, phone, documents, or photos in the collective dataset. Store collective records in the Motoko backend and expose aggregated statistics.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-collective-data-visualization-no-maps-build-a-collective-insights-page-that-shows-charts-tables-for-anonymous-reports-counts-by-platform-counts-by-reason-trend-over-last-30-90-days-with-filters-platform-reason-period-region-city",
+      "title": "Collective Data visualization (no maps): build a “Collective Insights” page that shows charts/tables for anonymous reports (counts by platform, counts by reason, trend over last 30/90 days) with filters (platform, reason, period, region/city).",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-coherent-accessible-visual-theme-suitable-for-an-android-entry-level-audience-but-implemented-on-the-web-dark-first-ui-large-touch-friendly-controls-plain-language-and-portuguese-only-content-inside-the-app-ensure-consistent-typography-spacing-and-component-styling-across-modules-avoid-a-blue-purple-primary-palette",
+      "title": "Apply a coherent, accessible visual theme suitable for an Android-entry-level audience but implemented on the web: dark-first UI, large touch-friendly controls, plain language, and Portuguese-only content inside the app. Ensure consistent typography, spacing, and component styling across modules (avoid a blue/purple primary palette).",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Módulo 1: Rastreador de evidências (selfie diária com prova de vida, linha do tempo de prints/avaliações, registro automático de condições, backup opcional criptografado)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Módulo 2: Calculadora de perdas (perfil financeiro, cálculo semanal/mensal/acumulado, gráfico de projeção, relatório PDF compartilhável)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Módulo 3: Gerador automático de recursos (formulário guiado, geração de texto via Gemini/OpenAI, editor e envio por e-mail com anexos)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Módulo 4: Mapa coletivo de desativações (compartilhamento anônimo, backend Firestore, mapa/heatmap com filtros; painel web futuro)",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "ROTAS E DIREITOS",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

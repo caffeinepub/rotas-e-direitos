@@ -1,0 +1,23 @@
+{
+  "frontend/src/App.tsx": "Main application router setup with proper React component functions (RootComponent, IndexComponent) to satisfy React hooks rules, defining all routes for the ROTAS E DIREITOS app.",
+  "frontend/src/hooks/useUserProfile.ts": "React Query hooks for fetching and saving user profile data with proper actor integration and cache invalidation.",
+  "frontend/src/hooks/useEvidence.ts": "React Query hooks for evidence CRUD operations including create, fetch by ID, get all, and timeline filtering.",
+  "frontend/src/hooks/useWorkSessions.ts": "React Query hooks for work session management including logging sessions, ending sessions, adding weather samples, and fetching session data.",
+  "frontend/src/hooks/useLossProfile.ts": "React Query hooks for fetching and setting loss profile data with proper type conversions for BigInt fields.",
+  "frontend/src/hooks/useAppeals.ts": "React Query hooks for generating appeals, fetching individual appeals, and listing caller's appeals.",
+  "frontend/src/hooks/useCollectiveReports.ts": "React Query hooks for submitting and fetching collective reports with proper actor integration.",
+  "frontend/src/lib/evidenceIndexedDb.ts": "IndexedDB wrapper for storing and retrieving evidence images locally with a React hook for loading images.",
+  "frontend/src/lib/zipExport.ts": "Evidence export utility that downloads manifest JSON and individual image files separately using browser download APIs (no external ZIP library).",
+  "frontend/src/lib/lossCalculations.ts": "Pure calculation functions for computing weekly, monthly, accumulated, and projected losses based on loss profile.",
+  "frontend/src/lib/pdfReport.ts": "Loss report generator that creates a plain text report instead of PDF using browser Blob APIs (no external PDF library).",
+  "frontend/src/lib/weatherClient.ts": "Weather API client for fetching current weather conditions for a given city with fallback handling.",
+  "frontend/src/lib/mailto.ts": "Utility for building mailto links with platform-specific email addresses and subjects for appeal sending.",
+  "frontend/src/lib/collectiveOptions.ts": "Static data for neighborhoods by region used in collective reporting forms.",
+  "frontend/src/hooks/useQueries.ts": "Additional React Query hooks for miscellaneous backend queries like the reviso motivada message.",
+  "frontend/src/index.css": "Global styles with OKLCH-based dark-first color system using green/teal primary palette instead of blue/purple.",
+  "frontend/index.html": "HTML entry point with Portuguese language attribute and proper meta tags.",
+  "frontend/src/components/evidence/EvidenceTimeline.tsx": "Evidence timeline component with filtering, selection, and navigation using useNavigate for type-safe routing to detail pages.",
+  "frontend/src/components/sessions/WorkSessionsList.tsx": "Work sessions list component displaying session history with proper navigation using useNavigate for type-safe routing.",
+  "frontend/src/components/loss/LossReportActions.tsx": "Loss report action buttons for downloading and sharing the text-based report with Web Share API fallback.",
+  "frontend/src/components/evidence/EvidenceSelectionToolbar.tsx": "Toolbar for selecting and exporting multiple evidence items with updated button text reflecting individual file downloads."
+}
