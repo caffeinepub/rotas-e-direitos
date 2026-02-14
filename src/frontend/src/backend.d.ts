@@ -7,6 +7,10 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
+export interface UserProfile {
+    name: string;
+    email?: string;
+}
 export interface PublicPaymentProviderConfig {
     publicKey: string;
     enabled: boolean;
@@ -14,18 +18,18 @@ export interface PublicPaymentProviderConfig {
 export interface PaymentConfig {
     mercadoPago: PaymentProviderConfig;
 }
-export interface LossProfile {
-    dailyEarnings: number;
-    deactivationDate: bigint;
-    platform: Platform;
-    daysPerWeek: bigint;
-}
 export interface TransformationOutput {
     status: bigint;
     body: Uint8Array;
     headers: Array<http_header>;
 }
 export type Time = bigint;
+export interface LossProfile {
+    dailyEarnings: number;
+    deactivationDate: bigint;
+    platform: Platform;
+    daysPerWeek: bigint;
+}
 export interface UserAccessInfo {
     principal: Principal;
     isBlockedByAdmin: boolean;
@@ -95,9 +99,12 @@ export interface WorkSession {
     city: string;
     weatherSamples: Array<WeatherSample>;
 }
-export interface UserProfile {
-    name: string;
-    email?: string;
+export interface Testimonial {
+    id: bigint;
+    status: TestimonialStatus;
+    content: string;
+    submitter: Principal;
+    timestamp: bigint;
 }
 export enum EvidenceType {
     audio = "audio",
@@ -121,6 +128,11 @@ export enum SubscriptionPlan {
     pro_monthly = "pro_monthly",
     pro_annual = "pro_annual"
 }
+export enum TestimonialStatus {
+    pending = "pending",
+    approved = "approved",
+    rejected = "rejected"
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -142,8 +154,10 @@ export interface backendInterface {
     createPaymentPreference(plan: SubscriptionPlan): Promise<PaymentCheckoutResponse>;
     getAllEvidence(): Promise<Array<Evidence>>;
     getAllUserAccessInfo(): Promise<Array<UserAccessInfo>>;
+    getApprovedTestimonials(): Promise<Array<Testimonial>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
+    getPendingTestimonials(): Promise<Array<Testimonial>>;
     getPublicPaymentConfig(): Promise<PublicPaymentConfig>;
     getSubscriptionStatus(): Promise<SubscriptionStatus>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
@@ -154,5 +168,7 @@ export interface backendInterface {
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     setLossProfile(profile: LossProfile): Promise<void>;
     setPaymentConfig(config: PaymentConfig): Promise<void>;
+    submitTestimonial(content: string): Promise<bigint>;
     transform(input: TransformationInput): Promise<TransformationOutput>;
+    updateTestimonialStatus(testimonialId: bigint, newStatus: TestimonialStatus): Promise<void>;
 }

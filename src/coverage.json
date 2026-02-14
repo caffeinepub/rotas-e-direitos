@@ -1,80 +1,40 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T19:51:24.686Z",
+  "generatedAt": "2026-02-14T21:39:00.259Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 2,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Implement a working Mercado Pago checkout flow in the Motoko backend so that creating a payment returns a valid Mercado Pago checkout URL and subsequent status checks can confirm the payment and upgrade the user subscription.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-2",
-        "summary": "Persist Mercado Pago configuration across canister upgrades and fix backend validation messaging so enabling Mercado Pago requires both accessToken and publicKey, with a correct, clear, non-sensitive error.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Update the frontend Mercado Pago hooks and Checkout page to use the real backend payment status + confirmation APIs (remove placeholder logic), handle redirect/return to the app, and ensure the normal checkout flow completes without throwing “not implemented” errors.",
+        "summary": "Update the app typography so the main page (route '/') uses a more modern sans-serif font family across headings, body text, buttons, and navigation, while keeping readability in both light and dark mode.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useMercadoPagoPayment.ts",
-          "frontend/src/pages/CheckoutPage.tsx",
-          "frontend/src/backend.d.ts",
-          "frontend/src/lib/payments/paymentErrorMessages.ts",
-          "frontend/src/types/mercadopago.ts",
-          "frontend/src/utils/urlParams.ts"
+          "frontend/index.html",
+          "frontend/tailwind.config.js",
+          "frontend/src/index.css"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useMercadoPagoPayment.ts",
-          "frontend/src/pages/CheckoutPage.tsx",
-          "frontend/src/backend.d.ts",
-          "frontend/src/lib/payments/paymentErrorMessages.ts"
-        ]
-      },
-      {
-        "id": "REQ-4",
-        "summary": "Ensure the admin Mercado Pago configuration UI reliably enables the gateway for real payments by validating supported key formats, saving successfully, and reflecting the updated enabled/publicKey state from getPublicPaymentConfig after save.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/AdminDashboardPage.tsx",
-          "frontend/src/hooks/useAdminPaymentConfig.ts",
-          "frontend/src/hooks/usePublicPaymentConfig.ts"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/AdminDashboardPage.tsx",
-          "frontend/src/hooks/useAdminPaymentConfig.ts"
+          "frontend/index.html",
+          "frontend/tailwind.config.js",
+          "frontend/src/index.css"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useAdminPaymentConfig.ts",
-    "frontend/src/hooks/useMercadoPagoPayment.ts",
-    "frontend/src/lib/payments/paymentErrorMessages.ts",
-    "frontend/src/pages/AdminDashboardPage.tsx",
-    "frontend/src/pages/CheckoutPage.tsx",
+    "frontend/index.html",
+    "frontend/src/index.css",
+    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

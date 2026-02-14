@@ -1,6 +1,5 @@
 import Runtime "mo:core/Runtime";
 import List "mo:core/List";
-import Order "mo:core/Order";
 import Map "mo:core/Map";
 import Time "mo:core/Time";
 import Nat "mo:core/Nat";
@@ -12,9 +11,6 @@ import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 import OutCall "http-outcalls/outcall";
 
-import Migration "migration";
-
-(with migration = Migration.run)
 actor {
   type EvidenceType = { #selfie; #screenshot; #audio; #video };
   type Platform = { #ifood; #uber; #rappi; #ninetyNine };
@@ -105,12 +101,6 @@ actor {
     createdTime : Int;
   };
 
-  module Evidence {
-    public func compare(e1 : Evidence, e2 : Evidence) : Order.Order {
-      Nat.compare(e1.id, e2.id);
-    };
-  };
-
   public type PublicLossProfile = {
     dailyEarnings : Float;
     daysPerWeek : Nat;
@@ -171,14 +161,24 @@ actor {
     rawResponse : Text;
   };
 
+  public type TestimonialStatus = { #pending; #approved; #rejected };
+
+  public type Testimonial = {
+    id : Nat;
+    submitter : Principal.Principal;
+    content : Text;
+    timestamp : Int;
+    status : TestimonialStatus;
+  };
+
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
-  // Persistent state
   var collectiveReports = List.empty<CollectiveReport>();
   var nextEvidenceId : Nat = 3501;
   var nextSessionId : Nat = 1;
   var nextAppealId : Nat = 1;
+  var nextTestimonialId : Nat = 1;
 
   let evidenceEntries = Map.empty<Nat, Evidence>();
   let lossProfiles = Map.empty<Principal.Principal, LossProfile>();
@@ -188,6 +188,7 @@ actor {
   let subscriptions = Map.empty<Principal.Principal, SubscriptionStatus>();
   let userAccess = Map.empty<Principal.Principal, UserAccessInternalInfo>();
   let pendingPayments = Map.empty<Text, { user : Principal.Principal; plan : SubscriptionPlan; timestamp : Int }>();
+  let testimonials = Map.empty<Nat, Testimonial>();
 
   var paymentConfig : PaymentConfig = {
     mercadoPago = { accessToken = ""; publicKey = ""; enabled = false };
@@ -445,6 +446,60 @@ actor {
         isAdmin or e.owner == caller;
       }
     );
-    filtered.toArray().sort();
+    filtered.toArray();
+  };
+
+  //--------------------------------------------------------------------
+  // Testimonial methods
+  //--------------------------------------------------------------------
+  public shared ({ caller }) func submitTestimonial(content : Text) : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can submit testimonials");
+    };
+
+    let testimonialId = nextTestimonialId;
+    nextTestimonialId += 1;
+
+    let newTestimonial : Testimonial = {
+      id = testimonialId;
+      submitter = caller;
+      content;
+      timestamp = Time.now();
+      status = #pending;
+    };
+
+    testimonials.add(testimonialId, newTestimonial);
+    testimonialId;
+  };
+
+  public query func getApprovedTestimonials() : async [Testimonial] {
+    testimonials.values().filter(
+      func(t) { t.status == #approved }
+    ).toArray();
+  };
+
+  public query ({ caller }) func getPendingTestimonials() : async [Testimonial] {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can view pending testimonials");
+    };
+    testimonials.values().filter(
+      func(t) { t.status == #pending }
+    ).toArray();
+  };
+
+  public shared ({ caller }) func updateTestimonialStatus(testimonialId : Nat, newStatus : TestimonialStatus) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can update testimonial status");
+    };
+
+    switch (testimonials.get(testimonialId)) {
+      case (?testimonial) {
+        let updatedTestimonial = { testimonial with status = newStatus };
+        testimonials.add(testimonialId, updatedTestimonial);
+      };
+      case (null) {
+        Runtime.trap("Testimonial not found");
+      };
+    };
   };
 };

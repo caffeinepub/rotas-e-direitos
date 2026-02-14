@@ -1,107 +1,38 @@
 {
   "kind": "build_request",
-  "title": "Fix Mercado Pago payment gateway bugs blocking checkout flow",
-  "priority": "high",
+  "title": "Update main page typography to a more modern font",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Implement a working Mercado Pago checkout flow in the Motoko backend so that creating a payment returns a valid Mercado Pago checkout URL and subsequent status checks can confirm the payment and upgrade the user subscription.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "recent-messages:user-1"
-        ],
-        "quotes": [
-          "corrija bugs com o mercado pago"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Calling createPaymentPreference(plan) returns a non-null checkoutUrl when Mercado Pago is enabled and credentials are configured.",
-        "Backend performs an HTTP outcall to Mercado Pago to create a preference/checkout session using the stored access token and includes a stable external reference that ties the payment to the caller and selected plan.",
-        "A new backend method exists to fetch payment status from Mercado Pago given a payment identifier (or external reference) and returns a status compatible with the frontend PaymentStatus union (pending/approved/rejected/cancelled/in_process/error).",
-        "A new backend method exists to confirm an approved payment and upgrade the caller subscription, and it verifies approval using Mercado Pago data (not only a client-provided status).",
-        "All backend errors returned via traps are non-sensitive (must not include access token, full credential values, raw Mercado Pago API responses, or headers)."
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Persist Mercado Pago configuration across canister upgrades and fix backend validation messaging so enabling Mercado Pago requires both accessToken and publicKey, with a correct, clear, non-sensitive error.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "recent-messages:user-1"
-        ],
-        "quotes": [
-          "corrija bugs com o mercado pago"
-        ]
-      },
-      "acceptanceCriteria": [
-        "PaymentConfig (including mercadoPago.accessToken, mercadoPago.publicKey, mercadoPago.enabled) persists across upgrades using stable storage + preupgrade/postupgrade (and migration.mo if required by the chosen upgrade approach).",
-        "When mercadoPago.enabled == true and either credential is empty, setPaymentConfig traps with a correct non-sensitive message indicating that both Public Key and Access Token are required.",
-        "getPublicPaymentConfig continues to return only non-sensitive fields (publicKey and enabled), never the access token."
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Update the frontend Mercado Pago hooks and Checkout page to use the real backend payment status + confirmation APIs (remove placeholder logic), handle redirect/return to the app, and ensure the normal checkout flow completes without throwing “not implemented” errors.",
+      "text": "Update the app typography so the main page (route '/') uses a more modern sans-serif font family across headings, body text, buttons, and navigation, while keeping readability in both light and dark mode.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "recent-messages:user-1"
+          "msg-5"
         ],
         "quotes": [
-          "corrija bugs com o mercado pago"
+          "MUDE A FONTE DAS LETRAS DA PAGINA PRINCIPL PAR UMA FONTE MAIS MODERNA"
         ]
       },
       "acceptanceCriteria": [
-        "useCreateMercadoPagoPayment uses the backend createPaymentPreference response and receives a real checkoutUrl in normal conditions; errors are mapped to safe English messages via sanitizePaymentError.",
-        "useCheckPaymentStatus calls the new backend payment-status method and returns a real status (not a hardcoded 'pending').",
-        "useConfirmPaymentAndUpgrade no longer throws 'Payment confirmation not yet implemented in backend' and calls the new backend confirmation/upgrade method.",
-        "Checkout page supports resuming a checkout after returning from Mercado Pago (e.g., by reading a payment identifier from the URL and showing PaymentStatusPanel to poll/refresh status).",
-        "All user-facing text introduced/changed by this work is in English."
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Ensure the admin Mercado Pago configuration UI reliably enables the gateway for real payments by validating supported key formats, saving successfully, and reflecting the updated enabled/publicKey state from getPublicPaymentConfig after save.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "recent-messages:user-1"
-        ],
-        "quotes": [
-          "corrija bugs com o mercado pago"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin can enter Mercado Pago Public Key values in the formats shown in the UI placeholders (e.g., APP_USR-... and TEST-...) without front-end validation incorrectly rejecting them.",
-        "On successful save, the UI re-fetches getPublicPaymentConfig and displays the updated enabled + publicKey state so the admin can confirm configuration is active.",
-        "If saving fails, the admin sees an English, non-sensitive error message (no credential echo)."
+        "A modern font is loaded in the app (via `frontend/index.html` and/or CSS) and applied through Tailwind (e.g., by configuring `fontFamily.sans` in `frontend/tailwind.config.js`).",
+        "The global base styles apply the new font to the `body` (in `frontend/src/index.css`) so text on the main page (`frontend/src/pages/PublicOverviewPage.tsx`) renders in the new font without requiring per-component overrides.",
+        "Key main page typography (e.g., the H1 'ROTAS E DIREITOS' and supporting paragraph) visually reflects the new modern font when previewed in the browser.",
+        "No changes are made to any immutable paths under `frontend/src/components/ui` or authentication hooks listed as immutable."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
-    "Do not edit files under frontend/src/components/ui or the immutable hook paths listed in SYSTEM_CONTEXT.",
-    "Do not expose Mercado Pago access tokens in any public query responses, logs, or user-facing error messages."
+    "Frontend immutable paths must not be edited: `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, `frontend/src/components/ui`.",
+    "Keep backend architecture unchanged (single Motoko actor); no backend changes are required for typography updates."
   ],
   "nonGoals": [
-    "Adding new payment providers besides Mercado Pago.",
-    "Integrating third-party auth providers (only Internet Identity is supported).",
-    "Implementing real-time/WebSocket payment updates (polling/refresh is sufficient)."
+    "Do not redesign layout, colors, or add new features beyond typography changes.",
+    "Do not change existing copy/wording as part of this request."
   ],
   "imageRequirements": {
     "required": [],
     "edits": []
-  },
-  "userProfileUpdate": {
-    "goalsToAdd": [],
-    "goalsToRemove": [],
-    "preferencesToAdd": [],
-    "preferencesToRemove": [],
-    "miscToAdd": [],
-    "miscToRemove": [],
-    "fieldsToSet": {},
-    "fieldsToDelete": []
   }
 }

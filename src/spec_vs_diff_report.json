@@ -1,110 +1,31 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T19:51:24.682Z",
-  "summary": "The diff implements several frontend changes for Mercado Pago (hooks, checkout resume flow, admin config validation/refetch) and introduces a migration module and actor migration wiring. However, the diff summary does not provide clear evidence that the Motoko backend actually performs Mercado Pago HTTP outcalls, exposes the required new status/confirm APIs with the specified semantics, or ensures non-sensitive backend outputs; additionally, many unrelated features appear to have been added/modified (evidence/work sessions/appeals/etc.) outside the requested scope.",
-  "missing_requirements": [
-    {
-      "id": "REQ-1",
-      "requirement": "Backend createPaymentPreference(plan) performs an HTTP outcall to Mercado Pago to create a preference/checkout session using the stored access token and returns a valid non-null checkoutUrl when Mercado Pago is enabled and configured.",
-      "reason": "backend/main.mo is truncated and shows type additions (PaymentCheckoutResponse, PaymentStatus) and imports OutCall, but the diff summary does not show any Mercado Pago HTTP request construction, calling the Mercado Pago API, or assembling/returning a checkout URL.",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-1",
-      "requirement": "Backend includes a stable external reference tying the payment to the caller and selected plan.",
-      "reason": "No evidence in the diff summary of an external_reference being generated/stored/sent to Mercado Pago or persisted for lookup; the shown types include paymentId/status/rawResponse but no external reference mechanism is demonstrated.",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-1",
-      "requirement": "A new backend method exists to fetch payment status from Mercado Pago given a payment identifier (or external reference) and returns a status compatible with the frontend PaymentStatus union (pending/approved/rejected/cancelled/in_process/error).",
-      "reason": "Frontend calls actor.checkPaymentStatus(paymentId), but the diff summary does not show backend implementation or a returned union-compatible status (backend PaymentStatus type shown is {paymentId; status: Text; rawResponse: Text}, not the specified union).",
-      "evidence": [
-        "frontend/src/hooks/useMercadoPagoPayment.ts",
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-1",
-      "requirement": "A new backend method exists to confirm an approved payment and upgrade the caller subscription, verifying approval via Mercado Pago data (not client-provided status).",
-      "reason": "CheckoutPage passes a client-provided status ('approved') into useConfirmPaymentAndUpgrade, but the diff summary does not show the backend confirm/upgrade method implementation or any verification outcall to Mercado Pago.",
-      "evidence": [
-        "frontend/src/pages/CheckoutPage.tsx",
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-1",
-      "requirement": "All backend errors returned via traps are non-sensitive (must not include access token, full credential values, raw Mercado Pago API responses, or headers).",
-      "reason": "The backend PaymentStatus type includes a public 'rawResponse : Text' field, which suggests raw provider responses may be returned to the frontend. The diff summary does not show explicit sanitization/redaction of traps/responses.",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "requirement": "When mercadoPago.enabled == true and either credential is empty, setPaymentConfig traps with a correct non-sensitive message indicating that both Public Key and Access Token are required.",
-      "reason": "Frontend adds validation and safe messaging, but the diff summary does not show the backend setPaymentConfig trap/message behavior. Backend main.mo is truncated and does not show setPaymentConfig implementation.",
-      "evidence": [
-        "frontend/src/hooks/useAdminPaymentConfig.ts",
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "requirement": "getPublicPaymentConfig continues to return only non-sensitive fields (publicKey and enabled), never the access token.",
-      "reason": "The diff summary does not show backend getPublicPaymentConfig implementation. While types for PublicPaymentConfig exist, no method body is visible to confirm it never returns accessToken.",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "requirement": "Checkout page supports resuming a checkout after returning from Mercado Pago by reading a payment identifier from the URL and showing PaymentStatusPanel to poll/refresh status.",
-      "reason": "The diff shows reading payment_id from URL and setting paymentData, but the truncated CheckoutPage section does not confirm that PaymentStatusPanel is actually rendered/used in the resume flow, nor that polling/refresh UI is wired end-to-end.",
-      "evidence": [
-        "frontend/src/pages/CheckoutPage.tsx"
-      ]
-    }
-  ],
+  "generatedAt": "2026-02-14T21:39:00.256Z",
+  "summary": "REQ-1 typography update appears implemented by loading Inter in frontend/index.html, configuring Tailwind fontFamily.sans, and applying font-sans to the global body styles in frontend/src/index.css. No evidence in the diff indicates edits to the listed immutable frontend paths. However, the diff also includes unrelated metadata/state changes not requested in the BuildRequest.",
+  "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Large migration module defining many unrelated domain types (evidence, weather, work sessions, appeals, collective reports) beyond Mercado Pago payment config persistence.",
-      "reason": "BuildRequest focuses on Mercado Pago checkout + config persistence; the added migration.mo contains extensive unrelated data model definitions, suggesting scope creep not requested.",
+      "description": "Project tracking/state updates unrelated to the typography request (adding new_feature_requests entries AR-1/AR-2 marked pending).",
+      "reason": "BuildRequest only asks for typography changes; it does not request modifying project_state.json or adding feature-request tracking entries.",
       "evidence": [
-        "backend/migration.mo"
+        "project_state.json"
       ]
     },
     {
-      "description": "Numerous unrelated frontend features and stubs (evidence CRUD/indexeddb/export, work sessions, loss profiles, appeals, collective reports, weather client, PDF report, new routes/pages) not requested as part of Mercado Pago fixes.",
-      "reason": "These items are outside the stated goals/non-goals and not part of REQ-1..REQ-4, yet appear in the diff summary as modified/added functionality.",
+      "description": "Updates to a repository summary/metadata file describing many new routes/hooks/features (e.g., blocked account help pages, evidence audio/video support, stubbed backend hooks), which are outside the typography-only scope.",
+      "reason": "Non-goals explicitly say not to add new features beyond typography changes; while this file is a summary, its update is not requested and documents substantial unrelated feature work.",
       "evidence": [
         "frontend-file-summaries.txt"
       ]
-    },
-    {
-      "description": "Backend PaymentStatus includes a 'rawResponse' field that appears to expose raw provider responses to the frontend.",
-      "reason": "REQ-1 emphasizes non-sensitive errors and does not request returning raw Mercado Pago API responses; exposing raw responses is an unrequested and potentially sensitive feature.",
-      "evidence": [
-        "backend/main.mo"
-      ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.78,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/hooks/useAdminPaymentConfig.ts",
-    "frontend/src/hooks/useMercadoPagoPayment.ts",
-    "frontend/src/lib/payments/paymentErrorMessages.ts",
-    "frontend/src/pages/AdminDashboardPage.tsx",
-    "frontend/src/pages/CheckoutPage.tsx",
+    "frontend/index.html",
+    "frontend/src/index.css",
+    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }

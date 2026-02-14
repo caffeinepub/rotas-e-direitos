@@ -3,24 +3,14 @@
   "projectStateVersion": 3,
   "summary": "New project",
   "architectural_notes": [],
-  "known_issues": [
-    "Bugs/errors in Mercado Pago payment gateway are preventing the normal payment flow (checkout)."
-  ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-frontend-mercado-pago-hooks-and-checkout-page-to-use-the-real-backend-payment-status-confirmation-apis-remove-placeholder-logic-handle-redirect-return-to-the-app-and-ensure-the-normal-checkout-flow-completes-without-throwing-not-implemented-errors",
-      "title": "Update the frontend Mercado Pago hooks and Checkout page to use the real backend payment status + confirmation APIs (remove placeholder logic), handle redirect/return to the app, and ensure the normal checkout flow completes without throwing “not implemented” errors.",
+      "id": "feature-update-the-app-typography-so-the-main-page-route-uses-a-more-modern-sans-serif-font-family-across-headings-body-text-buttons-and-navigation-while-keeping-readability-in-both-light-and-dark-mode",
+      "title": "Update the app typography so the main page (route '/') uses a more modern sans-serif font family across headings, body text, buttons, and navigation, while keeping readability in both light and dark mode.",
       "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-ensure-the-admin-mercado-pago-configuration-ui-reliably-enables-the-gateway-for-real-payments-by-validating-supported-key-formats-saving-successfully-and-reflecting-the-updated-enabled-publickey-state-from-getpublicpaymentconfig-after-save",
-      "title": "Ensure the admin Mercado Pago configuration UI reliably enables the gateway for real payments by validating supported key formats, saving successfully, and reflecting the updated enabled/publicKey state from getPublicPaymentConfig after save.",
-      "reqIds": [
-        "REQ-4"
+        "REQ-1"
       ],
       "version": 1
     }
@@ -28,22 +18,13 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Implement a working Mercado Pago checkout flow in the Motoko backend so that creating a payment returns a valid Mercado Pago checkout URL and subsequent status checks can confirm the payment and upgrade the user subscription.",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Persist Mercado Pago configuration across canister upgrades and fix backend validation messaging so enabling Mercado Pago requires both accessToken and publicKey, with a correct, clear, non-sensitive error.",
-      "reqIds": [
-        "REQ-2"
-      ],
+      "summary": "Change the main page typography to a more modern font",
+      "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Fix Mercado Pago payment gateway bugs blocking checkout flow",
+  "gameProjectType": "none",
+  "projectName": "Update main page typography to a more modern font",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

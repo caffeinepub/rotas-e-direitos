@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Settings, TrendingUp, Loader2, Save, AlertCircle, CheckCircle2, Ban, Unlock, ShieldAlert, Info } from 'lucide-react';
+import { Users, Settings, TrendingUp, Loader2, Save, AlertCircle, CheckCircle2, Ban, Unlock, ShieldAlert, Info, MessageSquare } from 'lucide-react';
 import { useGetAllUserAccessInfo, useBlockUser, useUnblockUser } from '../hooks/useAdmin';
 import { useUpdatePaymentConfig } from '../hooks/useAdminPaymentConfig';
 import { usePublicPaymentConfig } from '../hooks/usePublicPaymentConfig';
@@ -17,6 +17,7 @@ import { PaymentConfig } from '../backend';
 import { toast } from 'sonner';
 import { Principal } from '@dfinity/principal';
 import MercadoPagoSetupGuide from '../components/admin/MercadoPagoSetupGuide';
+import AdminTestimonialsModerationPanel from '../components/admin/AdminTestimonialsModerationPanel';
 import AdminGate from '../components/AdminGate';
 
 export default function AdminDashboardPage() {
@@ -180,6 +181,10 @@ export default function AdminDashboardPage() {
               <Users className="h-4 w-4 mr-2" />
               Users
             </TabsTrigger>
+            <TabsTrigger value="testimonials">
+              <MessageSquare className="h-4 w-4 mr-2" />
+              Testimonials
+            </TabsTrigger>
             <TabsTrigger value="payments">
               <Settings className="h-4 w-4 mr-2" />
               Payment Settings
@@ -263,13 +268,19 @@ export default function AdminDashboardPage() {
             </Card>
           </TabsContent>
 
+          <TabsContent value="testimonials" className="space-y-4">
+            <AdminTestimonialsModerationPanel />
+          </TabsContent>
+
           <TabsContent value="payments" className="space-y-4">
             <MercadoPagoSetupGuide />
 
             <Card>
               <CardHeader>
                 <CardTitle>Mercado Pago Configuration</CardTitle>
-                <CardDescription>Configure Mercado Pago payment provider credentials</CardDescription>
+                <CardDescription>
+                  Configure your Mercado Pago payment integration
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {configLoading ? (
@@ -278,49 +289,16 @@ export default function AdminDashboardPage() {
                   </div>
                 ) : (
                   <>
-                    {/* Current Status */}
-                    <Alert>
-                      <Info className="h-4 w-4" />
-                      <AlertDescription>
-                        <div className="space-y-2">
-                          <p className="font-medium">Current Status:</p>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm">Enabled:</span>
-                            <Badge variant={localConfig.mercadoPago.enabled ? 'default' : 'outline'}>
-                              {localConfig.mercadoPago.enabled ? 'Yes' : 'No'}
-                            </Badge>
-                          </div>
-                          {localConfig.mercadoPago.publicKey && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm">Public Key:</span>
-                              <code className="text-xs bg-muted px-2 py-1 rounded">
-                                {localConfig.mercadoPago.publicKey.substring(0, 20)}...
-                              </code>
-                            </div>
-                          )}
-                        </div>
-                      </AlertDescription>
-                    </Alert>
-
-                    {saveSuccess && (
-                      <Alert className="border-green-600">
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        <AlertDescription className="text-green-600">
-                          Configuration saved successfully! The payment system is now updated.
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <Label htmlFor="mercadopago-enabled">Enable Mercado Pago</Label>
+                          <Label htmlFor="mp-enabled">Enable Mercado Pago</Label>
                           <p className="text-sm text-muted-foreground">
                             Allow users to pay via Mercado Pago
                           </p>
                         </div>
                         <Switch
-                          id="mercadopago-enabled"
+                          id="mp-enabled"
                           checked={localConfig.mercadoPago.enabled}
                           onCheckedChange={(checked) =>
                             setLocalConfig({
@@ -334,9 +312,9 @@ export default function AdminDashboardPage() {
                       <Separator />
 
                       <div className="space-y-2">
-                        <Label htmlFor="mercadopago-public-key">Public Key</Label>
+                        <Label htmlFor="mp-public-key">Public Key</Label>
                         <Input
-                          id="mercadopago-public-key"
+                          id="mp-public-key"
                           type="text"
                           placeholder="TEST-... or APP_USR-..."
                           value={localConfig.mercadoPago.publicKey}
@@ -353,11 +331,11 @@ export default function AdminDashboardPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label htmlFor="mercadopago-access-token">Access Token</Label>
+                        <Label htmlFor="mp-access-token">Access Token</Label>
                         <Input
-                          id="mercadopago-access-token"
+                          id="mp-access-token"
                           type="password"
-                          placeholder="Enter Access Token"
+                          placeholder="Enter your Access Token"
                           value={localConfig.mercadoPago.accessToken}
                           onChange={(e) =>
                             setLocalConfig({
@@ -366,37 +344,41 @@ export default function AdminDashboardPage() {
                             })
                           }
                         />
-                        <p className="text-xs text-muted-foreground">
-                          Your Mercado Pago Access Token (kept secure on backend)
-                        </p>
+                        <Alert>
+                          <Info className="h-4 w-4" />
+                          <AlertDescription className="text-xs">
+                            For security, the Access Token is never displayed after saving. Enter it again only when updating.
+                          </AlertDescription>
+                        </Alert>
                       </div>
+                    </div>
 
-                      <Alert>
-                        <AlertCircle className="h-4 w-4" />
-                        <AlertDescription className="text-sm">
-                          For security, the Access Token is cleared from this form after saving. 
-                          You only need to re-enter it when updating credentials.
+                    {saveSuccess && (
+                      <Alert className="border-green-600 bg-green-50 dark:bg-green-950">
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <AlertDescription className="text-green-800 dark:text-green-200">
+                          Configuration saved successfully
                         </AlertDescription>
                       </Alert>
+                    )}
 
-                      <Button
-                        onClick={handleSaveConfig}
-                        disabled={isSaving || updateConfig.isPending}
-                        className="w-full"
-                      >
-                        {isSaving || updateConfig.isPending ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="h-4 w-4 mr-2" />
-                            Save Configuration
-                          </>
-                        )}
-                      </Button>
-                    </div>
+                    <Button
+                      onClick={handleSaveConfig}
+                      disabled={isSaving}
+                      className="w-full"
+                    >
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="h-4 w-4 mr-2" />
+                          Save Configuration
+                        </>
+                      )}
+                    </Button>
                   </>
                 )}
               </CardContent>

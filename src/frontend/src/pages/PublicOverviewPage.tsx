@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { FileText, Calculator, MessageSquare, BarChart3, Shield, Lock } from 'lucide-react';
 import TrustBadges from '../components/trust/TrustBadges';
 import MarketingBanner from '../components/marketing/MarketingBanner';
+import TestimonialsSection from '../components/testimonials/TestimonialsSection';
 
 export default function PublicOverviewPage() {
   const navigate = useNavigate();
@@ -50,7 +51,7 @@ export default function PublicOverviewPage() {
         </div>
       </div>
 
-      {/* Marketing Banner */}
+      {/* Marketing Banner - Now Dynamic and Clickable */}
       <MarketingBanner />
 
       <div className="grid gap-8 md:grid-cols-2">
@@ -73,6 +74,9 @@ export default function PublicOverviewPage() {
           );
         })}
       </div>
+
+      {/* User Testimonials Section */}
+      <TestimonialsSection />
 
       <Card className="border-primary/50">
         <CardHeader className="text-center">

@@ -71,6 +71,16 @@ export interface SubscriptionStatus {
   'endTime' : [] | [bigint],
   'currentPlan' : SubscriptionPlan,
 }
+export interface Testimonial {
+  'id' : bigint,
+  'status' : TestimonialStatus,
+  'content' : string,
+  'submitter' : Principal,
+  'timestamp' : bigint,
+}
+export type TestimonialStatus = { 'pending' : null } |
+  { 'approved' : null } |
+  { 'rejected' : null };
 export type Time = bigint;
 export interface TransformationInput {
   'context' : Uint8Array,
@@ -132,8 +142,10 @@ export interface _SERVICE {
   >,
   'getAllEvidence' : ActorMethod<[], Array<Evidence>>,
   'getAllUserAccessInfo' : ActorMethod<[], Array<UserAccessInfo>>,
+  'getApprovedTestimonials' : ActorMethod<[], Array<Testimonial>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getPendingTestimonials' : ActorMethod<[], Array<Testimonial>>,
   'getPublicPaymentConfig' : ActorMethod<[], PublicPaymentConfig>,
   'getSubscriptionStatus' : ActorMethod<[], SubscriptionStatus>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
@@ -142,7 +154,12 @@ export interface _SERVICE {
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setLossProfile' : ActorMethod<[LossProfile], undefined>,
   'setPaymentConfig' : ActorMethod<[PaymentConfig], undefined>,
+  'submitTestimonial' : ActorMethod<[string], bigint>,
   'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
+  'updateTestimonialStatus' : ActorMethod<
+    [bigint, TestimonialStatus],
+    undefined
+  >,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

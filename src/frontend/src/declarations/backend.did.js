@@ -73,6 +73,18 @@ export const UserAccessInfo = IDL.Record({
   'subscriptionStatus' : SubscriptionStatus,
   'profile' : IDL.Opt(UserProfile),
 });
+export const TestimonialStatus = IDL.Variant({
+  'pending' : IDL.Null,
+  'approved' : IDL.Null,
+  'rejected' : IDL.Null,
+});
+export const Testimonial = IDL.Record({
+  'id' : IDL.Nat,
+  'status' : TestimonialStatus,
+  'content' : IDL.Text,
+  'submitter' : Principal,
+  'timestamp' : IDL.Int,
+});
 export const PublicPaymentProviderConfig = IDL.Record({
   'publicKey' : IDL.Text,
   'enabled' : IDL.Bool,
@@ -153,8 +165,10 @@ export const idlService = IDL.Service({
     ),
   'getAllEvidence' : IDL.Func([], [IDL.Vec(Evidence)], ['query']),
   'getAllUserAccessInfo' : IDL.Func([], [IDL.Vec(UserAccessInfo)], ['query']),
+  'getApprovedTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getPendingTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
   'getPublicPaymentConfig' : IDL.Func([], [PublicPaymentConfig], ['query']),
   'getSubscriptionStatus' : IDL.Func([], [SubscriptionStatus], ['query']),
   'getUserProfile' : IDL.Func([Principal], [IDL.Opt(UserProfile)], ['query']),
@@ -167,11 +181,13 @@ export const idlService = IDL.Service({
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'setLossProfile' : IDL.Func([LossProfile], [], []),
   'setPaymentConfig' : IDL.Func([PaymentConfig], [], []),
+  'submitTestimonial' : IDL.Func([IDL.Text], [IDL.Nat], []),
   'transform' : IDL.Func(
       [TransformationInput],
       [TransformationOutput],
       ['query'],
     ),
+  'updateTestimonialStatus' : IDL.Func([IDL.Nat, TestimonialStatus], [], []),
 });
 
 export const idlInitArgs = [];
@@ -241,6 +257,18 @@ export const idlFactory = ({ IDL }) => {
     'isBlockedByAdmin' : IDL.Bool,
     'subscriptionStatus' : SubscriptionStatus,
     'profile' : IDL.Opt(UserProfile),
+  });
+  const TestimonialStatus = IDL.Variant({
+    'pending' : IDL.Null,
+    'approved' : IDL.Null,
+    'rejected' : IDL.Null,
+  });
+  const Testimonial = IDL.Record({
+    'id' : IDL.Nat,
+    'status' : TestimonialStatus,
+    'content' : IDL.Text,
+    'submitter' : Principal,
+    'timestamp' : IDL.Int,
   });
   const PublicPaymentProviderConfig = IDL.Record({
     'publicKey' : IDL.Text,
@@ -317,8 +345,10 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getAllEvidence' : IDL.Func([], [IDL.Vec(Evidence)], ['query']),
     'getAllUserAccessInfo' : IDL.Func([], [IDL.Vec(UserAccessInfo)], ['query']),
+    'getApprovedTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getPendingTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
     'getPublicPaymentConfig' : IDL.Func([], [PublicPaymentConfig], ['query']),
     'getSubscriptionStatus' : IDL.Func([], [SubscriptionStatus], ['query']),
     'getUserProfile' : IDL.Func([Principal], [IDL.Opt(UserProfile)], ['query']),
@@ -331,11 +361,13 @@ export const idlFactory = ({ IDL }) => {
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'setLossProfile' : IDL.Func([LossProfile], [], []),
     'setPaymentConfig' : IDL.Func([PaymentConfig], [], []),
+    'submitTestimonial' : IDL.Func([IDL.Text], [IDL.Nat], []),
     'transform' : IDL.Func(
         [TransformationInput],
         [TransformationOutput],
         ['query'],
       ),
+    'updateTestimonialStatus' : IDL.Func([IDL.Nat, TestimonialStatus], [], []),
   });
 };
 

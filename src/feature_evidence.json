@@ -2,12 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-frontend-mercado-pago-hooks-and-checkout-page-to-use-the-real-backend-payment-status-confirmation-apis-remove-placeholder-logic-handle-redirect-return-to-the-app-and-ensure-the-normal-checkout-flow-completes-without-throwing-not-implemented-errors",
-      "featureTitle": "Update the frontend Mercado Pago hooks and Checkout page to use the real backend payment status + confirmation APIs (remove placeholder logic), handle redirect/return to the app, and ensure the normal checkout flow completes without throwing “not implemented” errors.",
+      "featureId": "feature-update-the-app-typography-so-the-main-page-route-uses-a-more-modern-sans-serif-font-family-across-headings-body-text-buttons-and-navigation-while-keeping-readability-in-both-light-and-dark-mode",
+      "featureTitle": "Update the app typography so the main page (route '/') uses a more modern sans-serif font family across headings, body text, buttons, and navigation, while keeping readability in both light and dark mode.",
       "files": [
-        "frontend/src/hooks/useMercadoPagoPayment.ts",
-        "frontend/src/lib/payments/paymentErrorMessages.ts",
-        "frontend/src/pages/CheckoutPage.tsx"
+        "frontend/index.html",
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
       ],
       "components": [
         "authorization@4.0.0",
@@ -20,29 +20,7 @@
         "http-outcalls@3.0.0"
       ],
       "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-ensure-the-admin-mercado-pago-configuration-ui-reliably-enables-the-gateway-for-real-payments-by-validating-supported-key-formats-saving-successfully-and-reflecting-the-updated-enabled-publickey-state-from-getpublicpaymentconfig-after-save",
-      "featureTitle": "Ensure the admin Mercado Pago configuration UI reliably enables the gateway for real payments by validating supported key formats, saving successfully, and reflecting the updated enabled/publicKey state from getPublicPaymentConfig after save.",
-      "files": [
-        "frontend/src/hooks/useAdminPaymentConfig.ts",
-        "frontend/src/pages/AdminDashboardPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "camera@1.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
+        "REQ-1"
       ],
       "confidence": "high"
     }
