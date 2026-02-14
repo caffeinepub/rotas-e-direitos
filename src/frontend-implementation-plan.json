@@ -1,58 +1,65 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Admin dashboard (frontend) for tracking subscriptions and blocking/unblocking users",
+  "title": "Responsive gig-driver marketing banner on public landing page",
   "requirements": [
     {
-      "id": "REQ-25",
-      "summary": "Create an admin-only Admin Dashboard page to list user access info, search/filter users, and block/unblock with confirmation.",
+      "id": "REQ-27",
+      "summary": "Create a reusable responsive MarketingBanner component highlighting existing app services/benefits for gig drivers, explicitly mentioning Uber, 99, iFood, and InDriver.",
       "acceptanceCriteria": [
-        "The admin dashboard route renders only for admin users; non-admins see an access denied screen or are redirected away.",
-        "The page loads user summaries from the backend and renders them in a readable, mobile-friendly table/list.",
-        "An admin can block/unblock a user from the UI; after the action, the list refreshes and shows the updated blocked state.",
-        "The page includes a search/filter control that narrows the visible list without breaking the full list fetch."
+        "A new React component exists for the marketing banner (reusable; not hardcoded only inside a single page).",
+        "The banner layout is responsive: stacks cleanly on small screens and uses a multi-column layout on larger screens.",
+        "The banner content visually includes the target platforms (Uber, 99, iFood, InDriver) via text and/or badges/chips/icons.",
+        "The banner highlights at least 3 distinct benefits/services already provided by the app (e.g., evidence tracking, loss calculation, appeal generation, collective insights, privacy/security), without introducing new product features.",
+        "No changes are required to backend canisters for this banner."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useAdmin.ts",
+          "path": "frontend/src/components/marketing/MarketingBanner.tsx",
           "operation": "create",
-          "description": "Add React Query hooks for admin capabilities: fetching user access summaries (getAllUserAccessInfo), and mutations for blockUser/unblockUser. Ensure mutations invalidate/refetch the user list query. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useIsAdmin.ts",
-          "operation": "create",
-          "description": "Add a small hook that queries the backend capability isCallerAdmin (via useActor + React Query) and exposes { isAdmin, isLoading, error } for gating admin-only UI. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/AdminGate.tsx",
-          "operation": "create",
-          "description": "Create an admin-only gate component that composes the existing AuthGate and the new useIsAdmin hook; show a clear access-denied UI for authenticated non-admins and a loading state while role is being resolved. Use existing shadcn/ui components (e.g., Card/Alert/Button) without editing immutable ui paths. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/pages/AdminDashboardPage.tsx",
-          "operation": "create",
-          "description": "Implement the Admin Dashboard UI: load user list via useAdmin hook, render a mobile-friendly list/table (e.g., cards on small screens + table on larger screens), show principal + optional profile (name/email) + subscription plan + start/end times + entitlement-like status + blocked state; provide search/filter by principal/name/email; add block/unblock actions with confirmation (use existing shadcn/ui AlertDialog/Dialog components) and refresh list after changes. Verify the component's usage instructions before implementing."
+          "description": "Add a reusable MarketingBanner React component using Tailwind for a responsive (stack-on-mobile, multi-column-on-desktop) layout; include platform callouts (Uber, 99, iFood, InDriver, and optional “e outros”) and at least 3 existing benefits (e.g., Evidências, Calculadora de Perdas, Recursos, Dados Coletivos, Segurança/Privacidade). Reference the static hero images at frontend/public/assets/generated/banner-hero.dim_1600x600.png and frontend/public/assets/generated/banner-hero-mobile.dim_900x900.png. Ensure dark-first theme consistency and accessible contrast. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-26",
-      "summary": "Wire the Admin Dashboard into TanStack Router and show the Admin navigation entry only for admins.",
+      "id": "REQ-28",
+      "summary": "Integrate the MarketingBanner into the unauthenticated PublicOverviewPage near the top while preserving existing CTAs and structure.",
       "acceptanceCriteria": [
-        "An “Admin” (or equivalent) navigation item appears only for admin users and routes to the Admin Dashboard page.",
-        "No navigation entry is shown to non-admin users.",
-        "Routing is added via the existing TanStack Router setup (frontend/src/App.tsx) without modifying immutable frontend paths."
+        "When not authenticated, the home route renders PublicOverviewPage and the new banner is visible without scrolling excessively (near the top section).",
+        "Existing navigation actions (e.g., view plans, learn more) still work as before.",
+        "The page remains visually consistent with the current dark-first theme and Tailwind token usage."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/pages/PublicOverviewPage.tsx",
           "operation": "modify",
-          "description": "Register a new TanStack Router route for the Admin Dashboard page and ensure it is wired into the existing routeTree. Wrap the route component with the new AdminGate to enforce admin-only access at the route level. Verify the component's usage instructions before implementing."
+          "description": "Import and render the new MarketingBanner prominently near the top of the PublicOverviewPage content (before/around the current hero section) without removing or breaking existing headings, CTAs (Ver Planos / Saiba Mais), and existing sections/cards. Keep styling consistent with the current Tailwind token usage and dark-first theme. Verify the component's usage instructions before implementing."
+        }
+      ]
+    },
+    {
+      "id": "REQ-29",
+      "summary": "Add required banner image assets under frontend/public/assets/generated and ensure the banner component references them as static public assets.",
+      "acceptanceCriteria": [
+        "Banner image assets are present under frontend/public/assets/generated and are used by the banner component.",
+        "The banner remains readable and accessible with sufficient contrast on both light/dark backgrounds used by the app theme.",
+        "Images load correctly in the deployed build (no broken links; correct public paths)."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/public/assets/generated/banner-hero.dim_1600x600.png",
+          "operation": "create",
+          "description": "Add the generated wide hero/banner illustration asset as a static file to be used by MarketingBanner (no backend image serving)."
         },
         {
-          "path": "frontend/src/components/AppLayout.tsx",
+          "path": "frontend/public/assets/generated/banner-hero-mobile.dim_900x900.png",
+          "operation": "create",
+          "description": "Add the generated square/vertical mobile hero illustration asset as a static file to be used by MarketingBanner (no backend image serving)."
+        },
+        {
+          "path": "frontend/src/components/marketing/MarketingBanner.tsx",
           "operation": "modify",
-          "description": "Integrate an “Admin” navigation item (desktop + mobile menu) that is visible only when the authenticated user is an admin (use the new useIsAdmin hook). Ensure non-admin users never see the entry, and the item routes to the Admin Dashboard route. Verify the component's usage instructions before implementing."
+          "description": "Verify the component references the exact static asset paths frontend/public/assets/generated/banner-hero.dim_1600x600.png and frontend/public/assets/generated/banner-hero-mobile.dim_900x900.png, uses responsive image presentation (desktop vs mobile), and maintains accessible contrast/readability across theme backgrounds. Verify the component's usage instructions before implementing."
         }
       ]
     }

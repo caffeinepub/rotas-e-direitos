@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 9,
+  "projectStateVersion": 11,
   "summary": "Aplicativo “ROTAS E DIREITOS” com modelo freemium/assinatura e módulo de pagamentos (PIX QR, cartão até 12x, boleto), dashboard de planos/vantagens e acessos rápidos, selos/políticas; incluir também um dashboard administrativo para rastrear status de assinatura por usuário e permitir bloquear/liberar acessos.",
   "architectural_notes": [
     "Plataforma MVP: Android nativo (Kotlin), público-alvo inicial Fortaleza e Região Metropolitana (expansível).",
@@ -14,6 +14,7 @@
   ],
   "known_issues": [],
   "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Wide responsive hero/banner illustration with delivery rider silhouette and abstract city/road shapes, dark-friendly palette (banner-hero.dim_1600x600.png)\n- Square/vertical banner illustration variant optimized for mobile, same visual style (banner-hero-mobile.dim_900x900.png)",
   "existing_features": [
     {
       "id": "feature-create-the-core-app-structure-for-rotas-e-direitos-as-a-web-app-with-four-main-modules-accessible-from-a-home-dashboard-1-evidence-tracker-2-loss-calculator-3-appeal-generator-4-collective-data-include-navigation-module-landing-pages-and-empty-state-guidance-for-first-time-users",
@@ -190,6 +191,30 @@
         "REQ-26"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-create-a-reusable-responsive-marketing-banner-component-that-highlights-the-app-s-key-services-and-advantages-for-gig-workers-explicitly-mentioning-platforms-like-uber-99-ifood-and-indriver-and-optionally-and-others",
+      "title": "Create a reusable, responsive marketing banner component that highlights the app’s key services and advantages for gig workers, explicitly mentioning platforms like Uber, 99, iFood, and InDriver (and optionally “and others”).",
+      "reqIds": [
+        "REQ-27"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-the-responsive-marketing-banner-into-the-public-landing-experience-by-placing-it-prominently-on-the-unauthenticated-entry-page-frontend-src-pages-publicoverviewpage-tsx-keeping-the-page-s-existing-ctas-and-overall-structure-intact",
+      "title": "Integrate the responsive marketing banner into the public landing experience by placing it prominently on the unauthenticated entry page (frontend/src/pages/PublicOverviewPage.tsx), keeping the page’s existing CTAs and overall structure intact.",
+      "reqIds": [
+        "REQ-28"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-the-required-banner-image-assets-as-static-files-under-frontend-public-assets-generated-and-reference-them-from-the-banner-component-no-backend-image-serving",
+      "title": "Add the required banner image assets as static files under frontend/public/assets/generated and reference them from the banner component (no backend image serving).",
+      "reqIds": [
+        "REQ-29"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -289,6 +314,12 @@
       "reqIds": [
         "REQ-24"
       ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Criar um banner responsivo (marketing) destacando serviços e vantagens do app para usuários de Uber/99/iFood/InDriver etc., para uso em telas/web/app",
+      "reqIds": [],
       "status": "pending"
     }
   ],

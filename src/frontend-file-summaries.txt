@@ -37,10 +37,11 @@
   "frontend/src/pages/DataPolicyPage.tsx": "In-app Data Policy page with comprehensive LGPD-compliant content covering data treatment principles, categories, retention, and user rights.",
   "frontend/src/components/AppLayout.tsx": "App layout with header navigation including conditional admin menu item visible only to admin users in both desktop and mobile views.",
   "frontend/src/pages/Dashboard.tsx": "Authenticated dashboard with main modules and new quick access card section linking to Payments, Profile, and Quick Process Lookup.",
-  "frontend/src/pages/PublicOverviewPage.tsx": "Public landing page showcasing app features, security/privacy messaging with trust badges, and CTAs to view plans and learn more.",
+  "frontend/src/pages/PublicOverviewPage.tsx": "Public landing page with integrated marketing banner, feature cards, security messaging with trust badges, and CTAs to view plans and learn more.",
   "frontend/src/pages/AppealGeneratorPage.tsx": "Appeal generator page wrapped in FeatureGate to enforce subscription-based access control with upgrade prompts on expiry.",
   "frontend/src/hooks/useIsAdmin.ts": "React Query hook that checks if the current user is an admin by calling the backend isCallerAdmin method.",
   "frontend/src/hooks/useAdmin.ts": "React Query hooks for admin operations including fetching all user access info and mutations for blocking/unblocking users with proper cache invalidation.",
   "frontend/src/components/AdminGate.tsx": "Admin-only gate component that wraps protected admin routes, showing access denied screens for non-admins and loading states while verifying permissions.",
-  "frontend/src/pages/AdminDashboardPage.tsx": "Complete admin dashboard page with user list, search/filter, statistics cards, block/unblock actions with confirmation dialogs, and responsive mobile/desktop layouts."
+  "frontend/src/pages/AdminDashboardPage.tsx": "Complete admin dashboard page with user list, search/filter, statistics cards, block/unblock actions with confirmation dialogs, and responsive mobile/desktop layouts.",
+  "frontend/src/components/marketing/MarketingBanner.tsx": "Responsive marketing banner component showcasing app benefits for gig-driver platforms (Uber, 99, iFood, InDriver) with platform badges, benefit cards, and responsive hero images."
 }

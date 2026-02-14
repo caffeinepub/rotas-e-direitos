@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { FileText, Calculator, MessageSquare, BarChart3, Shield, Lock } from 'lucide-react';
 import TrustBadges from '../components/trust/TrustBadges';
+import MarketingBanner from '../components/marketing/MarketingBanner';
 
 export default function PublicOverviewPage() {
   const navigate = useNavigate();
@@ -48,6 +49,9 @@ export default function PublicOverviewPage() {
           </Button>
         </div>
       </div>
+
+      {/* Marketing Banner */}
+      <MarketingBanner />
 
       <div className="grid gap-8 md:grid-cols-2">
         {features.map((feature) => {

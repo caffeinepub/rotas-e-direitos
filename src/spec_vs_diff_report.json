@@ -1,56 +1,33 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T04:35:33.396Z",
-  "summary": "Frontend adds an admin-gated dashboard route (/admin) with user list fetching, search/filter, and block/unblock actions, plus admin-only navigation entry logic. Backend diff shows new types and in-memory maps for user access info, but the provided backend snippet does not show the required admin/user APIs nor enforcement of blocked users across protected update entrypoints.",
+  "generatedAt": "2026-02-14T04:41:36.321Z",
+  "summary": "REQ-27 and REQ-28 appear implemented via a new reusable MarketingBanner component and its insertion near the top of PublicOverviewPage. REQ-29 (adding the required static image assets under frontend/public/assets/generated) is not evidenced in the provided diff summary. Additionally, non-requested changes include modifications to project metadata/summary files.",
   "missing_requirements": [
     {
-      "id": "REQ-22",
-      "requirement": "Backend admin-only query to list user summaries including principal, optional profile, subscription status, and blocked flag; must deny non-admin callers; inclusion rules documented and consistent.",
-      "reason": "Frontend calls `actor.getAllUserAccessInfo()`, but the backend diff excerpt only shows type definitions (`UserAccessInfo`) and a `userAccess` map; no `getAllUserAccessInfo` admin-only query implementation or access check is visible in the shown backend changes.",
+      "id": "REQ-29",
+      "requirement": "Add the required banner image assets as static files under frontend/public/assets/generated and reference them from the banner component (no backend image serving).",
+      "reason": "The banner component references the expected public asset paths, but the diff summary does not show the image files being added under frontend/public/assets/generated.",
       "evidence": [
-        "frontend/src/hooks/useAdmin.ts",
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-23",
-      "requirement": "Backend admin-only actions to block/unblock a target principal, and a query for any authenticated user to read their own blocked status.",
-      "reason": "Frontend calls `actor.blockUser(...)` and `actor.unblockUser(...)`, and checks admin via `actor.isCallerAdmin()`, but the backend diff excerpt does not show implementations for `blockUser`, `unblockUser`, `isCallerAdmin`, or a caller-accessible 'my blocked status' query returning a boolean/equivalent.",
-      "evidence": [
-        "frontend/src/hooks/useAdmin.ts",
-        "frontend/src/hooks/useIsAdmin.ts",
-        "backend/main.mo"
-      ]
-    },
-    {
-      "id": "REQ-24",
-      "requirement": "Enforce admin block override across protected backend update calls (evidence creation, work sessions start/end/sample logging, loss profile set, appeal generation, collective report submission, subscription upgrade) so blocked users are denied and no state is written.",
-      "reason": "The backend diff excerpt does not show any authorization checks tied to `isBlockedByAdmin` being applied to protected update entrypoints, nor clear trap/deny messages for blocked users.",
-      "evidence": [
-        "backend/main.mo"
+        "frontend/src/components/marketing/MarketingBanner.tsx"
       ]
     }
   ],
   "hallucinated_features": [
     {
-      "description": "Admin dashboard shows extra aggregated stats (total/blocked/active/expired) in addition to the requested table and controls.",
-      "reason": "The BuildRequest did not ask for summary statistics; this is additional UI behavior beyond the stated AC.",
+      "description": "Updated/maintained repository summary/metadata files (frontend-file-summaries.txt and project_state.json), which were not requested as part of the UI banner work.",
+      "reason": "BuildRequest focuses on adding a marketing banner component, integrating it into PublicOverviewPage, and adding image assets. No requirement mentions updating these project summary/state files.",
       "evidence": [
-        "frontend/src/pages/AdminDashboardPage.tsx"
+        "frontend-file-summaries.txt",
+        "project_state.json"
       ]
     }
   ],
-  "confidence": 0.62,
+  "confidence": 0.74,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/App.tsx",
-    "frontend/src/components/AdminGate.tsx",
-    "frontend/src/components/AppLayout.tsx",
-    "frontend/src/hooks/useAdmin.ts",
-    "frontend/src/hooks/useIsAdmin.ts",
-    "frontend/src/pages/AdminDashboardPage.tsx",
+    "frontend/src/components/marketing/MarketingBanner.tsx",
+    "frontend/src/pages/PublicOverviewPage.tsx",
     "project_state.json"
   ]
 }

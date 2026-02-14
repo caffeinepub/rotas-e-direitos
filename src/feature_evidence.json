@@ -2,13 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-a-new-admin-dashboard-page-in-the-frontend-that-is-accessible-only-to-admins-and-provides-1-a-table-list-of-users-with-principal-profile-fields-when-present-plan-name-start-end-timestamps-entitlement-like-status-and-current-blocked-state-2-controls-to-block-unblock-a-selected-user-with-confirmation-3-basic-search-filter-by-principal-and-or-name-email-when-present",
-      "featureTitle": "Create a new Admin Dashboard page in the frontend that is accessible only to admins and provides: (1) a table/list of users with principal, profile fields when present, plan name, start/end timestamps, entitlement-like status, and current blocked state; (2) controls to block/unblock a selected user with confirmation; (3) basic search/filter by principal and/or name/email (when present).",
+      "featureId": "feature-create-a-reusable-responsive-marketing-banner-component-that-highlights-the-app-s-key-services-and-advantages-for-gig-workers-explicitly-mentioning-platforms-like-uber-99-ifood-and-indriver-and-optionally-and-others",
+      "featureTitle": "Create a reusable, responsive marketing banner component that highlights the app’s key services and advantages for gig workers, explicitly mentioning platforms like Uber, 99, iFood, and InDriver (and optionally “and others”).",
       "files": [
-        "frontend/src/components/AdminGate.tsx",
-        "frontend/src/hooks/useAdmin.ts",
-        "frontend/src/hooks/useIsAdmin.ts",
-        "frontend/src/pages/AdminDashboardPage.tsx"
+        "frontend/src/components/marketing/MarketingBanner.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -19,16 +16,15 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-25"
+        "REQ-27"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-integrate-the-admin-dashboard-into-the-existing-navigation-layout-so-that-the-entry-point-is-visible-only-when-the-authenticated-user-is-an-admin",
-      "featureTitle": "Integrate the Admin Dashboard into the existing navigation/layout so that the entry point is visible only when the authenticated user is an admin.",
+      "featureId": "feature-integrate-the-responsive-marketing-banner-into-the-public-landing-experience-by-placing-it-prominently-on-the-unauthenticated-entry-page-frontend-src-pages-publicoverviewpage-tsx-keeping-the-page-s-existing-ctas-and-overall-structure-intact",
+      "featureTitle": "Integrate the responsive marketing banner into the public landing experience by placing it prominently on the unauthenticated entry page (frontend/src/pages/PublicOverviewPage.tsx), keeping the page’s existing CTAs and overall structure intact.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/AppLayout.tsx"
+        "frontend/src/pages/PublicOverviewPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -39,7 +35,26 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-26"
+        "REQ-28"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-the-required-banner-image-assets-as-static-files-under-frontend-public-assets-generated-and-reference-them-from-the-banner-component-no-backend-image-serving",
+      "featureTitle": "Add the required banner image assets as static files under frontend/public/assets/generated and reference them from the banner component (no backend image serving).",
+      "files": [
+        "frontend/src/components/marketing/MarketingBanner.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-29"
       ],
       "confidence": "high"
     }

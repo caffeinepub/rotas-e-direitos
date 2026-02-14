@@ -1,13 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Add an admin-only dashboard to track user subscription/access status and allow admins to block or unblock users from protected app features.
+**Goal:** Add a reusable, responsive marketing banner to the public landing experience that highlights the app’s services and benefits for gig drivers (Uber, 99, iFood, InDriver).
 
 **Planned changes:**
-- Add admin-only backend APIs to list user summaries (principal, optional profile info, subscription details, and blocked override flag).
-- Add backend admin-only actions to block/unblock a user and a user-accessible query to read the caller’s own blocked status.
-- Enforce the admin block override across protected backend update/write entrypoints so blocked users cannot use protected features.
-- Create an Admin Dashboard page (admin-only) showing a searchable, mobile-friendly list of users and controls to block/unblock with confirmation.
-- Add an Admin navigation entry that is visible only to admins and routes to the Admin Dashboard using the existing router setup.
+- Create a reusable React marketing banner component with responsive layout (stacked on small screens, multi-column on larger screens).
+- Include platform mentions (Uber, 99, iFood, InDriver, optionally “and others”) via text and/or badges/chips/icons within the banner.
+- Highlight at least 3 existing app benefits/services (e.g., evidence tracking, loss calculation, appeal generation, collective insights, privacy/security) without introducing new features.
+- Add static banner image assets under `frontend/public/assets/generated` and reference them from the banner component.
+- Integrate the banner near the top of `frontend/src/pages/PublicOverviewPage.tsx` while keeping existing CTAs and overall structure intact and consistent with the current theme.
 
-**User-visible outcome:** Admins can open an Admin Dashboard to view users’ subscription/access status and block or unblock users; blocked users are prevented from using protected features even if they have an active subscription.
+**User-visible outcome:** Unauthenticated users see a prominent, responsive banner near the top of the public overview page that clearly communicates supported gig platforms and key app benefits, with correctly loading static images.

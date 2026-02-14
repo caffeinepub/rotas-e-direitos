@@ -1,107 +1,80 @@
 {
   "kind": "build_request",
-  "title": "Add admin dashboard to track user subscription status and block/unblock access",
+  "title": "Add a responsive marketing banner highlighting app services and benefits for gig drivers (Uber/99/iFood/InDriver)",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-22",
-      "text": "Add backend support for an administrator to list users and track each user’s access status, including: principal, optional user profile (name/email if present), subscription status (plan, startTime, endTime), and an admin override flag indicating whether the user is blocked from using the app’s protected features.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-3"
-        ],
-        "quotes": [
-          "SIM IMPLEMENTE UM DASBOARD ONDE EU POSSA COMO ADMINISTRADOR FAZER ESTE RASTREAMENTO PODENDO BLOQUEAR OU LIBERAR ACESSOS A USUARIOS"
-        ]
-      },
-      "acceptanceCriteria": [
-        "A new admin-only backend query returns a list of user summaries that includes principal + (profile if available) + subscription status + blocked flag.",
-        "Non-admin callers cannot access the admin list APIs (must trap/deny).",
-        "The returned list includes users that exist in the canister state (e.g., anyone with a stored profile and/or subscription entry; exact inclusion rules are documented in code and consistent)."
-      ]
-    },
-    {
-      "id": "REQ-23",
-      "text": "Add backend admin-only actions to block and unblock a specific user principal, and expose a backend query that allows any authenticated user to read their own blocked/unblocked status.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-3"
-        ],
-        "quotes": [
-          "...podendo BLOQUEAR OU LIBERAR ACESSOS A USUARIOS"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Admin-only backend method(s) exist to set a user’s blocked status to blocked/unblocked.",
-        "A non-admin caller cannot block/unblock anyone (must trap/deny).",
-        "A caller can query their own blocked status and receive a boolean (or equivalent) value."
-      ]
-    },
-    {
-      "id": "REQ-24",
-      "text": "Enforce the admin block override in backend write/update entrypoints that represent protected feature usage so blocked users cannot create/modify protected data even if they have an active subscription/trial.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-3"
-        ]
-      },
-      "acceptanceCriteria": [
-        "When a user is blocked, protected update calls fail with a clear authorization error (trap/deny) rather than writing state.",
-        "Blocking is enforced consistently across protected flows (at minimum: evidence creation, work session start/end/sample logging, loss profile set, appeal generation, collective report submission, and subscription upgrade).",
-        "Admins are not accidentally blocked from performing admin operations by the user-block mechanism."
-      ]
-    },
-    {
-      "id": "REQ-25",
-      "text": "Create a new Admin Dashboard page in the frontend that is accessible only to admins and provides: (1) a table/list of users with principal, profile fields when present, plan name, start/end timestamps, entitlement-like status, and current blocked state; (2) controls to block/unblock a selected user with confirmation; (3) basic search/filter by principal and/or name/email (when present).",
+      "id": "REQ-27",
+      "text": "Create a reusable, responsive marketing banner component that highlights the app’s key services and advantages for gig workers, explicitly mentioning platforms like Uber, 99, iFood, and InDriver (and optionally “and others”).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-4"
         ],
         "quotes": [
-          "...IMPLEMENTE UM DASBOARD ONDE EU POSSA COMO ADMINISTRADOR FAZER ESTE RASTREAMENTO..."
+          "CRIE UM BANNER RESPONSIVO MOSTRANDO OS SERVIÇO E VANTAGENS DO APP PARA USUARIOS UBER ,99,IFOOD,INDRIVER ETC"
         ]
       },
       "acceptanceCriteria": [
-        "The admin dashboard route renders only for admin users; non-admins see an access denied screen or are redirected away.",
-        "The page loads user summaries from the backend and renders them in a readable, mobile-friendly table/list.",
-        "An admin can block/unblock a user from the UI; after the action, the list refreshes and shows the updated blocked state.",
-        "The page includes a search/filter control that narrows the visible list without breaking the full list fetch."
+        "A new React component exists for the marketing banner (reusable; not hardcoded only inside a single page).",
+        "The banner layout is responsive: stacks cleanly on small screens and uses a multi-column layout on larger screens.",
+        "The banner content visually includes the target platforms (Uber, 99, iFood, InDriver) via text and/or badges/chips/icons.",
+        "The banner highlights at least 3 distinct benefits/services already provided by the app (e.g., evidence tracking, loss calculation, appeal generation, collective insights, privacy/security), without introducing new product features.",
+        "No changes are required to backend canisters for this banner."
       ]
     },
     {
-      "id": "REQ-26",
-      "text": "Integrate the Admin Dashboard into the existing navigation/layout so that the entry point is visible only when the authenticated user is an admin.",
+      "id": "REQ-28",
+      "text": "Integrate the responsive marketing banner into the public landing experience by placing it prominently on the unauthenticated entry page (frontend/src/pages/PublicOverviewPage.tsx), keeping the page’s existing CTAs and overall structure intact.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-4"
+        ],
+        "quotes": [
+          "CRIE UM BANNER RESPONSIVO MOSTRANDO OS SERVIÇO E VANTAGENS DO APP PARA USUARIOS UBER ,99,IFOOD,INDRIVER ETC"
         ]
       },
       "acceptanceCriteria": [
-        "An “Admin” (or equivalent) navigation item appears only for admin users and routes to the Admin Dashboard page.",
-        "No navigation entry is shown to non-admin users.",
-        "Routing is added via the existing TanStack Router setup (frontend/src/App.tsx) without modifying immutable frontend paths."
+        "When not authenticated, the home route renders PublicOverviewPage and the new banner is visible without scrolling excessively (near the top section).",
+        "Existing navigation actions (e.g., view plans, learn more) still work as before.",
+        "The page remains visually consistent with the current dark-first theme and Tailwind token usage."
+      ]
+    },
+    {
+      "id": "REQ-29",
+      "text": "Add the required banner image assets as static files under frontend/public/assets/generated and reference them from the banner component (no backend image serving).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4"
+        ],
+        "quotes": [
+          "CRIE UM BANNER RESPONSIVO MOSTRANDO OS SERVIÇO E VANTAGENS DO APP PARA USUARIOS UBER ,99,IFOOD,INDRIVER ETC"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Banner image assets are present under frontend/public/assets/generated and are used by the banner component.",
+        "The banner remains readable and accessible with sufficient contrast on both light/dark backgrounds used by the app theme.",
+        "Images load correctly in the deployed build (no broken links; correct public paths)."
       ]
     }
   ],
   "constraints": [
-    "Backend must remain a single-actor Motoko canister; place all new logic in backend/main.mo.",
-    "Do not edit files under frontend/src/components/ui or other paths listed in frontend.immutablePaths; compose existing components instead.",
-    "If new stable state is introduced/changed for the admin block list or admin user index, add/adjust backend/migration.mo according to the project’s conditional migration policy."
+    "Frontend immutable paths must not be edited: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
+    "Keep backend as a single Motoko actor; no backend changes are required for this UI-only request.",
+    "Use English only in this build request document; in the app UI, keep copy consistent with the app’s existing language strategy."
   ],
   "nonGoals": [
-    "Implementing third-party admin authentication/roles beyond the existing canister admin concept (e.g., no Auth0).",
-    "Adding real-time updates (no WebSockets).",
-    "Adding external databases or analytics systems.",
-    "Building a full CRM-style user management suite (password resets, messaging, etc.)."
+    "Do not implement new backend endpoints or data models for marketing content.",
+    "Do not add third-party marketing/analytics integrations.",
+    "Do not redesign global navigation or subscription gating as part of this banner work."
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "Wide responsive hero/banner illustration with delivery rider silhouette and abstract city/road shapes, dark-friendly palette (banner-hero.dim_1600x600.png)",
+      "Square/vertical banner illustration variant optimized for mobile, same visual style (banner-hero-mobile.dim_900x900.png)"
+    ],
     "edits": []
   }
 }
