@@ -7,24 +7,16 @@
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-app-typography-so-the-main-page-route-uses-a-more-modern-sans-serif-font-family-across-headings-body-text-buttons-and-navigation-while-keeping-readability-in-both-light-and-dark-mode",
-      "title": "Update the app typography so the main page (route '/') uses a more modern sans-serif font family across headings, body text, buttons, and navigation, while keeping readability in both light and dark mode.",
+      "id": "feature-refine-the-style-b-home-style-b-color-tone-so-the-unauthenticated-homepage-publicoverviewpage-marketingbanner-has-a-more-cohesive-balanced-palette-across-light-and-dark-modes-update-the-css-variable-overrides-for-style-b-in-frontend-src-index-css-e-g-background-card-accent-border-ring-and-if-needed-adjust-style-b-only-gradient-opacity-choices-in-frontend-src-components-marketing-marketingbanner-tsx-so-the-banner-and-page-surfaces-look-consistent-and-readable",
+      "title": "Refine the Style B (\"home-style-b\") color tone so the unauthenticated homepage (PublicOverviewPage + MarketingBanner) has a more cohesive, balanced palette across light and dark modes. Update the CSS variable overrides for Style B in `frontend/src/index.css` (e.g., background/card/accent/border/ring) and, if needed, adjust Style B-only gradient/opacity choices in `frontend/src/components/marketing/MarketingBanner.tsx` so the banner and page surfaces look consistent and readable.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Change the main page typography to a more modern font",
-      "reqIds": [],
-      "status": "pending"
-    }
-  ],
-  "gameProjectType": "none",
-  "projectName": "Update main page typography to a more modern font",
+  "new_feature_requests": [],
+  "projectName": "Adjust Style B homepage color tone to better match the new visual theme",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

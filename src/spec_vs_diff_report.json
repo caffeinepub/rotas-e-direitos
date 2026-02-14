@@ -1,31 +1,24 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T21:39:00.256Z",
-  "summary": "REQ-1 typography update appears implemented by loading Inter in frontend/index.html, configuring Tailwind fontFamily.sans, and applying font-sans to the global body styles in frontend/src/index.css. No evidence in the diff indicates edits to the listed immutable frontend paths. However, the diff also includes unrelated metadata/state changes not requested in the BuildRequest.",
+  "generatedAt": "2026-02-14T21:50:26.415Z",
+  "summary": "REQ-1 appears implemented via Style B-specific CSS variable overrides in `frontend/src/index.css` (light/dark) and Style B-only gradient/opacity tuning in `frontend/src/components/marketing/MarketingBanner.tsx`. No evidence of forbidden edits under `frontend/src/components/ui` or backend logic changes in the provided diff summary. Two non-requested metadata/documentation files were modified.",
   "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Project tracking/state updates unrelated to the typography request (adding new_feature_requests entries AR-1/AR-2 marked pending).",
-      "reason": "BuildRequest only asks for typography changes; it does not request modifying project_state.json or adding feature-request tracking entries.",
+      "description": "Updated/expanded repository metadata or documentation summaries unrelated to the Style B color-tone adjustment.",
+      "reason": "BuildRequest is styling-only and specifically targets `frontend/src/index.css` and optionally `frontend/src/components/marketing/MarketingBanner.tsx`; changes to project tracking/summary files were not requested.",
       "evidence": [
+        "frontend-file-summaries.txt",
         "project_state.json"
-      ]
-    },
-    {
-      "description": "Updates to a repository summary/metadata file describing many new routes/hooks/features (e.g., blocked account help pages, evidence audio/video support, stubbed backend hooks), which are outside the typography-only scope.",
-      "reason": "Non-goals explicitly say not to add new features beyond typography changes; while this file is a summary, its update is not requested and documents substantial unrelated feature work.",
-      "evidence": [
-        "frontend-file-summaries.txt"
       ]
     }
   ],
   "confidence": 0.78,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/index.html",
+    "frontend/src/components/marketing/MarketingBanner.tsx",
     "frontend/src/index.css",
-    "frontend/tailwind.config.js",
     "project_state.json"
   ]
 }

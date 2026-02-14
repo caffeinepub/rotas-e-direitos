@@ -2,12 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-app-typography-so-the-main-page-route-uses-a-more-modern-sans-serif-font-family-across-headings-body-text-buttons-and-navigation-while-keeping-readability-in-both-light-and-dark-mode",
-      "featureTitle": "Update the app typography so the main page (route '/') uses a more modern sans-serif font family across headings, body text, buttons, and navigation, while keeping readability in both light and dark mode.",
+      "featureId": "feature-refine-the-style-b-home-style-b-color-tone-so-the-unauthenticated-homepage-publicoverviewpage-marketingbanner-has-a-more-cohesive-balanced-palette-across-light-and-dark-modes-update-the-css-variable-overrides-for-style-b-in-frontend-src-index-css-e-g-background-card-accent-border-ring-and-if-needed-adjust-style-b-only-gradient-opacity-choices-in-frontend-src-components-marketing-marketingbanner-tsx-so-the-banner-and-page-surfaces-look-consistent-and-readable",
+      "featureTitle": "Refine the Style B (\"home-style-b\") color tone so the unauthenticated homepage (PublicOverviewPage + MarketingBanner) has a more cohesive, balanced palette across light and dark modes. Update the CSS variable overrides for Style B in `frontend/src/index.css` (e.g., background/card/accent/border/ring) and, if needed, adjust Style B-only gradient/opacity choices in `frontend/src/components/marketing/MarketingBanner.tsx` so the banner and page surfaces look consistent and readable.",
       "files": [
-        "frontend/index.html",
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
+        "frontend/src/components/marketing/MarketingBanner.tsx",
+        "frontend/src/index.css"
       ],
       "components": [
         "authorization@4.0.0",

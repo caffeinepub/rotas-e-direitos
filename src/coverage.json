@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T21:39:00.259Z",
+  "generatedAt": "2026-02-14T21:50:26.418Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -12,17 +12,15 @@
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the app typography so the main page (route '/') uses a more modern sans-serif font family across headings, body text, buttons, and navigation, while keeping readability in both light and dark mode.",
+        "summary": "Refine the Style B (\"home-style-b\") color tone so the unauthenticated homepage (PublicOverviewPage + MarketingBanner) has a more cohesive, balanced palette across light and dark modes. Update the CSS variable overrides for Style B in `frontend/src/index.css` (e.g., background/card/accent/border/ring) and, if needed, adjust Style B-only gradient/opacity choices in `frontend/src/components/marketing/MarketingBanner.tsx` so the banner and page surfaces look consistent and readable.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/index.html",
-          "frontend/tailwind.config.js",
-          "frontend/src/index.css"
+          "frontend/src/index.css",
+          "frontend/src/components/marketing/MarketingBanner.tsx"
         ],
         "matchedFiles": [
-          "frontend/index.html",
-          "frontend/tailwind.config.js",
-          "frontend/src/index.css"
+          "frontend/src/index.css",
+          "frontend/src/components/marketing/MarketingBanner.tsx"
         ]
       }
     ]
@@ -32,9 +30,8 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/index.html",
+    "frontend/src/components/marketing/MarketingBanner.tsx",
     "frontend/src/index.css",
-    "frontend/tailwind.config.js",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

@@ -1,32 +1,26 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Modernize typography on the public main page",
+  "title": "Tune Style B homepage palette for cohesive light/dark appearance",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Load and apply a modern sans-serif font globally so route '/' typography updates consistently across headings, body text, buttons, and navigation in light/dark mode.",
+      "summary": "Refine Style B theme variables and banner gradient/opacity so PublicOverviewPage + MarketingBanner have a cohesive, readable palette in light and dark modes without affecting Style A.",
       "acceptanceCriteria": [
-        "A modern font is loaded in the app (via `frontend/index.html` and/or CSS) and applied through Tailwind (e.g., by configuring `fontFamily.sans` in `frontend/tailwind.config.js`).",
-        "The global base styles apply the new font to the `body` (in `frontend/src/index.css`) so text on the main page (`frontend/src/pages/PublicOverviewPage.tsx`) renders in the new font without requiring per-component overrides.",
-        "Key main page typography (e.g., the H1 'ROTAS E DIREITOS' and supporting paragraph) visually reflects the new modern font when previewed in the browser.",
-        "No changes are made to any immutable paths under `frontend/src/components/ui` or authentication hooks listed as immutable."
+        "When the user toggles to Style B on the public homepage, the overall color tone looks consistent across the page sections and the MarketingBanner (no obvious mismatched tints between background, card surfaces, and banner gradient).",
+        "In both light and dark mode with Style B enabled, text remains comfortably readable (no low-contrast combinations on background/card/accent surfaces).",
+        "Changes are limited to Style B behavior; Style A styling remains visually unchanged."
       ],
       "file_operations": [
         {
-          "path": "frontend/index.html",
-          "operation": "modify",
-          "description": "Load a modern sans-serif webfont (e.g., via a hosted stylesheet link with preconnect for performance) so it is available app-wide before React renders."
-        },
-        {
-          "path": "frontend/tailwind.config.js",
-          "operation": "modify",
-          "description": "Configure Tailwind typography to use the newly loaded modern font as the default sans font stack (set `theme.extend.fontFamily.sans` to the new font with sensible fallbacks)."
-        },
-        {
           "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Apply the new sans font globally by setting the base `body` to use Tailwind's `font-sans` (or equivalent base layer rule) while preserving existing light/dark readability styles."
+          "description": "Adjust only the Style B CSS variable overrides (the .home-style-b and .dark .home-style-b blocks) to refine background/card/accent/border/ring tone for a more balanced palette in light and dark modes; keep all base :root and .dark variables unchanged to avoid impacting Style A."
+        },
+        {
+          "path": "frontend/src/components/marketing/MarketingBanner.tsx",
+          "operation": "modify",
+          "description": "Update Style B-only banner presentation (variant === 'B') to better align with the refined Style B variables—e.g., tweak the gradient stops/opacity choices and any surface translucency values used by banner/card styling—while keeping variant A classes unchanged and avoiding edits to any files under frontend/src/components/ui."
         }
       ]
     }

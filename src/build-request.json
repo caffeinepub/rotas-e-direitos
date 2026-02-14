@@ -1,35 +1,38 @@
 {
   "kind": "build_request",
-  "title": "Update main page typography to a more modern font",
+  "title": "Adjust Style B homepage color tone to better match the new visual theme",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the app typography so the main page (route '/') uses a more modern sans-serif font family across headings, body text, buttons, and navigation, while keeping readability in both light and dark mode.",
+      "text": "Refine the Style B (\"home-style-b\") color tone so the unauthenticated homepage (PublicOverviewPage + MarketingBanner) has a more cohesive, balanced palette across light and dark modes. Update the CSS variable overrides for Style B in `frontend/src/index.css` (e.g., background/card/accent/border/ring) and, if needed, adjust Style B-only gradient/opacity choices in `frontend/src/components/marketing/MarketingBanner.tsx` so the banner and page surfaces look consistent and readable.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-5"
+          "msg-1",
+          "msg-2"
         ],
         "quotes": [
-          "MUDE A FONTE DAS LETRAS DA PAGINA PRINCIPL PAR UMA FONTE MAIS MODERNA"
+          "Want to try adjusting the color tone to match the new style?",
+          "SIM"
         ]
       },
       "acceptanceCriteria": [
-        "A modern font is loaded in the app (via `frontend/index.html` and/or CSS) and applied through Tailwind (e.g., by configuring `fontFamily.sans` in `frontend/tailwind.config.js`).",
-        "The global base styles apply the new font to the `body` (in `frontend/src/index.css`) so text on the main page (`frontend/src/pages/PublicOverviewPage.tsx`) renders in the new font without requiring per-component overrides.",
-        "Key main page typography (e.g., the H1 'ROTAS E DIREITOS' and supporting paragraph) visually reflects the new modern font when previewed in the browser.",
-        "No changes are made to any immutable paths under `frontend/src/components/ui` or authentication hooks listed as immutable."
+        "When the user toggles to Style B on the public homepage, the overall color tone looks consistent across the page sections and the MarketingBanner (no obvious mismatched tints between background, card surfaces, and banner gradient).",
+        "In both light and dark mode with Style B enabled, text remains comfortably readable (no low-contrast combinations on background/card/accent surfaces).",
+        "Changes are limited to Style B behavior; Style A styling remains visually unchanged."
       ]
     }
   ],
   "constraints": [
-    "Frontend immutable paths must not be edited: `frontend/src/hooks/useInternetIdentity.ts`, `frontend/src/hooks/useInternetIdentity.tsx`, `frontend/src/hooks/useActor.ts`, `frontend/src/main.tsx`, `frontend/src/components/ui`.",
-    "Keep backend architecture unchanged (single Motoko actor); no backend changes are required for typography updates."
+    "Do not edit files under `frontend/src/components/ui` (read-only UI component sources).",
+    "Do not modify any immutable hook files listed in `SYSTEM_CONTEXT.frontend.immutablePaths`.",
+    "Keep all backend logic unchanged (this is a styling-only adjustment)."
   ],
   "nonGoals": [
-    "Do not redesign layout, colors, or add new features beyond typography changes.",
-    "Do not change existing copy/wording as part of this request."
+    "Adding new homepage features or new routes.",
+    "Changing the Style A theme or global typography system beyond what is required to tune Style B colors.",
+    "Translating or rewriting existing Portuguese UI copy."
   ],
   "imageRequirements": {
     "required": [],

@@ -1,13 +1,15 @@
 import { useNavigate } from '@tanstack/react-router';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { FileText, Calculator, MessageSquare, BarChart3, Shield, Lock } from 'lucide-react';
+import { FileText, Calculator, MessageSquare, BarChart3, Shield, Lock, Palette } from 'lucide-react';
 import TrustBadges from '../components/trust/TrustBadges';
 import MarketingBanner from '../components/marketing/MarketingBanner';
 import TestimonialsSection from '../components/testimonials/TestimonialsSection';
+import { useHomepageStyleVariant } from '../hooks/useHomepageStyleVariant';
 
 export default function PublicOverviewPage() {
   const navigate = useNavigate();
+  const { variant, toggleVariant } = useHomepageStyleVariant();
 
   const features = [
     {
@@ -33,15 +35,29 @@ export default function PublicOverviewPage() {
   ];
 
   return (
-    <div className="space-y-12 max-w-6xl mx-auto">
-      <div className="text-center space-y-6 py-12">
-        <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
+    <div className={`space-y-12 max-w-6xl mx-auto ${variant === 'B' ? 'home-style-b' : ''}`}>
+      {/* Style Toggle Control */}
+      <div className="flex justify-end pt-4">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={toggleVariant}
+          className="gap-2"
+          aria-label={`Alternar para Estilo ${variant === 'A' ? 'B' : 'A'}`}
+        >
+          <Palette className="h-4 w-4" />
+          Estilo {variant}
+        </Button>
+      </div>
+
+      <div className={`text-center space-y-6 ${variant === 'B' ? 'py-16' : 'py-12'}`}>
+        <h1 className={`font-bold tracking-tight ${variant === 'B' ? 'text-6xl md:text-7xl' : 'text-5xl md:text-6xl'}`}>
           ROTAS E DIREITOS
         </h1>
-        <p className="text-2xl text-muted-foreground max-w-3xl mx-auto">
+        <p className={`text-muted-foreground max-w-3xl mx-auto ${variant === 'B' ? 'text-xl' : 'text-2xl'}`}>
           Ferramenta completa para entregadores defenderem seus direitos contra desativações injustas
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+        <div className={`flex flex-col sm:flex-row gap-4 justify-center ${variant === 'B' ? 'pt-6' : 'pt-4'}`}>
           <Button size="lg" className="text-lg px-8" onClick={() => navigate({ to: '/planos' })}>
             Ver Planos
           </Button>
@@ -52,16 +68,16 @@ export default function PublicOverviewPage() {
       </div>
 
       {/* Marketing Banner - Now Dynamic and Clickable */}
-      <MarketingBanner />
+      <MarketingBanner variant={variant} />
 
-      <div className="grid gap-8 md:grid-cols-2">
+      <div className={`grid gap-8 md:grid-cols-2 ${variant === 'B' ? 'gap-10' : ''}`}>
         {features.map((feature) => {
           const Icon = feature.icon;
           return (
-            <Card key={feature.title}>
+            <Card key={feature.title} className={variant === 'B' ? 'border-2' : ''}>
               <CardHeader>
                 <div className="flex items-start gap-4">
-                  <div className="p-3 rounded-lg bg-primary/10">
+                  <div className={`p-3 rounded-lg bg-primary/10 ${variant === 'B' ? 'ring-2 ring-primary/20' : ''}`}>
                     <Icon className="h-8 w-8 text-primary" />
                   </div>
                   <div>
@@ -76,9 +92,11 @@ export default function PublicOverviewPage() {
       </div>
 
       {/* User Testimonials Section */}
-      <TestimonialsSection />
+      <div className={variant === 'B' ? 'py-8' : ''}>
+        <TestimonialsSection />
+      </div>
 
-      <Card className="border-primary/50">
+      <Card className={`border-primary/50 ${variant === 'B' ? 'border-2 shadow-lg' : ''}`}>
         <CardHeader className="text-center">
           <CardTitle className="text-2xl">Segurança e Privacidade</CardTitle>
           <CardDescription className="text-base">
@@ -110,8 +128,8 @@ export default function PublicOverviewPage() {
         </CardContent>
       </Card>
 
-      <Card className="bg-accent/50">
-        <CardContent className="pt-6 text-center">
+      <Card className={`bg-accent/50 ${variant === 'B' ? 'border-2 border-accent' : ''}`}>
+        <CardContent className={`text-center ${variant === 'B' ? 'pt-8 pb-8' : 'pt-6'}`}>
           <p className="text-lg leading-relaxed max-w-3xl mx-auto">
             Junte-se a centenas de entregadores que já estão usando o ROTAS E DIREITOS para
             organizar evidências, calcular perdas e gerar recursos profissionais.
