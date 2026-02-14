@@ -80,6 +80,32 @@
         --secondary: 0.24 0.04 160;
     }
 
+    /* Style C Variant - Light Mode (Warm Amber/Orange) */
+    .home-style-c {
+        --background: 0.96 0.05 50;
+        --card: 0.99 0.04 45;
+        --accent: 0.92 0.06 55;
+        --border: 0.82 0.05 50;
+        --ring: 0.58 0.20 40;
+        --muted: 0.91 0.04 50;
+        --secondary: 0.89 0.05 48;
+        --primary: 0.58 0.18 35;
+        --primary-foreground: 0.98 0 0;
+    }
+
+    /* Style C Variant - Dark Mode (Warm Amber/Orange) */
+    .dark .home-style-c {
+        --background: 0.15 0.05 45;
+        --card: 0.20 0.05 42;
+        --accent: 0.28 0.07 50;
+        --border: 0.34 0.06 48;
+        --ring: 0.58 0.20 40;
+        --muted: 0.24 0.05 45;
+        --secondary: 0.26 0.05 46;
+        --primary: 0.65 0.20 38;
+        --primary-foreground: 0.12 0 0;
+    }
+
     * {
         @apply border-border;
     }

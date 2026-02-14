@@ -1,16 +1,16 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T21:50:26.415Z",
-  "summary": "REQ-1 appears implemented via Style B-specific CSS variable overrides in `frontend/src/index.css` (light/dark) and Style B-only gradient/opacity tuning in `frontend/src/components/marketing/MarketingBanner.tsx`. No evidence of forbidden edits under `frontend/src/components/ui` or backend logic changes in the provided diff summary. Two non-requested metadata/documentation files were modified.",
+  "generatedAt": "2026-02-14T22:00:05.279Z",
+  "summary": "Diff implements a new homepage Style C variant across the variant hook, PublicOverviewPage scope class application + toggle cycling, MarketingBanner variant handling, and adds Style C CSS variable overrides for light/dark in index.css. No clear missing functional requirements for REQ-2/3/4 are evident from the provided diff summary.",
   "missing_requirements": [],
   "hallucinated_features": [
     {
-      "description": "Updated/expanded repository metadata or documentation summaries unrelated to the Style B color-tone adjustment.",
-      "reason": "BuildRequest is styling-only and specifically targets `frontend/src/index.css` and optionally `frontend/src/components/marketing/MarketingBanner.tsx`; changes to project tracking/summary files were not requested.",
+      "description": "Updates to project tracking/summary metadata files not requested as part of adding Style C (e.g., project_state.json and frontend-file-summaries.txt changes).",
+      "reason": "BuildRequest focuses on adding a Style C variant for the unauthenticated homepage and related styling/toggle behavior; it does not request changes to project state or repository summary files.",
       "evidence": [
-        "frontend-file-summaries.txt",
-        "project_state.json"
+        "project_state.json",
+        "frontend-file-summaries.txt"
       ]
     }
   ],
@@ -18,7 +18,9 @@
   "changed_files": [
     "frontend-file-summaries.txt",
     "frontend/src/components/marketing/MarketingBanner.tsx",
+    "frontend/src/hooks/useHomepageStyleVariant.ts",
     "frontend/src/index.css",
+    "frontend/src/pages/PublicOverviewPage.tsx",
     "project_state.json"
   ]
 }

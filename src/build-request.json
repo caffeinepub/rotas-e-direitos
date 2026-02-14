@@ -1,38 +1,73 @@
 {
   "kind": "build_request",
-  "title": "Adjust Style B homepage color tone to better match the new visual theme",
+  "title": "Add a third homepage color style variation (Style C) for the unauthenticated landing page",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Refine the Style B (\"home-style-b\") color tone so the unauthenticated homepage (PublicOverviewPage + MarketingBanner) has a more cohesive, balanced palette across light and dark modes. Update the CSS variable overrides for Style B in `frontend/src/index.css` (e.g., background/card/accent/border/ring) and, if needed, adjust Style B-only gradient/opacity choices in `frontend/src/components/marketing/MarketingBanner.tsx` so the banner and page surfaces look consistent and readable.",
+      "id": "REQ-2",
+      "text": "Add an additional homepage style variant (Style C) that provides a distinct, cohesive color palette for the unauthenticated homepage (PublicOverviewPage + MarketingBanner) in both light and dark modes, without changing existing Style A or Style B behavior.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-2"
+          "msg-3"
         ],
         "quotes": [
-          "Want to try adjusting the color tone to match the new style?",
           "SIM"
         ]
       },
       "acceptanceCriteria": [
-        "When the user toggles to Style B on the public homepage, the overall color tone looks consistent across the page sections and the MarketingBanner (no obvious mismatched tints between background, card surfaces, and banner gradient).",
-        "In both light and dark mode with Style B enabled, text remains comfortably readable (no low-contrast combinations on background/card/accent surfaces).",
-        "Changes are limited to Style B behavior; Style A styling remains visually unchanged."
+        "A new variant option exists in the homepage style variant system (currently 'A' | 'B') to support a third variant (e.g., 'C').",
+        "The new variant persists via the existing localStorage key (homepage-style-variant) and loads correctly on refresh.",
+        "PublicOverviewPage applies a new CSS scope class for Style C (similar to home-style-b) when the variant is set to C.",
+        "MarketingBanner accepts and handles the new variant value and applies appropriate styling so text, badges, and controls remain readable in both light and dark mode."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Define Style C theme overrides using CSS variables in `frontend/src/index.css` (light + dark) under a new scope class (e.g., `.home-style-c` and `.dark .home-style-c`) to achieve a clearly different but consistent palette across background/card/accent/border/ring/muted/secondary.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "SIM"
+        ]
+      },
+      "acceptanceCriteria": [
+        "`frontend/src/index.css` includes Style C variable overrides for light mode.",
+        "`frontend/src/index.css` includes Style C variable overrides for dark mode.",
+        "Style C updates only CSS variables (no global breakage): other pages and variants render as before.",
+        "In Style C, key surfaces (background, cards, banner gradient) have sufficient contrast for headings/body text and UI controls in both light and dark mode."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Update the style toggle control on `frontend/src/pages/PublicOverviewPage.tsx` so users can cycle through A → B → C (and back), and ensure the UI reflects the currently selected variant.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-3"
+        ],
+        "quotes": [
+          "SIM"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The toggle control on the public overview page can select all three variants without requiring manual localStorage edits.",
+        "When Style C is selected, the page container uses the Style C scope class and the MarketingBanner receives the variant prop value 'C'.",
+        "No TypeScript errors occur due to the expanded variant union type across components using the variant prop/state."
       ]
     }
   ],
   "constraints": [
-    "Do not edit files under `frontend/src/components/ui` (read-only UI component sources).",
-    "Do not modify any immutable hook files listed in `SYSTEM_CONTEXT.frontend.immutablePaths`.",
-    "Keep all backend logic unchanged (this is a styling-only adjustment)."
+    "Do not edit any files under `frontend/src/components/ui` (read-only UI components).",
+    "Do not modify immutable frontend hook files listed in SYSTEM_CONTEXT; compose around them where necessary.",
+    "Keep all changes within the existing React + TypeScript + Tailwind + React Query stack (no new frameworks or backend services)."
   ],
   "nonGoals": [
-    "Adding new homepage features or new routes.",
-    "Changing the Style A theme or global typography system beyond what is required to tune Style B colors.",
-    "Translating or rewriting existing Portuguese UI copy."
+    "Do not redesign non-homepage pages or change the app’s content/copy as part of this request.",
+    "Do not change backend canister logic; this is a frontend-only style variation."
   ],
   "imageRequirements": {
     "required": [],

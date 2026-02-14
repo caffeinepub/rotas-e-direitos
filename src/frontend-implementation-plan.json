@@ -1,26 +1,70 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Tune Style B homepage palette for cohesive light/dark appearance",
+  "title": "Homepage Style Variant C (light/dark) for unauthenticated landing page",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Refine Style B theme variables and banner gradient/opacity so PublicOverviewPage + MarketingBanner have a cohesive, readable palette in light and dark modes without affecting Style A.",
+      "id": "REQ-2",
+      "summary": "Add Style C as a third homepage style variant for the unauthenticated landing page and ensure it propagates through PublicOverviewPage and MarketingBanner without changing A/B behavior.",
       "acceptanceCriteria": [
-        "When the user toggles to Style B on the public homepage, the overall color tone looks consistent across the page sections and the MarketingBanner (no obvious mismatched tints between background, card surfaces, and banner gradient).",
-        "In both light and dark mode with Style B enabled, text remains comfortably readable (no low-contrast combinations on background/card/accent surfaces).",
-        "Changes are limited to Style B behavior; Style A styling remains visually unchanged."
+        "A new variant option exists in the homepage style variant system (currently 'A' | 'B') to support a third variant (e.g., 'C').",
+        "The new variant persists via the existing localStorage key (homepage-style-variant) and loads correctly on refresh.",
+        "PublicOverviewPage applies a new CSS scope class for Style C (similar to home-style-b) when the variant is set to C.",
+        "MarketingBanner accepts and handles the new variant value and applies appropriate styling so text, badges, and controls remain readable in both light and dark mode."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useHomepageStyleVariant.ts",
+          "operation": "modify",
+          "description": "Expand the homepage style variant union to include 'C' and ensure localStorage load/restore logic accepts 'C' while preserving existing 'A'/'B' behavior and the same storage key (homepage-style-variant)."
+        },
+        {
+          "path": "frontend/src/pages/PublicOverviewPage.tsx",
+          "operation": "modify",
+          "description": "Update the public homepage container class logic to apply a new Style C scope class (home-style-c) when the stored variant is 'C', while keeping existing Style A/B rendering unchanged."
+        },
+        {
+          "path": "frontend/src/components/marketing/MarketingBanner.tsx",
+          "operation": "modify",
+          "description": "Expand the MarketingBanner variant prop type to accept 'C' and add Style C-specific class branching (banner/card/control surfaces) to keep text, badges, and controls readable in both light and dark mode."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Define Style C theme overrides via scoped CSS variables in frontend/src/index.css for both light and dark modes.",
+      "acceptanceCriteria": [
+        "`frontend/src/index.css` includes Style C variable overrides for light mode.",
+        "`frontend/src/index.css` includes Style C variable overrides for dark mode.",
+        "Style C updates only CSS variables (no global breakage): other pages and variants render as before.",
+        "In Style C, key surfaces (background, cards, banner gradient) have sufficient contrast for headings/body text and UI controls in both light and dark mode."
       ],
       "file_operations": [
         {
           "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Adjust only the Style B CSS variable overrides (the .home-style-b and .dark .home-style-b blocks) to refine background/card/accent/border/ring tone for a more balanced palette in light and dark modes; keep all base :root and .dark variables unchanged to avoid impacting Style A."
+          "description": "Add a new scoped variable override block for Style C (e.g., .home-style-c for light and .dark .home-style-c for dark) covering background/card/accent/border/ring/muted/secondary, ensuring changes are limited to variable overrides and do not affect other pages/variants."
+        }
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "summary": "Update the PublicOverviewPage style toggle control to cycle through A → B → C (and back) and reflect the active variant across the page and MarketingBanner.",
+      "acceptanceCriteria": [
+        "The toggle control on the public overview page can select all three variants without requiring manual localStorage edits.",
+        "When Style C is selected, the page container uses the Style C scope class and the MarketingBanner receives the variant prop value 'C'.",
+        "No TypeScript errors occur due to the expanded variant union type across components using the variant prop/state."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useHomepageStyleVariant.ts",
+          "operation": "modify",
+          "description": "Update the toggle function behavior to cycle variants A → B → C → A, keeping persistence behavior intact and ensuring TypeScript types align with the expanded union."
         },
         {
-          "path": "frontend/src/components/marketing/MarketingBanner.tsx",
+          "path": "frontend/src/pages/PublicOverviewPage.tsx",
           "operation": "modify",
-          "description": "Update Style B-only banner presentation (variant === 'B') to better align with the refined Style B variables—e.g., tweak the gradient stops/opacity choices and any surface translucency values used by banner/card styling—while keeping variant A classes unchanged and avoiding edits to any files under frontend/src/components/ui."
+          "description": "Update the toggle button UI (label/aria-label and any visual indicator) to reflect the currently selected variant and to switch through all three variants; ensure the selected variant is passed to MarketingBanner as 'A' | 'B' | 'C'."
         }
       ]
     }

@@ -1,26 +1,52 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T21:50:26.418Z",
+  "generatedAt": "2026-02-14T22:00:05.282Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 1,
-    "implemented": 1,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-1",
-        "summary": "Refine the Style B (\"home-style-b\") color tone so the unauthenticated homepage (PublicOverviewPage + MarketingBanner) has a more cohesive, balanced palette across light and dark modes. Update the CSS variable overrides for Style B in `frontend/src/index.css` (e.g., background/card/accent/border/ring) and, if needed, adjust Style B-only gradient/opacity choices in `frontend/src/components/marketing/MarketingBanner.tsx` so the banner and page surfaces look consistent and readable.",
+        "id": "REQ-2",
+        "summary": "Add an additional homepage style variant (Style C) that provides a distinct, cohesive color palette for the unauthenticated homepage (PublicOverviewPage + MarketingBanner) in both light and dark modes, without changing existing Style A or Style B behavior.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/index.css",
+          "frontend/src/hooks/useHomepageStyleVariant.ts",
+          "frontend/src/pages/PublicOverviewPage.tsx",
           "frontend/src/components/marketing/MarketingBanner.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/index.css",
+          "frontend/src/hooks/useHomepageStyleVariant.ts",
+          "frontend/src/pages/PublicOverviewPage.tsx",
           "frontend/src/components/marketing/MarketingBanner.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Define Style C theme overrides using CSS variables in `frontend/src/index.css` (light + dark) under a new scope class (e.g., `.home-style-c` and `.dark .home-style-c`) to achieve a clearly different but consistent palette across background/card/accent/border/ring/muted/secondary.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/index.css"
+        ],
+        "matchedFiles": [
+          "frontend/src/index.css"
+        ]
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Update the style toggle control on `frontend/src/pages/PublicOverviewPage.tsx` so users can cycle through A → B → C (and back), and ensure the UI reflects the currently selected variant.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useHomepageStyleVariant.ts",
+          "frontend/src/pages/PublicOverviewPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useHomepageStyleVariant.ts",
+          "frontend/src/pages/PublicOverviewPage.tsx"
         ]
       }
     ]
@@ -31,7 +57,9 @@
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/components/marketing/MarketingBanner.tsx",
+    "frontend/src/hooks/useHomepageStyleVariant.ts",
     "frontend/src/index.css",
+    "frontend/src/pages/PublicOverviewPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

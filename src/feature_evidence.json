@@ -2,10 +2,32 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-refine-the-style-b-home-style-b-color-tone-so-the-unauthenticated-homepage-publicoverviewpage-marketingbanner-has-a-more-cohesive-balanced-palette-across-light-and-dark-modes-update-the-css-variable-overrides-for-style-b-in-frontend-src-index-css-e-g-background-card-accent-border-ring-and-if-needed-adjust-style-b-only-gradient-opacity-choices-in-frontend-src-components-marketing-marketingbanner-tsx-so-the-banner-and-page-surfaces-look-consistent-and-readable",
-      "featureTitle": "Refine the Style B (\"home-style-b\") color tone so the unauthenticated homepage (PublicOverviewPage + MarketingBanner) has a more cohesive, balanced palette across light and dark modes. Update the CSS variable overrides for Style B in `frontend/src/index.css` (e.g., background/card/accent/border/ring) and, if needed, adjust Style B-only gradient/opacity choices in `frontend/src/components/marketing/MarketingBanner.tsx` so the banner and page surfaces look consistent and readable.",
+      "featureId": "feature-add-an-additional-homepage-style-variant-style-c-that-provides-a-distinct-cohesive-color-palette-for-the-unauthenticated-homepage-publicoverviewpage-marketingbanner-in-both-light-and-dark-modes-without-changing-existing-style-a-or-style-b-behavior",
+      "featureTitle": "Add an additional homepage style variant (Style C) that provides a distinct, cohesive color palette for the unauthenticated homepage (PublicOverviewPage + MarketingBanner) in both light and dark modes, without changing existing Style A or Style B behavior.",
       "files": [
         "frontend/src/components/marketing/MarketingBanner.tsx",
+        "frontend/src/hooks/useHomepageStyleVariant.ts",
+        "frontend/src/pages/PublicOverviewPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-define-style-c-theme-overrides-using-css-variables-in-frontend-src-index-css-light-dark-under-a-new-scope-class-e-g-home-style-c-and-dark-home-style-c-to-achieve-a-clearly-different-but-consistent-palette-across-background-card-accent-border-ring-muted-secondary",
+      "featureTitle": "Define Style C theme overrides using CSS variables in `frontend/src/index.css` (light + dark) under a new scope class (e.g., `.home-style-c` and `.dark .home-style-c`) to achieve a clearly different but consistent palette across background/card/accent/border/ring/muted/secondary.",
+      "files": [
         "frontend/src/index.css"
       ],
       "components": [
@@ -19,7 +41,29 @@
         "http-outcalls@3.0.0"
       ],
       "testIds": [
-        "REQ-1"
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-the-style-toggle-control-on-frontend-src-pages-publicoverviewpage-tsx-so-users-can-cycle-through-a-b-c-and-back-and-ensure-the-ui-reflects-the-currently-selected-variant",
+      "featureTitle": "Update the style toggle control on `frontend/src/pages/PublicOverviewPage.tsx` so users can cycle through A → B → C (and back), and ensure the UI reflects the currently selected variant.",
+      "files": [
+        "frontend/src/hooks/useHomepageStyleVariant.ts",
+        "frontend/src/pages/PublicOverviewPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0"
+      ],
+      "testIds": [
+        "REQ-4"
       ],
       "confidence": "high"
     }

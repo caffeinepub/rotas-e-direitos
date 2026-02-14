@@ -7,7 +7,7 @@ import { bannerSlides } from './marketingBannerSlides';
 import { useMarketingBannerCarousel } from './useMarketingBannerCarousel';
 
 interface MarketingBannerProps {
-  variant?: 'A' | 'B';
+  variant?: 'A' | 'B' | 'C';
 }
 
 export default function MarketingBanner({ variant = 'A' }: MarketingBannerProps) {
@@ -73,17 +73,35 @@ export default function MarketingBanner({ variant = 'A' }: MarketingBannerProps)
     e.stopPropagation();
   };
 
-  const bannerClasses = variant === 'B'
-    ? 'relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/25 via-accent/15 to-card/95 border-4 border-primary/35 cursor-pointer transition-all hover:border-primary/55 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary focus-visible:ring-offset-4'
-    : 'relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-accent/10 to-background border-2 border-primary/30 cursor-pointer transition-all hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2';
+  const getBannerClasses = () => {
+    if (variant === 'B') {
+      return 'relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/25 via-accent/15 to-card/95 border-4 border-primary/35 cursor-pointer transition-all hover:border-primary/55 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary focus-visible:ring-offset-4';
+    }
+    if (variant === 'C') {
+      return 'relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/30 via-accent/20 to-card/90 border-2 border-primary/40 cursor-pointer transition-all hover:border-primary/60 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2';
+    }
+    return 'relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-accent/10 to-background border-2 border-primary/30 cursor-pointer transition-all hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2';
+  };
 
-  const cardClasses = variant === 'B'
-    ? 'p-4 bg-card/95 backdrop-blur-md border-2 border-primary/25 hover:border-primary/45 hover:shadow-lg transition-all'
-    : 'p-4 bg-card/80 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors';
+  const getCardClasses = () => {
+    if (variant === 'B') {
+      return 'p-4 bg-card/95 backdrop-blur-md border-2 border-primary/25 hover:border-primary/45 hover:shadow-lg transition-all';
+    }
+    if (variant === 'C') {
+      return 'p-4 bg-card/90 backdrop-blur-sm border-2 border-primary/30 hover:border-primary/50 hover:shadow-md transition-all';
+    }
+    return 'p-4 bg-card/80 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors';
+  };
+
+  const getImageOpacity = () => {
+    if (variant === 'B') return 0.12;
+    if (variant === 'C') return 0.15;
+    return 0.1;
+  };
 
   return (
     <div
-      className={bannerClasses}
+      className={getBannerClasses()}
       onClick={handleBannerClick}
       onKeyDown={handleKeyDown}
       onMouseEnter={pause}
@@ -101,7 +119,7 @@ export default function MarketingBanner({ variant = 'A' }: MarketingBannerProps)
             key={slide.id}
             className="absolute inset-0 opacity-10 transition-opacity duration-700"
             style={{
-              opacity: index === currentSlide ? (variant === 'B' ? 0.12 : 0.1) : 0,
+              opacity: index === currentSlide ? getImageOpacity() : 0,
               pointerEvents: 'none',
             }}
           >
@@ -150,10 +168,10 @@ export default function MarketingBanner({ variant = 'A' }: MarketingBannerProps)
             return (
               <Card
                 key={service.title}
-                className={cardClasses}
+                className={getCardClasses()}
               >
                 <div className="flex flex-col items-center text-center space-y-3">
-                  <div className={`p-3 rounded-full bg-primary/10 ${variant === 'B' ? 'ring-2 ring-primary/25' : ''}`}>
+                  <div className={`p-3 rounded-full bg-primary/10 ${variant === 'B' ? 'ring-2 ring-primary/25' : variant === 'C' ? 'ring-2 ring-primary/20' : ''}`}>
                     <Icon className="h-6 w-6 text-primary" />
                   </div>
                   <div>

@@ -7,16 +7,32 @@
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-refine-the-style-b-home-style-b-color-tone-so-the-unauthenticated-homepage-publicoverviewpage-marketingbanner-has-a-more-cohesive-balanced-palette-across-light-and-dark-modes-update-the-css-variable-overrides-for-style-b-in-frontend-src-index-css-e-g-background-card-accent-border-ring-and-if-needed-adjust-style-b-only-gradient-opacity-choices-in-frontend-src-components-marketing-marketingbanner-tsx-so-the-banner-and-page-surfaces-look-consistent-and-readable",
-      "title": "Refine the Style B (\"home-style-b\") color tone so the unauthenticated homepage (PublicOverviewPage + MarketingBanner) has a more cohesive, balanced palette across light and dark modes. Update the CSS variable overrides for Style B in `frontend/src/index.css` (e.g., background/card/accent/border/ring) and, if needed, adjust Style B-only gradient/opacity choices in `frontend/src/components/marketing/MarketingBanner.tsx` so the banner and page surfaces look consistent and readable.",
+      "id": "feature-add-an-additional-homepage-style-variant-style-c-that-provides-a-distinct-cohesive-color-palette-for-the-unauthenticated-homepage-publicoverviewpage-marketingbanner-in-both-light-and-dark-modes-without-changing-existing-style-a-or-style-b-behavior",
+      "title": "Add an additional homepage style variant (Style C) that provides a distinct, cohesive color palette for the unauthenticated homepage (PublicOverviewPage + MarketingBanner) in both light and dark modes, without changing existing Style A or Style B behavior.",
       "reqIds": [
-        "REQ-1"
+        "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-define-style-c-theme-overrides-using-css-variables-in-frontend-src-index-css-light-dark-under-a-new-scope-class-e-g-home-style-c-and-dark-home-style-c-to-achieve-a-clearly-different-but-consistent-palette-across-background-card-accent-border-ring-muted-secondary",
+      "title": "Define Style C theme overrides using CSS variables in `frontend/src/index.css` (light + dark) under a new scope class (e.g., `.home-style-c` and `.dark .home-style-c`) to achieve a clearly different but consistent palette across background/card/accent/border/ring/muted/secondary.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-style-toggle-control-on-frontend-src-pages-publicoverviewpage-tsx-so-users-can-cycle-through-a-b-c-and-back-and-ensure-the-ui-reflects-the-currently-selected-variant",
+      "title": "Update the style toggle control on `frontend/src/pages/PublicOverviewPage.tsx` so users can cycle through A → B → C (and back), and ensure the UI reflects the currently selected variant.",
+      "reqIds": [
+        "REQ-4"
       ],
       "version": 1
     }
   ],
   "new_feature_requests": [],
-  "projectName": "Adjust Style B homepage color tone to better match the new visual theme",
+  "projectName": "Add a third homepage color style variation (Style C) for the unauthenticated landing page",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

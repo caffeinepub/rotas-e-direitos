@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-type StyleVariant = 'A' | 'B';
+type StyleVariant = 'A' | 'B' | 'C';
 
 const STORAGE_KEY = 'homepage-style-variant';
 
@@ -8,7 +8,9 @@ export function useHomepageStyleVariant() {
   const [variant, setVariant] = useState<StyleVariant>(() => {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
-      return stored === 'B' ? 'B' : 'A';
+      if (stored === 'B') return 'B';
+      if (stored === 'C') return 'C';
+      return 'A';
     } catch {
       return 'A';
     }
@@ -23,7 +25,11 @@ export function useHomepageStyleVariant() {
   }, [variant]);
 
   const toggleVariant = () => {
-    setVariant((prev) => (prev === 'A' ? 'B' : 'A'));
+    setVariant((prev) => {
+      if (prev === 'A') return 'B';
+      if (prev === 'B') return 'C';
+      return 'A';
+    });
   };
 
   return { variant, toggleVariant };

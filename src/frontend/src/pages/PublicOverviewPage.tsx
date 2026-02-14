@@ -34,8 +34,10 @@ export default function PublicOverviewPage() {
     },
   ];
 
+  const containerClass = variant === 'B' ? 'home-style-b' : variant === 'C' ? 'home-style-c' : '';
+
   return (
-    <div className={`space-y-12 max-w-6xl mx-auto ${variant === 'B' ? 'home-style-b' : ''}`}>
+    <div className={`space-y-12 max-w-6xl mx-auto ${containerClass}`}>
       {/* Style Toggle Control */}
       <div className="flex justify-end pt-4">
         <Button
@@ -43,7 +45,7 @@ export default function PublicOverviewPage() {
           size="sm"
           onClick={toggleVariant}
           className="gap-2"
-          aria-label={`Alternar para Estilo ${variant === 'A' ? 'B' : 'A'}`}
+          aria-label={`Alternar para Estilo ${variant === 'A' ? 'B' : variant === 'B' ? 'C' : 'A'}`}
         >
           <Palette className="h-4 w-4" />
           Estilo {variant}
