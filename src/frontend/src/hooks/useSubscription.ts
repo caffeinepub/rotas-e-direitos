@@ -1,6 +1,6 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import { SubscriptionStatus, SubscriptionPlan } from '../backend';
+import { SubscriptionStatus } from '../backend';
 import { evaluateEntitlement, EntitlementStatus } from '../lib/subscriptions/rules';
 
 export function useGetSubscriptionStatus() {
@@ -22,19 +22,4 @@ export function useEntitlement(): EntitlementStatus | null {
   if (!status) return null;
   
   return evaluateEntitlement(status);
-}
-
-export function useUpgradeSubscription() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (newPlan: SubscriptionPlan) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.upgradeSubscription(newPlan);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['subscriptionStatus'] });
-    },
-  });
 }

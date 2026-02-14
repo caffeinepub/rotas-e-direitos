@@ -1,239 +1,250 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useSearch } from '@tanstack/react-router';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { QrCode, CreditCard, FileText, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Loader2, CreditCard, QrCode, CheckCircle2 } from 'lucide-react';
+import { useCreateMercadoPagoPayment, useCheckPaymentStatus, useConfirmPaymentAndUpgrade } from '../hooks/useMercadoPagoPayment';
+import { usePublicPaymentConfig } from '../hooks/usePublicPaymentConfig';
 import { getSelectedPlan, clearSelectedPlan } from '../lib/payments/checkoutState';
-import { getPlanById } from '../lib/subscriptions/plans';
-import { useUpgradeSubscription } from '../hooks/useSubscription';
-import TrustBadges from '../components/trust/TrustBadges';
+import { PLANS } from '../lib/subscriptions/plans';
+import { SubscriptionPlan } from '../backend';
+import { MercadoPagoPaymentResponse, PaymentStatusResponse } from '../types/mercadopago';
 import { toast } from 'sonner';
+import TrustBadges from '../components/trust/TrustBadges';
+import MercadoPagoNextSteps from '../components/payments/MercadoPagoNextSteps';
+import PaymentStatusPanel from '../components/payments/PaymentStatusPanel';
+import PaymentProviderNotConfigured from '../components/payments/PaymentProviderNotConfigured';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
-  const [installments, setInstallments] = useState('1');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const upgradeSubscription = useUpgradeSubscription();
+  const searchParams = useSearch({ strict: false }) as { payment_id?: string; status?: string };
+  const [paymentData, setPaymentData] = useState<MercadoPagoPaymentResponse | null>(null);
+
+  const selectedPlan = getSelectedPlan();
+  const plan = selectedPlan ? PLANS.find((p) => p.id === selectedPlan) : null;
+
+  const { data: publicConfig, isLoading: configLoading } = usePublicPaymentConfig();
+  const createMercadoPagoPayment = useCreateMercadoPagoPayment();
+  const { data: paymentStatus, isLoading: statusLoading, refetch: refetchStatus } = useCheckPaymentStatus(paymentData?.paymentId || null);
+  const confirmPayment = useConfirmPaymentAndUpgrade();
+
+  // Handle return from Mercado Pago (resume checkout flow)
+  useEffect(() => {
+    const paymentIdFromUrl = searchParams.payment_id;
+    if (paymentIdFromUrl && !paymentData) {
+      // Resume checkout with payment ID from URL
+      setPaymentData({
+        paymentId: paymentIdFromUrl,
+        checkoutUrl: undefined,
+        pixInstructions: undefined,
+      });
+    }
+  }, [searchParams.payment_id]);
 
   useEffect(() => {
-    const planId = getSelectedPlan();
-    if (!planId) {
+    if (!selectedPlan && !searchParams.payment_id) {
       navigate({ to: '/planos' });
-      return;
     }
-    setSelectedPlan(planId);
-  }, [navigate]);
+  }, [selectedPlan, searchParams.payment_id, navigate]);
 
-  const plan = selectedPlan ? getPlanById(selectedPlan as any) : null;
+  useEffect(() => {
+    if (paymentStatus === 'approved' && !confirmPayment.isPending) {
+      handlePaymentApproved();
+    }
+  }, [paymentStatus]);
 
-  const handlePayment = async (method: string) => {
-    if (!selectedPlan) return;
+  const handlePaymentApproved = async () => {
+    if (!paymentData?.paymentId) return;
 
-    setIsProcessing(true);
     try {
-      await upgradeSubscription.mutateAsync(selectedPlan as any);
-      toast.success('Assinatura ativada com sucesso!');
+      await confirmPayment.mutateAsync({
+        paymentId: paymentData.paymentId,
+        status: 'approved',
+      });
+      toast.success('Payment confirmed! Your subscription has been upgraded.');
       clearSelectedPlan();
-      navigate({ to: '/dashboard-planos' });
-    } catch (error) {
-      toast.error('Erro ao processar pagamento. Tente novamente.');
-      console.error('Payment error:', error);
-    } finally {
-      setIsProcessing(false);
+      navigate({ to: '/planos' });
+    } catch (error: any) {
+      toast.error(error || 'Failed to confirm payment');
     }
   };
 
-  if (!plan) {
-    return null;
+  const handleMercadoPagoCheckout = async () => {
+    if (!plan) return;
+
+    try {
+      const planId = plan.id as SubscriptionPlan;
+      const response = await createMercadoPagoPayment.mutateAsync(planId);
+
+      setPaymentData(response);
+
+      if (response.checkoutUrl) {
+        toast.success('Redirecting to Mercado Pago...');
+        // Add payment_id to return URL for resume flow
+        const returnUrl = `${window.location.origin}/checkout?payment_id=${response.paymentId}`;
+        window.location.href = response.checkoutUrl;
+      } else {
+        toast.info('Payment preference created. Awaiting payment confirmation.');
+      }
+    } catch (error: any) {
+      toast.error(error || 'Failed to create payment');
+    }
+  };
+
+  const handleRefreshStatus = () => {
+    refetchStatus();
+  };
+
+  if (!plan && !searchParams.payment_id) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
   }
 
-  const installmentValue = plan.priceValue / parseInt(installments);
+  if (configLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[60vh]">
+        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
+  const mercadoPagoEnabled = publicConfig?.mercadoPago?.enabled || false;
+
+  // Convert PaymentStatus to PaymentStatusResponse for the panel
+  const statusResponse: PaymentStatusResponse | null = paymentData && paymentStatus ? {
+    paymentId: paymentData.paymentId,
+    status: paymentStatus,
+    statusDetail: undefined,
+  } : null;
 
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate({ to: '/planos' })}>
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Finalizar Pagamento</h1>
-          <p className="text-muted-foreground">Plano selecionado: {plan.name}</p>
-        </div>
+    <div className="max-w-4xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight">Checkout</h1>
+        <p className="text-muted-foreground">Complete your subscription purchase</p>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
-        <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle>Escolha a Forma de Pagamento</CardTitle>
-              <CardDescription>Selecione como deseja pagar sua assinatura</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="pix" className="w-full">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="pix">
-                    <QrCode className="h-4 w-4 mr-2" />
-                    PIX
-                  </TabsTrigger>
-                  <TabsTrigger value="card">
-                    <CreditCard className="h-4 w-4 mr-2" />
-                    Cartão
-                  </TabsTrigger>
-                  <TabsTrigger value="boleto">
-                    <FileText className="h-4 w-4 mr-2" />
-                    Boleto
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="pix" className="space-y-4 mt-6">
-                  <Alert>
-                    <QrCode className="h-4 w-4" />
-                    <AlertDescription>
-                      Pagamento instantâneo via PIX. Após o pagamento, sua assinatura será ativada automaticamente.
-                    </AlertDescription>
-                  </Alert>
-                  <div className="flex flex-col items-center gap-4 p-6 bg-accent rounded-lg">
-                    <div className="w-48 h-48 bg-white rounded-lg flex items-center justify-center border-2 border-border">
-                      <QrCode className="h-32 w-32 text-muted-foreground" />
-                    </div>
-                    <p className="text-sm text-muted-foreground text-center">
-                      QR Code será gerado após a confirmação
-                    </p>
-                    <Input
-                      readOnly
-                      value="00020126580014br.gov.bcb.pix..."
-                      className="font-mono text-xs"
-                    />
-                    <Button className="w-full" size="lg" onClick={() => handlePayment('pix')} disabled={isProcessing}>
-                      {isProcessing ? 'Processando...' : 'Confirmar Pagamento PIX'}
-                    </Button>
+      <div className="grid gap-6 lg:grid-cols-3">
+        <div className="lg:col-span-2 space-y-6">
+          {plan && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Selected Plan</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-semibold">{plan.name}</h3>
+                    <p className="text-sm text-muted-foreground">{plan.description}</p>
                   </div>
-                </TabsContent>
-
-                <TabsContent value="card" className="space-y-4 mt-6">
-                  <Alert>
-                    <CreditCard className="h-4 w-4" />
-                    <AlertDescription>
-                      Parcele em até 12x sem juros. Pagamento processado de forma segura.
-                    </AlertDescription>
-                  </Alert>
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="installments">Número de Parcelas</Label>
-                      <Select value={installments} onValueChange={setInstallments}>
-                        <SelectTrigger id="installments">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
-                            <SelectItem key={num} value={num.toString()}>
-                              {num}x de R$ {installmentValue.toFixed(2)} {num === 1 ? '(à vista)' : 'sem juros'}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="cardNumber">Número do Cartão</Label>
-                      <Input id="cardNumber" placeholder="0000 0000 0000 0000" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="expiry">Validade</Label>
-                        <Input id="expiry" placeholder="MM/AA" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="cvv">CVV</Label>
-                        <Input id="cvv" placeholder="123" />
-                      </div>
-                    </div>
-                    <Button className="w-full" size="lg" onClick={() => handlePayment('card')} disabled={isProcessing}>
-                      {isProcessing ? 'Processando...' : `Pagar ${installments}x de R$ ${installmentValue.toFixed(2)}`}
-                    </Button>
+                  <div className="text-right">
+                    <p className="text-2xl font-bold">{plan.price}</p>
+                    <p className="text-sm text-muted-foreground">{plan.billingPeriod}</p>
                   </div>
-                </TabsContent>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
-                <TabsContent value="boleto" className="space-y-4 mt-6">
-                  <Alert>
-                    <FileText className="h-4 w-4" />
-                    <AlertDescription>
-                      Boleto com vencimento em 3 dias úteis. Sua assinatura será ativada após a confirmação do pagamento.
-                    </AlertDescription>
-                  </Alert>
-                  <div className="space-y-4 p-6 bg-accent rounded-lg">
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Código de Barras</p>
-                      <Input
-                        readOnly
-                        value="34191.79001 01043.510047 91020.150008 1 84560000012345"
-                        className="font-mono text-xs"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <p className="text-sm font-medium">Instruções</p>
-                      <ul className="text-sm text-muted-foreground space-y-1">
-                        <li>• Pague em qualquer banco, lotérica ou app bancário</li>
-                        <li>• Vencimento: 3 dias úteis após a geração</li>
-                        <li>• Confirmação em até 2 dias úteis</li>
-                      </ul>
-                    </div>
-                    <Button className="w-full" size="lg" onClick={() => handlePayment('boleto')} disabled={isProcessing}>
-                      {isProcessing ? 'Processando...' : 'Gerar Boleto'}
-                    </Button>
-                  </div>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+          {paymentData && statusResponse ? (
+            <PaymentStatusPanel
+              status={statusResponse}
+              isLoading={statusLoading}
+              onRefresh={handleRefreshStatus}
+            />
+          ) : (
+            <Card>
+              <CardHeader>
+                <CardTitle>Payment Method</CardTitle>
+                <CardDescription>Choose how you want to pay</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {!mercadoPagoEnabled ? (
+                  <PaymentProviderNotConfigured 
+                    providerName="mercadopago" 
+                    providerDisplayName="Mercado Pago" 
+                  />
+                ) : (
+                  <Tabs defaultValue="mercadopago" className="w-full">
+                    <TabsList className="grid w-full grid-cols-1">
+                      <TabsTrigger value="mercadopago">
+                        <CreditCard className="h-4 w-4 mr-2" />
+                        Mercado Pago
+                      </TabsTrigger>
+                    </TabsList>
 
-          <TrustBadges />
+                    <TabsContent value="mercadopago" className="space-y-4">
+                      <Alert>
+                        <QrCode className="h-4 w-4" />
+                        <AlertDescription>
+                          Pay with PIX, credit card, or other methods via Mercado Pago
+                        </AlertDescription>
+                      </Alert>
+
+                      {paymentData && (
+                        <MercadoPagoNextSteps paymentData={paymentData} />
+                      )}
+
+                      <Button
+                        onClick={handleMercadoPagoCheckout}
+                        disabled={createMercadoPagoPayment.isPending || !!paymentData}
+                        className="w-full"
+                        size="lg"
+                      >
+                        {createMercadoPagoPayment.isPending ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Processing...
+                          </>
+                        ) : paymentData ? (
+                          <>
+                            <CheckCircle2 className="h-4 w-4 mr-2" />
+                            Payment Created
+                          </>
+                        ) : (
+                          <>
+                            <CreditCard className="h-4 w-4 mr-2" />
+                            Continue to Mercado Pago
+                          </>
+                        )}
+                      </Button>
+                    </TabsContent>
+                  </Tabs>
+                )}
+              </CardContent>
+            </Card>
+          )}
         </div>
 
-        <div className="lg:col-span-1">
-          <Card className="sticky top-24">
-            <CardHeader>
-              <CardTitle>Resumo do Pedido</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
+        <div className="space-y-6">
+          {plan && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Order Summary</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Plano</span>
+                  <span className="text-muted-foreground">Plan</span>
                   <span className="font-medium">{plan.name}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-muted-foreground">Período</span>
+                  <span className="text-muted-foreground">Billing</span>
                   <span className="font-medium">{plan.billingPeriod}</span>
                 </div>
-                <div className="border-t pt-2 mt-2">
-                  <div className="flex justify-between text-lg font-bold">
-                    <span>Total</span>
-                    <span>{plan.price}</span>
-                  </div>
+                <div className="border-t pt-4 flex justify-between">
+                  <span className="font-semibold">Total</span>
+                  <span className="text-2xl font-bold">{plan.price}</span>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
+          )}
 
-              <div className="space-y-2 pt-4 border-t">
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <p className="text-sm text-muted-foreground">
-                    Acesso imediato após confirmação do pagamento
-                  </p>
-                </div>
-                <div className="flex items-start gap-2">
-                  <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                  <p className="text-sm text-muted-foreground">
-                    Cancele a qualquer momento
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <TrustBadges />
         </div>
       </div>
     </div>

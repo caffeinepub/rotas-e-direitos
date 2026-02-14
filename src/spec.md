@@ -1,13 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Add a reusable, responsive marketing banner to the public landing experience that highlights the app’s services and benefits for gig drivers (Uber, 99, iFood, InDriver).
+**Goal:** Fix Mercado Pago integration so checkout reliably creates a payment, returns a valid checkout URL, supports status checks and confirmation, and upgrades subscriptions without placeholder/not-implemented errors.
 
 **Planned changes:**
-- Create a reusable React marketing banner component with responsive layout (stacked on small screens, multi-column on larger screens).
-- Include platform mentions (Uber, 99, iFood, InDriver, optionally “and others”) via text and/or badges/chips/icons within the banner.
-- Highlight at least 3 existing app benefits/services (e.g., evidence tracking, loss calculation, appeal generation, collective insights, privacy/security) without introducing new features.
-- Add static banner image assets under `frontend/public/assets/generated` and reference them from the banner component.
-- Integrate the banner near the top of `frontend/src/pages/PublicOverviewPage.tsx` while keeping existing CTAs and overall structure intact and consistent with the current theme.
+- Backend: Implement Mercado Pago preference creation via HTTP outcall, returning a valid checkout URL tied to the caller and selected plan via a stable external reference.
+- Backend: Add APIs to fetch Mercado Pago payment status and to confirm an approved payment (verified against Mercado Pago) and upgrade the caller’s subscription.
+- Backend: Persist Mercado Pago configuration across canister upgrades; improve validation so enabling Mercado Pago requires both Access Token and Public Key with clear, non-sensitive trap messages; keep access token private.
+- Frontend: Update Mercado Pago hooks to use the real backend APIs for create/status/confirm, sanitize errors to safe English messages, and remove placeholder logic.
+- Frontend: Update Checkout page to support returning from Mercado Pago (resume by reading an identifier from the URL) and show/poll real payment status.
+- Frontend: Fix admin Mercado Pago configuration UI validation to accept supported key formats, save reliably, re-fetch and display updated enabled/publicKey state, and show English non-sensitive errors on failure.
 
-**User-visible outcome:** Unauthenticated users see a prominent, responsive banner near the top of the public overview page that clearly communicates supported gig platforms and key app benefits, with correctly loading static images.
+**User-visible outcome:** Users can complete a Mercado Pago checkout end-to-end (create payment, be redirected, return, see real status, and get subscription upgraded on approval), and admins can enable/configure Mercado Pago reliably with safe validation and error messaging.

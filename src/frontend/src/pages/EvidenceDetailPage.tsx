@@ -1,10 +1,10 @@
 import { useParams, useNavigate } from '@tanstack/react-router';
 import { useGetEvidenceById } from '../hooks/useEvidence';
-import { useEvidenceImage } from '../lib/evidenceIndexedDb';
+import { useEvidenceMedia } from '../lib/evidenceIndexedDb';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, FileText, Loader2 } from 'lucide-react';
+import { ArrowLeft, Calendar, FileText, Loader2, Mic, Video } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { EvidenceType, Platform } from '../backend';
@@ -19,13 +19,15 @@ const platformLabels: Record<Platform, string> = {
 const typeLabels: Record<EvidenceType, string> = {
   [EvidenceType.selfie]: 'Selfie',
   [EvidenceType.screenshot]: 'Print',
+  [EvidenceType.audio]: 'Áudio',
+  [EvidenceType.video]: 'Vídeo',
 };
 
 export default function EvidenceDetailPage() {
   const { evidenceId } = useParams({ from: '/evidencias/$evidenceId' });
   const navigate = useNavigate();
   const { data: evidence, isLoading } = useGetEvidenceById(Number(evidenceId));
-  const imageUrl = useEvidenceImage(Number(evidenceId));
+  const { url: mediaUrl, mediaType } = useEvidenceMedia(Number(evidenceId));
 
   if (isLoading) {
     return (
@@ -68,9 +70,22 @@ export default function EvidenceDetailPage() {
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {imageUrl && (
+          {mediaUrl && (
             <div className="rounded-lg overflow-hidden border border-border">
-              <img src={imageUrl} alt="Evidência" className="w-full h-auto" />
+              {(mediaType === 'image' || evidence.evidenceType === EvidenceType.selfie || evidence.evidenceType === EvidenceType.screenshot) && (
+                <img src={mediaUrl} alt="Evidência" className="w-full h-auto" />
+              )}
+              {(mediaType === 'audio' || evidence.evidenceType === EvidenceType.audio) && (
+                <div className="p-8 bg-muted flex flex-col items-center gap-4">
+                  <Mic className="h-16 w-16 text-muted-foreground" />
+                  <audio controls src={mediaUrl} className="w-full max-w-md" />
+                </div>
+              )}
+              {(mediaType === 'video' || evidence.evidenceType === EvidenceType.video) && (
+                <div className="bg-black">
+                  <video controls src={mediaUrl} className="w-full h-auto" />
+                </div>
+              )}
             </div>
           )}
 

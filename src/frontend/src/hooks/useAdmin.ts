@@ -1,18 +1,18 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { UserAccessInfo } from '../backend';
-import { Principal } from '@icp-sdk/core/principal';
+import { Principal } from '@dfinity/principal';
 
 export function useGetAllUserAccessInfo() {
-  const { actor, isFetching: actorFetching } = useActor();
+  const { actor, isFetching } = useActor();
 
   return useQuery<UserAccessInfo[]>({
     queryKey: ['allUserAccessInfo'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
+      if (!actor) return [];
       return actor.getAllUserAccessInfo();
     },
-    enabled: !!actor && !actorFetching,
+    enabled: !!actor && !isFetching,
   });
 }
 
@@ -20,10 +20,11 @@ export function useBlockUser() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<void, Error, Principal>({
     mutationFn: async (targetPrincipal: Principal) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.blockUser(targetPrincipal);
+      // Backend method not implemented yet
+      throw new Error('Block user functionality not yet implemented in backend');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allUserAccessInfo'] });
@@ -35,10 +36,11 @@ export function useUnblockUser() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<void, Error, Principal>({
     mutationFn: async (targetPrincipal: Principal) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.unblockUser(targetPrincipal);
+      // Backend method not implemented yet
+      throw new Error('Unblock user functionality not yet implemented in backend');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allUserAccessInfo'] });

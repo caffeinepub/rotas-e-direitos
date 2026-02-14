@@ -1,80 +1,107 @@
 {
   "kind": "build_request",
-  "title": "Add a responsive marketing banner highlighting app services and benefits for gig drivers (Uber/99/iFood/InDriver)",
-  "priority": "normal",
+  "title": "Fix Mercado Pago payment gateway bugs blocking checkout flow",
+  "priority": "high",
   "requirements": [
     {
-      "id": "REQ-27",
-      "text": "Create a reusable, responsive marketing banner component that highlights the app’s key services and advantages for gig workers, explicitly mentioning platforms like Uber, 99, iFood, and InDriver (and optionally “and others”).",
-      "target": "frontend",
+      "id": "REQ-1",
+      "text": "Implement a working Mercado Pago checkout flow in the Motoko backend so that creating a payment returns a valid Mercado Pago checkout URL and subsequent status checks can confirm the payment and upgrade the user subscription.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "recent-messages:user-1"
         ],
         "quotes": [
-          "CRIE UM BANNER RESPONSIVO MOSTRANDO OS SERVIÇO E VANTAGENS DO APP PARA USUARIOS UBER ,99,IFOOD,INDRIVER ETC"
+          "corrija bugs com o mercado pago"
         ]
       },
       "acceptanceCriteria": [
-        "A new React component exists for the marketing banner (reusable; not hardcoded only inside a single page).",
-        "The banner layout is responsive: stacks cleanly on small screens and uses a multi-column layout on larger screens.",
-        "The banner content visually includes the target platforms (Uber, 99, iFood, InDriver) via text and/or badges/chips/icons.",
-        "The banner highlights at least 3 distinct benefits/services already provided by the app (e.g., evidence tracking, loss calculation, appeal generation, collective insights, privacy/security), without introducing new product features.",
-        "No changes are required to backend canisters for this banner."
+        "Calling createPaymentPreference(plan) returns a non-null checkoutUrl when Mercado Pago is enabled and credentials are configured.",
+        "Backend performs an HTTP outcall to Mercado Pago to create a preference/checkout session using the stored access token and includes a stable external reference that ties the payment to the caller and selected plan.",
+        "A new backend method exists to fetch payment status from Mercado Pago given a payment identifier (or external reference) and returns a status compatible with the frontend PaymentStatus union (pending/approved/rejected/cancelled/in_process/error).",
+        "A new backend method exists to confirm an approved payment and upgrade the caller subscription, and it verifies approval using Mercado Pago data (not only a client-provided status).",
+        "All backend errors returned via traps are non-sensitive (must not include access token, full credential values, raw Mercado Pago API responses, or headers)."
       ]
     },
     {
-      "id": "REQ-28",
-      "text": "Integrate the responsive marketing banner into the public landing experience by placing it prominently on the unauthenticated entry page (frontend/src/pages/PublicOverviewPage.tsx), keeping the page’s existing CTAs and overall structure intact.",
-      "target": "frontend",
+      "id": "REQ-2",
+      "text": "Persist Mercado Pago configuration across canister upgrades and fix backend validation messaging so enabling Mercado Pago requires both accessToken and publicKey, with a correct, clear, non-sensitive error.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "recent-messages:user-1"
         ],
         "quotes": [
-          "CRIE UM BANNER RESPONSIVO MOSTRANDO OS SERVIÇO E VANTAGENS DO APP PARA USUARIOS UBER ,99,IFOOD,INDRIVER ETC"
+          "corrija bugs com o mercado pago"
         ]
       },
       "acceptanceCriteria": [
-        "When not authenticated, the home route renders PublicOverviewPage and the new banner is visible without scrolling excessively (near the top section).",
-        "Existing navigation actions (e.g., view plans, learn more) still work as before.",
-        "The page remains visually consistent with the current dark-first theme and Tailwind token usage."
+        "PaymentConfig (including mercadoPago.accessToken, mercadoPago.publicKey, mercadoPago.enabled) persists across upgrades using stable storage + preupgrade/postupgrade (and migration.mo if required by the chosen upgrade approach).",
+        "When mercadoPago.enabled == true and either credential is empty, setPaymentConfig traps with a correct non-sensitive message indicating that both Public Key and Access Token are required.",
+        "getPublicPaymentConfig continues to return only non-sensitive fields (publicKey and enabled), never the access token."
       ]
     },
     {
-      "id": "REQ-29",
-      "text": "Add the required banner image assets as static files under frontend/public/assets/generated and reference them from the banner component (no backend image serving).",
+      "id": "REQ-3",
+      "text": "Update the frontend Mercado Pago hooks and Checkout page to use the real backend payment status + confirmation APIs (remove placeholder logic), handle redirect/return to the app, and ensure the normal checkout flow completes without throwing “not implemented” errors.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "recent-messages:user-1"
         ],
         "quotes": [
-          "CRIE UM BANNER RESPONSIVO MOSTRANDO OS SERVIÇO E VANTAGENS DO APP PARA USUARIOS UBER ,99,IFOOD,INDRIVER ETC"
+          "corrija bugs com o mercado pago"
         ]
       },
       "acceptanceCriteria": [
-        "Banner image assets are present under frontend/public/assets/generated and are used by the banner component.",
-        "The banner remains readable and accessible with sufficient contrast on both light/dark backgrounds used by the app theme.",
-        "Images load correctly in the deployed build (no broken links; correct public paths)."
+        "useCreateMercadoPagoPayment uses the backend createPaymentPreference response and receives a real checkoutUrl in normal conditions; errors are mapped to safe English messages via sanitizePaymentError.",
+        "useCheckPaymentStatus calls the new backend payment-status method and returns a real status (not a hardcoded 'pending').",
+        "useConfirmPaymentAndUpgrade no longer throws 'Payment confirmation not yet implemented in backend' and calls the new backend confirmation/upgrade method.",
+        "Checkout page supports resuming a checkout after returning from Mercado Pago (e.g., by reading a payment identifier from the URL and showing PaymentStatusPanel to poll/refresh status).",
+        "All user-facing text introduced/changed by this work is in English."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Ensure the admin Mercado Pago configuration UI reliably enables the gateway for real payments by validating supported key formats, saving successfully, and reflecting the updated enabled/publicKey state from getPublicPaymentConfig after save.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "recent-messages:user-1"
+        ],
+        "quotes": [
+          "corrija bugs com o mercado pago"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin can enter Mercado Pago Public Key values in the formats shown in the UI placeholders (e.g., APP_USR-... and TEST-...) without front-end validation incorrectly rejecting them.",
+        "On successful save, the UI re-fetches getPublicPaymentConfig and displays the updated enabled + publicKey state so the admin can confirm configuration is active.",
+        "If saving fails, the admin sees an English, non-sensitive error message (no credential echo)."
       ]
     }
   ],
   "constraints": [
-    "Frontend immutable paths must not be edited: frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, frontend/src/components/ui.",
-    "Keep backend as a single Motoko actor; no backend changes are required for this UI-only request.",
-    "Use English only in this build request document; in the app UI, keep copy consistent with the app’s existing language strategy."
+    "Backend must remain a single Motoko actor in backend/main.mo (no additional backend services).",
+    "Do not edit files under frontend/src/components/ui or the immutable hook paths listed in SYSTEM_CONTEXT.",
+    "Do not expose Mercado Pago access tokens in any public query responses, logs, or user-facing error messages."
   ],
   "nonGoals": [
-    "Do not implement new backend endpoints or data models for marketing content.",
-    "Do not add third-party marketing/analytics integrations.",
-    "Do not redesign global navigation or subscription gating as part of this banner work."
+    "Adding new payment providers besides Mercado Pago.",
+    "Integrating third-party auth providers (only Internet Identity is supported).",
+    "Implementing real-time/WebSocket payment updates (polling/refresh is sufficient)."
   ],
   "imageRequirements": {
-    "required": [
-      "Wide responsive hero/banner illustration with delivery rider silhouette and abstract city/road shapes, dark-friendly palette (banner-hero.dim_1600x600.png)",
-      "Square/vertical banner illustration variant optimized for mobile, same visual style (banner-hero-mobile.dim_900x900.png)"
-    ],
+    "required": [],
     "edits": []
+  },
+  "userProfileUpdate": {
+    "goalsToAdd": [],
+    "goalsToRemove": [],
+    "preferencesToAdd": [],
+    "preferencesToRemove": [],
+    "miscToAdd": [],
+    "miscToRemove": [],
+    "fieldsToSet": {},
+    "fieldsToDelete": []
   }
 }

@@ -1,63 +1,80 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T04:41:36.325Z",
+  "generatedAt": "2026-02-14T19:51:24.686Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 4,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-27",
-        "summary": "Create a reusable, responsive marketing banner component that highlights the app’s key services and advantages for gig workers, explicitly mentioning platforms like Uber, 99, iFood, and InDriver (and optionally “and others”).",
+        "id": "REQ-1",
+        "summary": "Implement a working Mercado Pago checkout flow in the Motoko backend so that creating a payment returns a valid Mercado Pago checkout URL and subsequent status checks can confirm the payment and upgrade the user subscription.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-2",
+        "summary": "Persist Mercado Pago configuration across canister upgrades and fix backend validation messaging so enabling Mercado Pago requires both accessToken and publicKey, with a correct, clear, non-sensitive error.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Update the frontend Mercado Pago hooks and Checkout page to use the real backend payment status + confirmation APIs (remove placeholder logic), handle redirect/return to the app, and ensure the normal checkout flow completes without throwing “not implemented” errors.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/marketing/MarketingBanner.tsx"
+          "frontend/src/hooks/useMercadoPagoPayment.ts",
+          "frontend/src/pages/CheckoutPage.tsx",
+          "frontend/src/backend.d.ts",
+          "frontend/src/lib/payments/paymentErrorMessages.ts",
+          "frontend/src/types/mercadopago.ts",
+          "frontend/src/utils/urlParams.ts"
         ],
         "matchedFiles": [
-          "frontend/src/components/marketing/MarketingBanner.tsx"
+          "frontend/src/hooks/useMercadoPagoPayment.ts",
+          "frontend/src/pages/CheckoutPage.tsx",
+          "frontend/src/backend.d.ts",
+          "frontend/src/lib/payments/paymentErrorMessages.ts"
         ]
       },
       {
-        "id": "REQ-28",
-        "summary": "Integrate the responsive marketing banner into the public landing experience by placing it prominently on the unauthenticated entry page (frontend/src/pages/PublicOverviewPage.tsx), keeping the page’s existing CTAs and overall structure intact.",
+        "id": "REQ-4",
+        "summary": "Ensure the admin Mercado Pago configuration UI reliably enables the gateway for real payments by validating supported key formats, saving successfully, and reflecting the updated enabled/publicKey state from getPublicPaymentConfig after save.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/PublicOverviewPage.tsx"
+          "frontend/src/pages/AdminDashboardPage.tsx",
+          "frontend/src/hooks/useAdminPaymentConfig.ts",
+          "frontend/src/hooks/usePublicPaymentConfig.ts"
         ],
         "matchedFiles": [
-          "frontend/src/pages/PublicOverviewPage.tsx"
-        ]
-      },
-      {
-        "id": "REQ-29",
-        "summary": "Add the required banner image assets as static files under frontend/public/assets/generated and reference them from the banner component (no backend image serving).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/public/assets/generated/banner-hero.dim_1600x600.png",
-          "frontend/public/assets/generated/banner-hero-mobile.dim_900x900.png",
-          "frontend/src/components/marketing/MarketingBanner.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/public/assets/generated/banner-hero.dim_1600x600.png",
-          "frontend/public/assets/generated/banner-hero-mobile.dim_900x900.png",
-          "frontend/src/components/marketing/MarketingBanner.tsx"
+          "frontend/src/pages/AdminDashboardPage.tsx",
+          "frontend/src/hooks/useAdminPaymentConfig.ts"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/public/assets/generated/banner-hero-mobile.dim_900x900.png",
-    "frontend/public/assets/generated/banner-hero.dim_1600x600.png",
-    "frontend/src/components/marketing/MarketingBanner.tsx",
-    "frontend/src/pages/PublicOverviewPage.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useAdminPaymentConfig.ts",
+    "frontend/src/hooks/useMercadoPagoPayment.ts",
+    "frontend/src/lib/payments/paymentErrorMessages.ts",
+    "frontend/src/pages/AdminDashboardPage.tsx",
+    "frontend/src/pages/CheckoutPage.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

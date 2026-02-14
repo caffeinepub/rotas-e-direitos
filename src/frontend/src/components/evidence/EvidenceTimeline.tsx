@@ -7,11 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import EvidenceFilters from './EvidenceFilters';
 import EvidenceSelectionToolbar from './EvidenceSelectionToolbar';
-import { useEvidenceImage } from '../../lib/evidenceIndexedDb';
+import { useEvidenceMedia } from '../../lib/evidenceIndexedDb';
 import { EvidenceType, Platform } from '../../backend';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { FileText, Loader2 } from 'lucide-react';
+import { FileText, Loader2, Mic, Video } from 'lucide-react';
 
 const platformLabels: Record<Platform, string> = {
   [Platform.ifood]: 'iFood',
@@ -23,14 +23,52 @@ const platformLabels: Record<Platform, string> = {
 const typeLabels: Record<EvidenceType, string> = {
   [EvidenceType.selfie]: 'Selfie',
   [EvidenceType.screenshot]: 'Print',
+  [EvidenceType.audio]: 'Áudio',
+  [EvidenceType.video]: 'Vídeo',
 };
 
 function EvidenceCard({ evidence, isSelected, onToggle }: any) {
-  const imageUrl = useEvidenceImage(Number(evidence.id));
+  const { url: mediaUrl, mediaType } = useEvidenceMedia(Number(evidence.id));
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate({ to: '/evidencias/$evidenceId', params: { evidenceId: String(evidence.id) } });
+  };
+
+  const renderPreview = () => {
+    if (!mediaUrl) {
+      return (
+        <div className="w-24 h-24 bg-muted rounded-lg flex items-center justify-center">
+          <FileText className="h-8 w-8 text-muted-foreground" />
+        </div>
+      );
+    }
+
+    if (mediaType === 'image' || evidence.evidenceType === EvidenceType.selfie || evidence.evidenceType === EvidenceType.screenshot) {
+      return <img src={mediaUrl} alt="Evidência" className="w-24 h-24 object-cover rounded-lg" />;
+    }
+
+    if (mediaType === 'audio' || evidence.evidenceType === EvidenceType.audio) {
+      return (
+        <div className="w-24 h-24 bg-muted rounded-lg flex items-center justify-center">
+          <Mic className="h-8 w-8 text-muted-foreground" />
+        </div>
+      );
+    }
+
+    if (mediaType === 'video' || evidence.evidenceType === EvidenceType.video) {
+      return (
+        <div className="w-24 h-24 bg-muted rounded-lg flex items-center justify-center">
+          <Video className="h-8 w-8 text-muted-foreground" />
+        </div>
+      );
+    }
+
+    return (
+      <div className="w-24 h-24 bg-muted rounded-lg flex items-center justify-center">
+        <FileText className="h-8 w-8 text-muted-foreground" />
+      </div>
+    );
   };
 
   return (
@@ -48,13 +86,7 @@ function EvidenceCard({ evidence, isSelected, onToggle }: any) {
 
           <div className="flex-1 min-w-0 cursor-pointer" onClick={handleClick}>
             <div className="flex gap-4">
-              {imageUrl ? (
-                <img src={imageUrl} alt="Evidência" className="w-24 h-24 object-cover rounded-lg" />
-              ) : (
-                <div className="w-24 h-24 bg-muted rounded-lg flex items-center justify-center">
-                  <FileText className="h-8 w-8 text-muted-foreground" />
-                </div>
-              )}
+              {renderPreview()}
 
               <div className="flex-1 min-w-0 space-y-2">
                 <div className="flex items-start gap-2 flex-wrap">
@@ -102,11 +134,7 @@ export default function EvidenceTimeline() {
     });
   };
 
-  const selectAll = () => {
-    setSelectedIds(new Set(evidence.map((e) => Number(e.id))));
-  };
-
-  const selectNone = () => {
+  const clearSelection = () => {
     setSelectedIds(new Set());
   };
 
@@ -137,9 +165,8 @@ export default function EvidenceTimeline() {
           {selectedIds.size > 0 && (
             <EvidenceSelectionToolbar
               selectedIds={selectedIds}
-              evidence={evidence}
-              onSelectAll={selectAll}
-              onSelectNone={selectNone}
+              allEvidence={evidence}
+              onClearSelection={clearSelection}
             />
           )}
 

@@ -11,19 +11,19 @@ export default function PaymentsPage() {
     {
       icon: QrCode,
       title: 'PIX',
-      description: 'Pagamento instantâneo via QR Code',
+      description: 'Instant payment via QR Code',
       color: 'text-chart-1',
     },
     {
       icon: CreditCard,
-      title: 'Cartão de Crédito',
-      description: 'Parcelamento em até 12x sem juros',
+      title: 'Credit Card',
+      description: 'Pay in up to 12 interest-free installments',
       color: 'text-chart-2',
     },
     {
       icon: FileText,
-      title: 'Boleto Bancário',
-      description: 'Pagamento via boleto com vencimento em 3 dias',
+      title: 'Bank Slip',
+      description: 'Payment via boleto with 3-day expiry',
       color: 'text-chart-3',
     },
   ];
@@ -31,9 +31,9 @@ export default function PaymentsPage() {
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold tracking-tight">Pagamentos</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Payments</h1>
         <p className="text-xl text-muted-foreground">
-          Escolha a forma de pagamento mais conveniente para você
+          Choose the most convenient payment method for you
         </p>
       </div>
 
@@ -56,14 +56,14 @@ export default function PaymentsPage() {
 
       <Card className="border-primary/50">
         <CardHeader>
-          <CardTitle className="text-2xl">Pronto para Assinar?</CardTitle>
+          <CardTitle className="text-2xl">Ready to Subscribe?</CardTitle>
           <CardDescription className="text-base">
-            Escolha seu plano e selecione a forma de pagamento no próximo passo
+            Choose your plan and select the payment method in the next step. PIX provider selection is available during checkout.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Button size="lg" className="w-full md:w-auto" onClick={() => navigate({ to: '/planos' })}>
-            Ver Planos Disponíveis
+            View Available Plans
             <ArrowRight className="ml-2 h-5 w-5" />
           </Button>
         </CardContent>
@@ -73,12 +73,12 @@ export default function PaymentsPage() {
 
       <Card className="bg-accent/50">
         <CardContent className="pt-6 space-y-4">
-          <h3 className="font-semibold text-lg">Informações Importantes</h3>
+          <h3 className="font-semibold text-lg">Important Information</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
-            <li>• Todos os pagamentos são processados de forma segura</li>
-            <li>• Você receberá um recibo por e-mail após a confirmação</li>
-            <li>• Cancele sua assinatura a qualquer momento</li>
-            <li>• Suporte disponível para dúvidas sobre pagamento</li>
+            <li>• All payments are processed securely</li>
+            <li>• You will receive a receipt by email after confirmation</li>
+            <li>• Cancel your subscription at any time</li>
+            <li>• Support available for payment questions</li>
           </ul>
         </CardContent>
       </Card>

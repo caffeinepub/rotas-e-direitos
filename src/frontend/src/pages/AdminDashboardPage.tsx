@@ -1,509 +1,409 @@
-import { useState, useMemo } from 'react';
-import { useGetAllUserAccessInfo, useBlockUser, useUnblockUser } from '../hooks/useAdmin';
-import AdminGate from '../components/AdminGate';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
+import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
-import { Loader2, Search, ShieldCheck, ShieldX, Users, Lock, Unlock } from 'lucide-react';
-import { UserAccessInfo, SubscriptionPlan } from '../backend';
-import { Principal } from '@icp-sdk/core/principal';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Users, Settings, TrendingUp, Loader2, Save, AlertCircle, CheckCircle2, Ban, Unlock, ShieldAlert, Info } from 'lucide-react';
+import { useGetAllUserAccessInfo, useBlockUser, useUnblockUser } from '../hooks/useAdmin';
+import { useUpdatePaymentConfig } from '../hooks/useAdminPaymentConfig';
+import { usePublicPaymentConfig } from '../hooks/usePublicPaymentConfig';
+import { PaymentConfig } from '../backend';
+import { toast } from 'sonner';
+import { Principal } from '@dfinity/principal';
+import MercadoPagoSetupGuide from '../components/admin/MercadoPagoSetupGuide';
+import AdminGate from '../components/AdminGate';
 
-function getPlanLabel(plan: SubscriptionPlan): string {
-  switch (plan) {
-    case SubscriptionPlan.free_24h:
-      return 'Gratuito 24h';
-    case SubscriptionPlan.pro_monthly:
-      return 'Pro Mensal';
-    case SubscriptionPlan.pro_annual:
-      return 'Pro Anual';
-    default:
-      return 'Desconhecido';
-  }
-}
+export default function AdminDashboardPage() {
+  const { data: users, isLoading: usersLoading } = useGetAllUserAccessInfo();
+  const { data: publicConfig, isLoading: configLoading, refetch: refetchPublicConfig } = usePublicPaymentConfig();
+  const updateConfig = useUpdatePaymentConfig();
+  const blockUser = useBlockUser();
+  const unblockUser = useUnblockUser();
 
-function getPlanBadgeVariant(plan: SubscriptionPlan): 'default' | 'secondary' | 'outline' {
-  switch (plan) {
-    case SubscriptionPlan.free_24h:
-      return 'outline';
-    case SubscriptionPlan.pro_monthly:
-      return 'secondary';
-    case SubscriptionPlan.pro_annual:
-      return 'default';
-    default:
-      return 'outline';
-  }
-}
-
-function formatDate(timestamp?: bigint): string {
-  if (!timestamp) return 'N/A';
-  const date = new Date(Number(timestamp) / 1000000);
-  return date.toLocaleDateString('pt-BR', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
+  // Initialize with default empty config
+  const [localConfig, setLocalConfig] = useState<PaymentConfig>({
+    mercadoPago: {
+      accessToken: '',
+      publicKey: '',
+      enabled: false,
+    },
   });
-}
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
-function isSubscriptionActive(endTime?: bigint): boolean {
-  if (!endTime) return false;
-  const now = Date.now() * 1000000;
-  return Number(endTime) > now;
-}
+  // Update local config when public config loads (only non-sensitive fields)
+  useEffect(() => {
+    if (publicConfig?.mercadoPago) {
+      setLocalConfig(prev => ({
+        ...prev,
+        mercadoPago: {
+          ...prev.mercadoPago,
+          publicKey: publicConfig.mercadoPago.publicKey,
+          enabled: publicConfig.mercadoPago.enabled,
+          // Keep accessToken from local state (not available from backend)
+        },
+      }));
+    }
+  }, [publicConfig]);
 
-interface BlockDialogState {
-  open: boolean;
-  user: UserAccessInfo | null;
-  action: 'block' | 'unblock';
-}
-
-function AdminDashboardContent() {
-  const { data: users, isLoading, error } = useGetAllUserAccessInfo();
-  const { mutate: blockUser, isPending: isBlocking } = useBlockUser();
-  const { mutate: unblockUser, isPending: isUnblocking } = useUnblockUser();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [dialogState, setDialogState] = useState<BlockDialogState>({
-    open: false,
-    user: null,
-    action: 'block',
-  });
-
-  const filteredUsers = useMemo(() => {
-    if (!users) return [];
-    if (!searchTerm.trim()) return users;
-
-    const term = searchTerm.toLowerCase();
-    return users.filter((user) => {
-      const principalStr = user.principal.toString().toLowerCase();
-      const name = user.profile?.name?.toLowerCase() || '';
-      const email = user.profile?.email?.toLowerCase() || '';
-      return principalStr.includes(term) || name.includes(term) || email.includes(term);
-    });
-  }, [users, searchTerm]);
-
-  const handleOpenDialog = (user: UserAccessInfo, action: 'block' | 'unblock') => {
-    setDialogState({ open: true, user, action });
+  const validatePublicKey = (key: string): boolean => {
+    if (!key.trim()) return false;
+    // Accept keys starting with TEST- or APP_USR- (case insensitive)
+    const upperKey = key.toUpperCase();
+    return upperKey.startsWith('TEST-') || upperKey.startsWith('APP_USR-');
   };
 
-  const handleConfirmAction = () => {
-    if (!dialogState.user) return;
+  const handleSaveConfig = async () => {
+    if (!localConfig) return;
 
-    if (dialogState.action === 'block') {
-      blockUser(dialogState.user.principal);
-    } else {
-      unblockUser(dialogState.user.principal);
+    // Validation: Check if Mercado Pago is being enabled
+    if (localConfig.mercadoPago.enabled) {
+      if (!localConfig.mercadoPago.publicKey.trim()) {
+        toast.error('Public Key is required when Mercado Pago is enabled');
+        return;
+      }
+
+      if (!validatePublicKey(localConfig.mercadoPago.publicKey)) {
+        toast.error('Public Key must start with TEST- or APP_USR-');
+        return;
+      }
+
+      if (!localConfig.mercadoPago.accessToken.trim()) {
+        toast.error('Access Token is required when Mercado Pago is enabled');
+        return;
+      }
     }
 
-    setDialogState({ open: false, user: null, action: 'block' });
+    setIsSaving(true);
+    setSaveSuccess(false);
+
+    try {
+      await updateConfig.mutateAsync(localConfig);
+      
+      // Explicitly refetch public config to update UI with saved state
+      await refetchPublicConfig();
+      
+      setSaveSuccess(true);
+      toast.success('Payment configuration saved successfully');
+      
+      // Clear Access Token field for security (don't keep it in local state)
+      setLocalConfig(prev => ({
+        ...prev,
+        mercadoPago: {
+          ...prev.mercadoPago,
+          accessToken: '',
+        },
+      }));
+
+      // Clear success message after 3 seconds
+      setTimeout(() => setSaveSuccess(false), 3000);
+    } catch (error: any) {
+      console.error('Save config error:', error);
+      toast.error(error.message || 'Failed to save payment configuration');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const stats = useMemo(() => {
-    if (!users) return { total: 0, blocked: 0, active: 0, expired: 0 };
-    return {
-      total: users.length,
-      blocked: users.filter((u) => u.isBlockedByAdmin).length,
-      active: users.filter((u) => isSubscriptionActive(u.subscriptionStatus.endTime)).length,
-      expired: users.filter((u) => !isSubscriptionActive(u.subscriptionStatus.endTime)).length,
-    };
-  }, [users]);
+  const handleBlockUser = async (principal: Principal) => {
+    try {
+      await blockUser.mutateAsync(principal);
+      toast.success('User blocked successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to block user');
+    }
+  };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Carregando dados dos usuários...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleUnblockUser = async (principal: Principal) => {
+    try {
+      await unblockUser.mutateAsync(principal);
+      toast.success('User unblocked successfully');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to unblock user');
+    }
+  };
 
-  if (error) {
-    return (
-      <Card className="border-destructive">
-        <CardHeader>
-          <CardTitle className="text-destructive">Erro ao Carregar Dados</CardTitle>
-          <CardDescription>
-            Não foi possível carregar as informações dos usuários.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <p className="text-sm text-muted-foreground">{String(error)}</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const totalUsers = users?.length || 0;
+  const blockedUsers = users?.filter(u => u.isBlockedByAdmin).length || 0;
+  const proUsers = users?.filter(u => u.subscriptionStatus.currentPlan !== 'free_24h').length || 0;
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3">
-          <ShieldCheck className="h-8 w-8 text-primary" />
-          Painel Administrativo
-        </h1>
-        <p className="text-muted-foreground mt-2">
-          Gerencie usuários, assinaturas e controle de acesso
-        </p>
-      </div>
+    <AdminGate>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+          <p className="text-muted-foreground">Manage users and system configuration</p>
+        </div>
 
-      {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Total de Usuários
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-primary" />
-              <span className="text-2xl font-bold">{stats.total}</span>
-            </div>
-          </CardContent>
-        </Card>
+        {/* Statistics Cards */}
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{totalUsers}</div>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Assinaturas Ativas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <ShieldCheck className="h-5 w-5 text-green-600" />
-              <span className="text-2xl font-bold">{stats.active}</span>
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Pro Subscribers</CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{proUsers}</div>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Assinaturas Expiradas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <ShieldX className="h-5 w-5 text-orange-600" />
-              <span className="text-2xl font-bold">{stats.expired}</span>
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Blocked Users</CardTitle>
+              <ShieldAlert className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{blockedUsers}</div>
+            </CardContent>
+          </Card>
+        </div>
 
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">
-              Usuários Bloqueados
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center gap-2">
-              <Lock className="h-5 w-5 text-destructive" />
-              <span className="text-2xl font-bold">{stats.blocked}</span>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+        <Tabs defaultValue="users" className="space-y-4">
+          <TabsList>
+            <TabsTrigger value="users">
+              <Users className="h-4 w-4 mr-2" />
+              Users
+            </TabsTrigger>
+            <TabsTrigger value="payments">
+              <Settings className="h-4 w-4 mr-2" />
+              Payment Settings
+            </TabsTrigger>
+          </TabsList>
 
-      {/* Search and Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Gerenciar Usuários</CardTitle>
-          <CardDescription>
-            Pesquise e gerencie o acesso dos usuários ao sistema
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Buscar por principal, nome ou email..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-
-            {/* Desktop Table */}
-            <div className="hidden md:block rounded-md border">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Usuário</TableHead>
-                    <TableHead>Principal</TableHead>
-                    <TableHead>Plano</TableHead>
-                    <TableHead>Início</TableHead>
-                    <TableHead>Expiração</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="text-right">Ações</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filteredUsers.length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={7} className="text-center text-muted-foreground py-8">
-                        {searchTerm ? 'Nenhum usuário encontrado' : 'Nenhum usuário cadastrado'}
-                      </TableCell>
-                    </TableRow>
-                  ) : (
-                    filteredUsers.map((user) => {
-                      const isActive = isSubscriptionActive(user.subscriptionStatus.endTime);
-                      return (
+          <TabsContent value="users" className="space-y-4">
+            <Card>
+              <CardHeader>
+                <CardTitle>User Management</CardTitle>
+                <CardDescription>View and manage all registered users</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {usersLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : users && users.length > 0 ? (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Email</TableHead>
+                        <TableHead>Plan</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {users.map((user) => (
                         <TableRow key={user.principal.toString()}>
-                          <TableCell>
-                            <div>
-                              <div className="font-medium">
-                                {user.profile?.name || 'Sem nome'}
-                              </div>
-                              {user.profile?.email && (
-                                <div className="text-sm text-muted-foreground">
-                                  {user.profile.email}
-                                </div>
-                              )}
-                            </div>
+                          <TableCell className="font-medium">
+                            {user.profile?.name || 'No name'}
                           </TableCell>
+                          <TableCell>{user.profile?.email || 'No email'}</TableCell>
                           <TableCell>
-                            <code className="text-xs bg-muted px-2 py-1 rounded">
-                              {user.principal.toString().slice(0, 12)}...
-                            </code>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant={getPlanBadgeVariant(user.subscriptionStatus.currentPlan)}>
-                              {getPlanLabel(user.subscriptionStatus.currentPlan)}
+                            <Badge variant={user.subscriptionStatus.currentPlan === 'free_24h' ? 'outline' : 'default'}>
+                              {user.subscriptionStatus.currentPlan.replace('_', ' ')}
                             </Badge>
                           </TableCell>
-                          <TableCell className="text-sm">
-                            {formatDate(user.subscriptionStatus.startTime)}
-                          </TableCell>
-                          <TableCell className="text-sm">
-                            {formatDate(user.subscriptionStatus.endTime)}
+                          <TableCell>
+                            {user.isBlockedByAdmin ? (
+                              <Badge variant="destructive">Blocked</Badge>
+                            ) : (
+                              <Badge variant="outline" className="border-green-600 text-green-600">Active</Badge>
+                            )}
                           </TableCell>
                           <TableCell>
                             {user.isBlockedByAdmin ? (
-                              <Badge variant="destructive" className="gap-1">
-                                <Lock className="h-3 w-3" />
-                                Bloqueado
-                              </Badge>
-                            ) : isActive ? (
-                              <Badge variant="default" className="gap-1 bg-green-600">
-                                <ShieldCheck className="h-3 w-3" />
-                                Ativo
-                              </Badge>
-                            ) : (
-                              <Badge variant="secondary" className="gap-1">
-                                <ShieldX className="h-3 w-3" />
-                                Expirado
-                              </Badge>
-                            )}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            {user.isBlockedByAdmin ? (
                               <Button
-                                size="sm"
                                 variant="outline"
-                                onClick={() => handleOpenDialog(user, 'unblock')}
-                                disabled={isUnblocking}
+                                size="sm"
+                                onClick={() => handleUnblockUser(user.principal)}
+                                disabled={unblockUser.isPending}
                               >
                                 <Unlock className="h-4 w-4 mr-1" />
-                                Desbloquear
+                                Unblock
                               </Button>
                             ) : (
                               <Button
+                                variant="outline"
                                 size="sm"
-                                variant="destructive"
-                                onClick={() => handleOpenDialog(user, 'block')}
-                                disabled={isBlocking}
+                                onClick={() => handleBlockUser(user.principal)}
+                                disabled={blockUser.isPending}
                               >
-                                <Lock className="h-4 w-4 mr-1" />
-                                Bloquear
+                                <Ban className="h-4 w-4 mr-1" />
+                                Block
                               </Button>
                             )}
                           </TableCell>
                         </TableRow>
-                      );
-                    })
-                  )}
-                </TableBody>
-              </Table>
-            </div>
+                      ))}
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No users found
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-            {/* Mobile Cards */}
-            <div className="md:hidden space-y-4">
-              {filteredUsers.length === 0 ? (
-                <div className="text-center text-muted-foreground py-8">
-                  {searchTerm ? 'Nenhum usuário encontrado' : 'Nenhum usuário cadastrado'}
-                </div>
-              ) : (
-                filteredUsers.map((user) => {
-                  const isActive = isSubscriptionActive(user.subscriptionStatus.endTime);
-                  return (
-                    <Card key={user.principal.toString()}>
-                      <CardHeader className="pb-3">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <CardTitle className="text-base">
-                              {user.profile?.name || 'Sem nome'}
-                            </CardTitle>
-                            {user.profile?.email && (
-                              <CardDescription className="text-sm mt-1">
-                                {user.profile.email}
-                              </CardDescription>
-                            )}
+          <TabsContent value="payments" className="space-y-4">
+            <MercadoPagoSetupGuide />
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Mercado Pago Configuration</CardTitle>
+                <CardDescription>Configure Mercado Pago payment provider credentials</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {configLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <>
+                    {/* Current Status */}
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertDescription>
+                        <div className="space-y-2">
+                          <p className="font-medium">Current Status:</p>
+                          <div className="flex items-center gap-2">
+                            <span className="text-sm">Enabled:</span>
+                            <Badge variant={localConfig.mercadoPago.enabled ? 'default' : 'outline'}>
+                              {localConfig.mercadoPago.enabled ? 'Yes' : 'No'}
+                            </Badge>
                           </div>
-                          {user.isBlockedByAdmin ? (
-                            <Badge variant="destructive" className="gap-1">
-                              <Lock className="h-3 w-3" />
-                              Bloqueado
-                            </Badge>
-                          ) : isActive ? (
-                            <Badge variant="default" className="gap-1 bg-green-600">
-                              <ShieldCheck className="h-3 w-3" />
-                              Ativo
-                            </Badge>
-                          ) : (
-                            <Badge variant="secondary" className="gap-1">
-                              <ShieldX className="h-3 w-3" />
-                              Expirado
-                            </Badge>
+                          {localConfig.mercadoPago.publicKey && (
+                            <div className="flex items-center gap-2">
+                              <span className="text-sm">Public Key:</span>
+                              <code className="text-xs bg-muted px-2 py-1 rounded">
+                                {localConfig.mercadoPago.publicKey.substring(0, 20)}...
+                              </code>
+                            </div>
                           )}
                         </div>
-                      </CardHeader>
-                      <CardContent className="space-y-3">
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Principal:</span>
-                            <code className="text-xs bg-muted px-2 py-1 rounded">
-                              {user.principal.toString().slice(0, 12)}...
-                            </code>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Plano:</span>
-                            <Badge variant={getPlanBadgeVariant(user.subscriptionStatus.currentPlan)}>
-                              {getPlanLabel(user.subscriptionStatus.currentPlan)}
-                            </Badge>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Início:</span>
-                            <span>{formatDate(user.subscriptionStatus.startTime)}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="text-muted-foreground">Expiração:</span>
-                            <span>{formatDate(user.subscriptionStatus.endTime)}</span>
-                          </div>
-                        </div>
-                        <div className="pt-2">
-                          {user.isBlockedByAdmin ? (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleOpenDialog(user, 'unblock')}
-                              disabled={isUnblocking}
-                              className="w-full"
-                            >
-                              <Unlock className="h-4 w-4 mr-2" />
-                              Desbloquear Usuário
-                            </Button>
-                          ) : (
-                            <Button
-                              size="sm"
-                              variant="destructive"
-                              onClick={() => handleOpenDialog(user, 'block')}
-                              disabled={isBlocking}
-                              className="w-full"
-                            >
-                              <Lock className="h-4 w-4 mr-2" />
-                              Bloquear Usuário
-                            </Button>
-                          )}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  );
-                })
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                      </AlertDescription>
+                    </Alert>
 
-      {/* Confirmation Dialog */}
-      <AlertDialog open={dialogState.open} onOpenChange={(open) => setDialogState({ ...dialogState, open })}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {dialogState.action === 'block' ? 'Bloquear Usuário?' : 'Desbloquear Usuário?'}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {dialogState.action === 'block' ? (
-                <>
-                  Você está prestes a bloquear o acesso de{' '}
-                  <strong>{dialogState.user?.profile?.name || 'este usuário'}</strong>.
-                  <br />
-                  <br />
-                  O usuário não poderá mais acessar funcionalidades protegidas do sistema até ser desbloqueado.
-                </>
-              ) : (
-                <>
-                  Você está prestes a desbloquear o acesso de{' '}
-                  <strong>{dialogState.user?.profile?.name || 'este usuário'}</strong>.
-                  <br />
-                  <br />
-                  O usuário poderá voltar a acessar o sistema normalmente.
-                </>
-              )}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleConfirmAction}
-              className={dialogState.action === 'block' ? 'bg-destructive hover:bg-destructive/90' : ''}
-            >
-              {isBlocking || isUnblocking ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Processando...
-                </>
-              ) : dialogState.action === 'block' ? (
-                'Bloquear'
-              ) : (
-                'Desbloquear'
-              )}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
-  );
-}
+                    {saveSuccess && (
+                      <Alert className="border-green-600">
+                        <CheckCircle2 className="h-4 w-4 text-green-600" />
+                        <AlertDescription className="text-green-600">
+                          Configuration saved successfully! The payment system is now updated.
+                        </AlertDescription>
+                      </Alert>
+                    )}
 
-export default function AdminDashboardPage() {
-  return (
-    <AdminGate>
-      <AdminDashboardContent />
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <Label htmlFor="mercadopago-enabled">Enable Mercado Pago</Label>
+                          <p className="text-sm text-muted-foreground">
+                            Allow users to pay via Mercado Pago
+                          </p>
+                        </div>
+                        <Switch
+                          id="mercadopago-enabled"
+                          checked={localConfig.mercadoPago.enabled}
+                          onCheckedChange={(checked) =>
+                            setLocalConfig({
+                              ...localConfig,
+                              mercadoPago: { ...localConfig.mercadoPago, enabled: checked },
+                            })
+                          }
+                        />
+                      </div>
+
+                      <Separator />
+
+                      <div className="space-y-2">
+                        <Label htmlFor="mercadopago-public-key">Public Key</Label>
+                        <Input
+                          id="mercadopago-public-key"
+                          type="text"
+                          placeholder="TEST-... or APP_USR-..."
+                          value={localConfig.mercadoPago.publicKey}
+                          onChange={(e) =>
+                            setLocalConfig({
+                              ...localConfig,
+                              mercadoPago: { ...localConfig.mercadoPago, publicKey: e.target.value },
+                            })
+                          }
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Your Mercado Pago Public Key (starts with TEST- or APP_USR-)
+                        </p>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="mercadopago-access-token">Access Token</Label>
+                        <Input
+                          id="mercadopago-access-token"
+                          type="password"
+                          placeholder="Enter Access Token"
+                          value={localConfig.mercadoPago.accessToken}
+                          onChange={(e) =>
+                            setLocalConfig({
+                              ...localConfig,
+                              mercadoPago: { ...localConfig.mercadoPago, accessToken: e.target.value },
+                            })
+                          }
+                        />
+                        <p className="text-xs text-muted-foreground">
+                          Your Mercado Pago Access Token (kept secure on backend)
+                        </p>
+                      </div>
+
+                      <Alert>
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertDescription className="text-sm">
+                          For security, the Access Token is cleared from this form after saving. 
+                          You only need to re-enter it when updating credentials.
+                        </AlertDescription>
+                      </Alert>
+
+                      <Button
+                        onClick={handleSaveConfig}
+                        disabled={isSaving || updateConfig.isPending}
+                        className="w-full"
+                      >
+                        {isSaving || updateConfig.isPending ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Saving...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            Save Configuration
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </AdminGate>
   );
 }

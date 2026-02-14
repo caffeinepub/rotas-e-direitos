@@ -1,155 +1,160 @@
-import { useState, useEffect } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Share2, Loader2, CheckCircle2, Info } from 'lucide-react';
 import { useSubmitCollectiveReport } from '../../hooks/useCollectiveReports';
-import { Platform, ReasonCategory, Region } from '../../backend';
+import { toast } from 'sonner';
+import { ReasonCategory } from '../../types/backend-extended';
+import { Platform, Region } from '../../backend';
 import { getNeighborhoods } from '../../lib/collectiveOptions';
-import { Loader2 } from 'lucide-react';
 
-interface CollectiveSharePromptProps {
-  platform: Platform;
-  reason: ReasonCategory;
-  onClose: () => void;
-}
-
-const regionLabels: Record<Region, string> = {
-  [Region.fortaleza]: 'Fortaleza',
-  [Region.caucaia]: 'Caucaia',
-  [Region.maracanau]: 'Maracanaú',
-};
-
-export default function CollectiveSharePrompt({ platform, reason, onClose }: CollectiveSharePromptProps) {
-  const [open, setOpen] = useState(true);
-  const [region, setRegion] = useState<Region>(Region.fortaleza);
+export default function CollectiveSharePrompt() {
+  const [platform, setPlatform] = useState<Platform | ''>('');
+  const [region, setRegion] = useState<Region | ''>('');
   const [neighborhood, setNeighborhood] = useState('');
-  const [dontAskAgain, setDontAskAgain] = useState(false);
-  const { mutate: submitReport, isPending } = useSubmitCollectiveReport();
+  const [reason, setReason] = useState<ReasonCategory | ''>('');
 
-  useEffect(() => {
-    const dontAsk = localStorage.getItem('dontAskCollectiveShare');
-    if (dontAsk === 'true') {
-      setOpen(false);
-      onClose();
-    }
-  }, [onClose]);
+  const submitReport = useSubmitCollectiveReport();
 
-  const handleShare = () => {
-    if (dontAskAgain) {
-      localStorage.setItem('dontAskCollectiveShare', 'true');
+  const neighborhoods = region ? getNeighborhoods(region) : [];
+
+  const handleSubmit = async () => {
+    if (!platform || !region || !neighborhood || !reason) {
+      toast.error('Please fill all fields');
+      return;
     }
 
-    submitReport(
-      {
-        platform,
-        region,
+    try {
+      await submitReport.mutateAsync({
+        platform: platform as Platform,
+        region: region as Region,
         neighborhood,
-        reason,
-      },
-      {
-        onSuccess: () => {
-          setOpen(false);
-          onClose();
-        },
-      }
-    );
-  };
-
-  const handleNotNow = () => {
-    if (dontAskAgain) {
-      localStorage.setItem('dontAskCollectiveShare', 'true');
+        reason: reason as ReasonCategory,
+      });
+      toast.success('Report submitted successfully');
+      // Reset form
+      setPlatform('');
+      setRegion('');
+      setNeighborhood('');
+      setReason('');
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to submit report');
     }
-    setOpen(false);
-    onClose();
   };
 
-  const neighborhoods = getNeighborhoods(region);
+  const isValid = platform && region && neighborhood && reason;
 
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && handleNotNow()}>
-      <DialogContent className="sm:max-w-[500px]">
-        <DialogHeader>
-          <DialogTitle className="text-2xl">Apoie a Categoria</DialogTitle>
-          <DialogDescription className="text-base">
-            Compartilhar dados anônimos desta desativação ajuda a criar um mapa de bloqueios em Fortaleza.
-            Sindicatos podem usar esses dados para ações coletivas.
-          </DialogDescription>
-        </DialogHeader>
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Share2 className="h-5 w-5" />
+          Share Your Experience
+        </CardTitle>
+        <CardDescription>
+          Help build collective data by sharing your block information
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <Alert>
+          <Info className="h-4 w-4" />
+          <AlertDescription>
+            Your submission is anonymous and helps identify patterns of unfair blocks
+          </AlertDescription>
+        </Alert>
 
-        <div className="space-y-4 py-4">
-          <div className="space-y-2">
-            <Label htmlFor="region" className="text-base">
-              Região
-            </Label>
-            <Select value={region} onValueChange={(v) => setRegion(v as Region)}>
-              <SelectTrigger id="region" className="h-12 text-base">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {Object.entries(regionLabels).map(([key, label]) => (
-                  <SelectItem key={key} value={key}>
-                    {label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="neighborhood" className="text-base">
-              Bairro
-            </Label>
-            <Select value={neighborhood} onValueChange={setNeighborhood}>
-              <SelectTrigger id="neighborhood" className="h-12 text-base">
-                <SelectValue placeholder="Selecione..." />
-              </SelectTrigger>
-              <SelectContent>
-                {neighborhoods.map((n) => (
-                  <SelectItem key={n} value={n}>
-                    {n}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex items-center space-x-2 pt-2">
-            <Checkbox
-              id="dont-ask"
-              checked={dontAskAgain}
-              onCheckedChange={(checked) => setDontAskAgain(checked as boolean)}
-            />
-            <Label htmlFor="dont-ask" className="text-sm cursor-pointer">
-              Não perguntar novamente
-            </Label>
-          </div>
+        <div className="space-y-2">
+          <Label htmlFor="platform">Platform</Label>
+          <Select value={platform} onValueChange={(value) => setPlatform(value as Platform)}>
+            <SelectTrigger id="platform">
+              <SelectValue placeholder="Select platform" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="uber">Uber</SelectItem>
+              <SelectItem value="ninetyNine">99</SelectItem>
+              <SelectItem value="ifood">iFood</SelectItem>
+              <SelectItem value="rappi">Rappi</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
-        <DialogFooter className="gap-2">
-          <Button variant="outline" onClick={handleNotNow} size="lg">
-            Agora Não
-          </Button>
-          <Button onClick={handleShare} disabled={!neighborhood || isPending} size="lg">
-            {isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Compartilhando...
-              </>
-            ) : (
-              'Compartilhar'
-            )}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        <div className="space-y-2">
+          <Label htmlFor="region">Region</Label>
+          <Select value={region} onValueChange={(value) => {
+            setRegion(value as Region);
+            setNeighborhood('');
+          }}>
+            <SelectTrigger id="region">
+              <SelectValue placeholder="Select region" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="fortaleza">Fortaleza</SelectItem>
+              <SelectItem value="caucaia">Caucaia</SelectItem>
+              <SelectItem value="maracanau">Maracanaú</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="neighborhood">Neighborhood</Label>
+          <Select value={neighborhood} onValueChange={setNeighborhood} disabled={!region}>
+            <SelectTrigger id="neighborhood">
+              <SelectValue placeholder={region ? "Select neighborhood" : "Select region first"} />
+            </SelectTrigger>
+            <SelectContent>
+              {neighborhoods.map((n) => (
+                <SelectItem key={n} value={n}>
+                  {n}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="reason">Reason for Block</Label>
+          <Select value={reason} onValueChange={(value) => setReason(value as ReasonCategory)}>
+            <SelectTrigger id="reason">
+              <SelectValue placeholder="Select reason" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="documentsExpired">Documents Expired</SelectItem>
+              <SelectItem value="selfieInvalid">Selfie Invalid</SelectItem>
+              <SelectItem value="lowRating">Low Rating</SelectItem>
+              <SelectItem value="dangerousConduct">Dangerous Conduct</SelectItem>
+              <SelectItem value="fraudSuspicion">Fraud Suspicion</SelectItem>
+              <SelectItem value="multipleAccounts">Multiple Accounts</SelectItem>
+              <SelectItem value="other">Other</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <Button
+          onClick={handleSubmit}
+          disabled={!isValid || submitReport.isPending}
+          className="w-full"
+        >
+          {submitReport.isPending ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Submitting...
+            </>
+          ) : submitReport.isSuccess ? (
+            <>
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Submitted
+            </>
+          ) : (
+            <>
+              <Share2 className="h-4 w-4 mr-2" />
+              Submit Report
+            </>
+          )}
+        </Button>
+      </CardContent>
+    </Card>
   );
 }

@@ -10,34 +10,22 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface Appeal {
-  'id' : bigint,
-  'owner' : Principal,
-  'createdTime' : bigint,
-  'platform' : Platform,
-  'userExplanation' : string,
-  'reasonCategory' : ReasonCategory,
-  'generatedText' : string,
-  'evidenceIds' : Array<bigint>,
-}
-export interface CollectiveReport {
-  'region' : Region,
-  'neighborhood' : string,
-  'platform' : Platform,
-  'timestamp' : Time,
-  'reason' : ReasonCategory,
-}
 export interface Evidence {
   'id' : bigint,
   'regiao' : [] | [Region],
+  'duration' : [] | [bigint],
   'owner' : Principal,
   'bairro' : [] | [string],
+  'audioQuality' : [] | [string],
+  'videoQuality' : [] | [string],
   'platform' : [] | [Platform],
   'notes' : string,
   'uploadTime' : bigint,
   'evidenceType' : EvidenceType,
 }
-export type EvidenceType = { 'selfie' : null } |
+export type EvidenceType = { 'audio' : null } |
+  { 'video' : null } |
+  { 'selfie' : null } |
   { 'screenshot' : null };
 export interface LossProfile {
   'dailyEarnings' : number,
@@ -45,24 +33,33 @@ export interface LossProfile {
   'platform' : Platform,
   'daysPerWeek' : bigint,
 }
+export interface PaymentCheckoutResponse {
+  'paymentId' : string,
+  'checkoutUrl' : [] | [string],
+}
+export interface PaymentConfig { 'mercadoPago' : PaymentProviderConfig }
+export interface PaymentProviderConfig {
+  'publicKey' : string,
+  'enabled' : boolean,
+  'accessToken' : string,
+}
+export interface PaymentStatus {
+  'status' : string,
+  'paymentId' : string,
+  'rawResponse' : string,
+}
 export type Platform = { 'uber' : null } |
   { 'ninetyNine' : null } |
   { 'ifood' : null } |
   { 'rappi' : null };
 export type Principal = Principal;
-export interface PublicLossProfile {
-  'dailyEarnings' : number,
-  'deactivationDate' : bigint,
-  'platform' : Platform,
-  'daysPerWeek' : bigint,
+export interface PublicPaymentConfig {
+  'mercadoPago' : PublicPaymentProviderConfig,
 }
-export type ReasonCategory = { 'lowRating' : null } |
-  { 'other' : null } |
-  { 'documentsExpired' : null } |
-  { 'fraudSuspicion' : null } |
-  { 'selfieInvalid' : null } |
-  { 'dangerousConduct' : null } |
-  { 'multipleAccounts' : null };
+export interface PublicPaymentProviderConfig {
+  'publicKey' : string,
+  'enabled' : boolean,
+}
 export type Region = { 'maracanau' : null } |
   { 'caucaia' : null } |
   { 'fortaleza' : null };
@@ -75,6 +72,15 @@ export interface SubscriptionStatus {
   'currentPlan' : SubscriptionPlan,
 }
 export type Time = bigint;
+export interface TransformationInput {
+  'context' : Uint8Array,
+  'response' : http_request_result,
+}
+export interface TransformationOutput {
+  'status' : bigint,
+  'body' : Uint8Array,
+  'headers' : Array<http_header>,
+}
 export interface UserAccessInfo {
   'principal' : Principal,
   'isBlockedByAdmin' : boolean,
@@ -106,88 +112,37 @@ export interface WorkSession {
   'city' : string,
   'weatherSamples' : Array<WeatherSample>,
 }
+export interface http_header { 'value' : string, 'name' : string }
+export interface http_request_result {
+  'status' : bigint,
+  'body' : Uint8Array,
+  'headers' : Array<http_header>,
+}
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
-  'addWeatherSample' : ActorMethod<
-    [bigint, { 'temperatureC' : number, 'condition' : WeatherCondition }],
-    WorkSession
-  >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'blockUser' : ActorMethod<[Principal], undefined>,
-  'createEvidence' : ActorMethod<
-    [
-      {
-        'regiao' : [] | [Region],
-        'bairro' : [] | [string],
-        'platform' : [] | [Platform],
-        'notes' : string,
-        'evidenceType' : EvidenceType,
-      },
-    ],
-    Evidence
+  'checkPaymentStatus' : ActorMethod<[string], PaymentStatus>,
+  'createMercadoPagoCheckout' : ActorMethod<
+    [SubscriptionPlan],
+    PaymentCheckoutResponse
   >,
-  'endWorkSession' : ActorMethod<[bigint], WorkSession>,
-  'generateAppeal' : ActorMethod<
-    [
-      {
-        'platform' : Platform,
-        'userExplanation' : string,
-        'reasonCategory' : ReasonCategory,
-        'evidenceIds' : Array<bigint>,
-      },
-    ],
-    Appeal
+  'createPaymentPreference' : ActorMethod<
+    [SubscriptionPlan],
+    PaymentCheckoutResponse
   >,
   'getAllEvidence' : ActorMethod<[], Array<Evidence>>,
   'getAllUserAccessInfo' : ActorMethod<[], Array<UserAccessInfo>>,
-  'getAppeal' : ActorMethod<[bigint], [] | [Appeal]>,
-  'getCallerAppeals' : ActorMethod<[], Array<Appeal>>,
-  'getCallerLossProfile' : ActorMethod<[], [] | [PublicLossProfile]>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
-  'getCollectiveReports' : ActorMethod<[], Array<CollectiveReport>>,
-  'getEvidenceById' : ActorMethod<[bigint], [] | [Evidence]>,
-  'getEvidenceFiltered' : ActorMethod<
-    [[] | [EvidenceType], [] | [Platform]],
-    Array<Evidence>
-  >,
-  'getLossProfile' : ActorMethod<[Principal], [] | [PublicLossProfile]>,
-  'getPlatformStats' : ActorMethod<[Platform], bigint>,
-  'getReasonStats' : ActorMethod<[ReasonCategory], bigint>,
-  'getRegionStats' : ActorMethod<[Region], bigint>,
-  'getRevisoMotivadaMessage' : ActorMethod<[], string>,
+  'getPublicPaymentConfig' : ActorMethod<[], PublicPaymentConfig>,
   'getSubscriptionStatus' : ActorMethod<[], SubscriptionStatus>,
-  'getTimeline' : ActorMethod<
-    [
-      {
-        'startTime' : [] | [bigint],
-        'endTime' : [] | [bigint],
-        'platformFilter' : [] | [Platform],
-        'typeFilter' : [] | [EvidenceType],
-      },
-    ],
-    Array<Evidence>
-  >,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
-  'getWorkSession' : ActorMethod<[bigint], [] | [WorkSession]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  'isCurrentUserBlocked' : ActorMethod<[], boolean>,
   'logWorkSession' : ActorMethod<[{ 'city' : string }], WorkSession>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setLossProfile' : ActorMethod<[LossProfile], undefined>,
-  'submitCollectiveReport' : ActorMethod<
-    [
-      {
-        'region' : Region,
-        'neighborhood' : string,
-        'platform' : Platform,
-        'reason' : ReasonCategory,
-      },
-    ],
-    undefined
-  >,
-  'unblockUser' : ActorMethod<[Principal], undefined>,
-  'upgradeSubscription' : ActorMethod<[SubscriptionPlan], undefined>,
+  'setPaymentConfig' : ActorMethod<[PaymentConfig], undefined>,
+  'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

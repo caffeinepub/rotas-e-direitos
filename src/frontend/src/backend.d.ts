@@ -7,20 +7,23 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
-export interface UserProfile {
-    name: string;
-    email?: string;
+export interface PublicPaymentProviderConfig {
+    publicKey: string;
+    enabled: boolean;
 }
-export interface SubscriptionStatus {
-    startTime?: bigint;
-    endTime?: bigint;
-    currentPlan: SubscriptionPlan;
+export interface PaymentConfig {
+    mercadoPago: PaymentProviderConfig;
 }
 export interface LossProfile {
     dailyEarnings: number;
     deactivationDate: bigint;
     platform: Platform;
     daysPerWeek: bigint;
+}
+export interface TransformationOutput {
+    status: bigint;
+    body: Uint8Array;
+    headers: Array<http_header>;
 }
 export type Time = bigint;
 export interface UserAccessInfo {
@@ -30,22 +33,14 @@ export interface UserAccessInfo {
     profile?: UserProfile;
 }
 export type Principal = Principal;
-export interface Appeal {
-    id: bigint;
-    owner: Principal;
-    createdTime: bigint;
-    platform: Platform;
-    userExplanation: string;
-    reasonCategory: ReasonCategory;
-    generatedText: string;
-    evidenceIds: Array<bigint>;
+export interface http_header {
+    value: string;
+    name: string;
 }
-export interface CollectiveReport {
-    region: Region;
-    neighborhood: string;
-    platform: Platform;
-    timestamp: Time;
-    reason: ReasonCategory;
+export interface http_request_result {
+    status: bigint;
+    body: Uint8Array;
+    headers: Array<http_header>;
 }
 export interface WeatherSample {
     city: string;
@@ -53,21 +48,44 @@ export interface WeatherSample {
     temperatureC: number;
     condition: WeatherCondition;
 }
+export interface PublicPaymentConfig {
+    mercadoPago: PublicPaymentProviderConfig;
+}
+export interface PaymentProviderConfig {
+    publicKey: string;
+    enabled: boolean;
+    accessToken: string;
+}
+export interface TransformationInput {
+    context: Uint8Array;
+    response: http_request_result;
+}
+export interface PaymentCheckoutResponse {
+    paymentId: string;
+    checkoutUrl?: string;
+}
+export interface PaymentStatus {
+    status: string;
+    paymentId: string;
+    rawResponse: string;
+}
 export interface Evidence {
     id: bigint;
     regiao?: Region;
+    duration?: bigint;
     owner: Principal;
     bairro?: string;
+    audioQuality?: string;
+    videoQuality?: string;
     platform?: Platform;
     notes: string;
     uploadTime: bigint;
     evidenceType: EvidenceType;
 }
-export interface PublicLossProfile {
-    dailyEarnings: number;
-    deactivationDate: bigint;
-    platform: Platform;
-    daysPerWeek: bigint;
+export interface SubscriptionStatus {
+    startTime?: bigint;
+    endTime?: bigint;
+    currentPlan: SubscriptionPlan;
 }
 export interface WorkSession {
     id: bigint;
@@ -77,7 +95,13 @@ export interface WorkSession {
     city: string;
     weatherSamples: Array<WeatherSample>;
 }
+export interface UserProfile {
+    name: string;
+    email?: string;
+}
 export enum EvidenceType {
+    audio = "audio",
+    video = "video",
     selfie = "selfie",
     screenshot = "screenshot"
 }
@@ -86,15 +110,6 @@ export enum Platform {
     ninetyNine = "ninetyNine",
     ifood = "ifood",
     rappi = "rappi"
-}
-export enum ReasonCategory {
-    lowRating = "lowRating",
-    other = "other",
-    documentsExpired = "documentsExpired",
-    fraudSuspicion = "fraudSuspicion",
-    selfieInvalid = "selfieInvalid",
-    dangerousConduct = "dangerousConduct",
-    multipleAccounts = "multipleAccounts"
 }
 export enum Region {
     maracanau = "maracanau",
@@ -121,63 +136,23 @@ export enum WeatherCondition {
     rainy = "rainy"
 }
 export interface backendInterface {
-    addWeatherSample(sessionId: bigint, params: {
-        temperatureC: number;
-        condition: WeatherCondition;
-    }): Promise<WorkSession>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
-    blockUser(target: Principal): Promise<void>;
-    createEvidence(params: {
-        regiao?: Region;
-        bairro?: string;
-        platform?: Platform;
-        notes: string;
-        evidenceType: EvidenceType;
-    }): Promise<Evidence>;
-    endWorkSession(sessionId: bigint): Promise<WorkSession>;
-    generateAppeal(params: {
-        platform: Platform;
-        userExplanation: string;
-        reasonCategory: ReasonCategory;
-        evidenceIds: Array<bigint>;
-    }): Promise<Appeal>;
+    checkPaymentStatus(paymentId: string): Promise<PaymentStatus>;
+    createMercadoPagoCheckout(plan: SubscriptionPlan): Promise<PaymentCheckoutResponse>;
+    createPaymentPreference(plan: SubscriptionPlan): Promise<PaymentCheckoutResponse>;
     getAllEvidence(): Promise<Array<Evidence>>;
     getAllUserAccessInfo(): Promise<Array<UserAccessInfo>>;
-    getAppeal(appealId: bigint): Promise<Appeal | null>;
-    getCallerAppeals(): Promise<Array<Appeal>>;
-    getCallerLossProfile(): Promise<PublicLossProfile | null>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
-    getCollectiveReports(): Promise<Array<CollectiveReport>>;
-    getEvidenceById(evidenceId: bigint): Promise<Evidence | null>;
-    getEvidenceFiltered(typeFilter: EvidenceType | null, platformFilter: Platform | null): Promise<Array<Evidence>>;
-    getLossProfile(user: Principal): Promise<PublicLossProfile | null>;
-    getPlatformStats(platform: Platform): Promise<bigint>;
-    getReasonStats(reason: ReasonCategory): Promise<bigint>;
-    getRegionStats(region: Region): Promise<bigint>;
-    getRevisoMotivadaMessage(): Promise<string>;
+    getPublicPaymentConfig(): Promise<PublicPaymentConfig>;
     getSubscriptionStatus(): Promise<SubscriptionStatus>;
-    getTimeline(params: {
-        startTime?: bigint;
-        endTime?: bigint;
-        platformFilter?: Platform;
-        typeFilter?: EvidenceType;
-    }): Promise<Array<Evidence>>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    getWorkSession(sessionId: bigint): Promise<WorkSession | null>;
     isCallerAdmin(): Promise<boolean>;
-    isCurrentUserBlocked(): Promise<boolean>;
     logWorkSession(params: {
         city: string;
     }): Promise<WorkSession>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     setLossProfile(profile: LossProfile): Promise<void>;
-    submitCollectiveReport(params: {
-        region: Region;
-        neighborhood: string;
-        platform: Platform;
-        reason: ReasonCategory;
-    }): Promise<void>;
-    unblockUser(target: Principal): Promise<void>;
-    upgradeSubscription(newPlan: SubscriptionPlan): Promise<void>;
+    setPaymentConfig(config: PaymentConfig): Promise<void>;
+    transform(input: TransformationInput): Promise<TransformationOutput>;
 }

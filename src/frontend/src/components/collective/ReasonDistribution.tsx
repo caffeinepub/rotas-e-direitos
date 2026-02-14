@@ -1,96 +1,59 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useGetCollectiveReports } from '../../hooks/useCollectiveReports';
-import { Platform, ReasonCategory, Region } from '../../backend';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { Loader2 } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Platform, Region } from '../../backend';
+import { ReasonCategory, CollectiveReport } from '../../types/backend-extended';
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 
 interface ReasonDistributionProps {
-  platformFilter: Platform | null;
-  reasonFilter: ReasonCategory | null;
-  regionFilter: Region | null;
-  periodDays: number;
+  reports: CollectiveReport[];
 }
 
-const reasonLabels: Record<ReasonCategory, string> = {
-  [ReasonCategory.documentsExpired]: 'Documentos',
-  [ReasonCategory.selfieInvalid]: 'Selfie',
-  [ReasonCategory.lowRating]: 'Avaliação',
-  [ReasonCategory.dangerousConduct]: 'Conduta',
-  [ReasonCategory.fraudSuspicion]: 'Fraude',
-  [ReasonCategory.multipleAccounts]: 'Múltiplas Contas',
-  [ReasonCategory.other]: 'Outro',
-};
+const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8', '#82CA9D', '#FFC658'];
 
-export default function ReasonDistribution({
-  platformFilter,
-  reasonFilter,
-  regionFilter,
-  periodDays,
-}: ReasonDistributionProps) {
-  const { data: reports = [], isLoading } = useGetCollectiveReports();
+export default function ReasonDistribution({ reports }: ReasonDistributionProps) {
+  const reasonCounts = reports.reduce((acc, report) => {
+    const reason = report.reason;
+    acc[reason] = (acc[reason] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const cutoffTime = Date.now() - periodDays * 24 * 60 * 60 * 1000;
-  const filtered = reports.filter((r) => {
-    const time = Number(r.timestamp) / 1000000;
-    if (time < cutoffTime) return false;
-    if (platformFilter && r.platform !== platformFilter) return false;
-    if (reasonFilter && r.reason !== reasonFilter) return false;
-    if (regionFilter && r.region !== regionFilter) return false;
-    return true;
-  });
-
-  const counts: Record<ReasonCategory, number> = {
-    [ReasonCategory.documentsExpired]: 0,
-    [ReasonCategory.selfieInvalid]: 0,
-    [ReasonCategory.lowRating]: 0,
-    [ReasonCategory.dangerousConduct]: 0,
-    [ReasonCategory.fraudSuspicion]: 0,
-    [ReasonCategory.multipleAccounts]: 0,
-    [ReasonCategory.other]: 0,
-  };
-
-  filtered.forEach((r) => {
-    counts[r.reason]++;
-  });
-
-  const data = Object.entries(counts)
-    .map(([reason, count]) => ({
-      reason: reasonLabels[reason as ReasonCategory],
-      count,
-    }))
-    .sort((a, b) => b.count - a.count);
+  const data = Object.entries(reasonCounts).map(([reason, count]) => ({
+    name: reason.replace(/([A-Z])/g, ' $1').trim(),
+    value: count,
+  }));
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">Distribuição por Motivo</CardTitle>
+        <CardTitle>Blocks by Reason</CardTitle>
+        <CardDescription>Distribution of block reasons</CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={data} layout="vertical">
-            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis type="number" className="text-sm" />
-            <YAxis dataKey="reason" type="category" width={100} className="text-sm" />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'hsl(var(--popover))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '8px',
-              }}
-            />
-            <Bar dataKey="count" fill="hsl(var(--chart-2))" radius={[0, 8, 8, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        {data.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={(entry) => entry.name}
+                outerRadius={80}
+                fill="#8884d8"
+                dataKey="value"
+              >
+                {data.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+            No data available
+          </div>
+        )}
       </CardContent>
     </Card>
   );

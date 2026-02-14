@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useLogWorkSession, useEndWorkSession, useAddWeatherSample } from '../../hooks/useWorkSessions';
 import { fetchWeather } from '../../lib/weatherClient';
+import { WeatherSample } from '../../backend';
 import { Play, Square, Loader2 } from 'lucide-react';
 
 interface WorkSessionControlsProps {
@@ -26,10 +27,15 @@ export default function WorkSessionControls({ activeSessionId, setActiveSessionI
     const interval = setInterval(async () => {
       try {
         const weather = await fetchWeather(city);
-        addWeatherSample({
-          sessionId: activeSessionId,
+        const sample: WeatherSample = {
+          timestamp: BigInt(Date.now()),
           condition: weather.condition,
           temperatureC: weather.temperatureC,
+          city: city,
+        };
+        addWeatherSample({
+          sessionId: activeSessionId,
+          sample,
         });
       } catch (error) {
         console.error('Failed to fetch weather:', error);
@@ -39,10 +45,15 @@ export default function WorkSessionControls({ activeSessionId, setActiveSessionI
     // Fetch immediately on start
     fetchWeather(city)
       .then((weather) => {
-        addWeatherSample({
-          sessionId: activeSessionId,
+        const sample: WeatherSample = {
+          timestamp: BigInt(Date.now()),
           condition: weather.condition,
           temperatureC: weather.temperatureC,
+          city: city,
+        };
+        addWeatherSample({
+          sessionId: activeSessionId,
+          sample,
         });
       })
       .catch(console.error);

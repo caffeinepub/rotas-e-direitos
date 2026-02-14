@@ -1,84 +1,49 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useGetCollectiveReports } from '../../hooks/useCollectiveReports';
-import { Platform, ReasonCategory, Region } from '../../backend';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Platform, Region } from '../../backend';
+import { ReasonCategory, CollectiveReport } from '../../types/backend-extended';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import { format, subDays, startOfDay } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { Loader2 } from 'lucide-react';
 
 interface TrendChartProps {
-  platformFilter: Platform | null;
-  reasonFilter: ReasonCategory | null;
-  regionFilter: Region | null;
-  periodDays: number;
+  reports: CollectiveReport[];
 }
 
-export default function TrendChart({ platformFilter, reasonFilter, regionFilter, periodDays }: TrendChartProps) {
-  const { data: reports = [], isLoading } = useGetCollectiveReports();
+export default function TrendChart({ reports }: TrendChartProps) {
+  // Group reports by date
+  const reportsByDate = reports.reduce((acc, report) => {
+    const date = new Date(Number(report.timestamp)).toLocaleDateString();
+    acc[date] = (acc[date] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
 
-  if (isLoading) {
-    return (
-      <Card>
-        <CardContent className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  const cutoffTime = Date.now() - periodDays * 24 * 60 * 60 * 1000;
-  const filtered = reports.filter((r) => {
-    const time = Number(r.timestamp) / 1000000;
-    if (time < cutoffTime) return false;
-    if (platformFilter && r.platform !== platformFilter) return false;
-    if (reasonFilter && r.reason !== reasonFilter) return false;
-    if (regionFilter && r.region !== regionFilter) return false;
-    return true;
-  });
-
-  const dailyCounts: Record<string, number> = {};
-  const today = startOfDay(new Date());
-
-  for (let i = periodDays - 1; i >= 0; i--) {
-    const date = subDays(today, i);
-    const key = format(date, 'yyyy-MM-dd');
-    dailyCounts[key] = 0;
-  }
-
-  filtered.forEach((r) => {
-    const date = startOfDay(new Date(Number(r.timestamp) / 1000000));
-    const key = format(date, 'yyyy-MM-dd');
-    if (dailyCounts[key] !== undefined) {
-      dailyCounts[key]++;
-    }
-  });
-
-  const data = Object.entries(dailyCounts).map(([date, count]) => ({
-    date: format(new Date(date), 'dd/MM', { locale: ptBR }),
-    count,
-  }));
+  const data = Object.entries(reportsByDate)
+    .map(([date, count]) => ({
+      date,
+      count,
+    }))
+    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-xl">Tendência ao Longo do Tempo</CardTitle>
+        <CardTitle>Block Trend Over Time</CardTitle>
+        <CardDescription>Number of reported blocks per day</CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-            <XAxis dataKey="date" className="text-sm" />
-            <YAxis className="text-sm" />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'hsl(var(--popover))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '8px',
-              }}
-            />
-            <Line type="monotone" dataKey="count" stroke="hsl(var(--chart-3))" strokeWidth={2} />
-          </LineChart>
-        </ResponsiveContainer>
+        {data.length > 0 ? (
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="date" />
+              <YAxis />
+              <Tooltip />
+              <Line type="monotone" dataKey="count" stroke="hsl(var(--primary))" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+            No data available
+          </div>
+        )}
       </CardContent>
     </Card>
   );

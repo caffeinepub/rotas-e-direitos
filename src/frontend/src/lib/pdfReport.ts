@@ -1,58 +1,30 @@
-import { PublicLossProfile } from '../backend';
-import { calculateLosses } from './lossCalculations';
+import { PublicLossProfile } from '../types/backend-extended';
+import { calculateWeeklyLoss, calculateMonthlyLoss, calculateAccumulatedLoss } from './lossCalculations';
 
-export async function generateLossPDF(
-  profile: PublicLossProfile,
-  returnBlob: boolean = false
-): Promise<Blob | null> {
-  const losses = calculateLosses(profile);
+export function generateLossReport(profile: PublicLossProfile): Blob {
+  const weeklyLoss = calculateWeeklyLoss(profile);
+  const monthlyLoss = calculateMonthlyLoss(profile);
+  const accumulatedLoss = calculateAccumulatedLoss(profile);
+  const deactivationDate = new Date(Number(profile.deactivationDate));
 
-  const formatCurrency = (value: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  const reportText = `
+LOSS REPORT
+===========
 
-  const deactivationDate = new Date(Number(profile.deactivationDate) / 1000000);
-  const today = new Date();
+Platform: ${profile.platform}
+Deactivation Date: ${deactivationDate.toLocaleDateString()}
+Daily Earnings: R$ ${profile.dailyEarnings.toFixed(2)}
+Days Per Week: ${profile.daysPerWeek}
 
-  const content = `
-RELATÓRIO DE PERDAS FINANCEIRAS
-================================
+CALCULATED LOSSES
+=================
 
-Entregador #${Math.random().toString(36).substring(2, 10).toUpperCase()}
+Weekly Loss: R$ ${weeklyLoss.toFixed(2)}
+Monthly Loss: R$ ${monthlyLoss.toFixed(2)}
+Accumulated Loss: R$ ${accumulatedLoss.toFixed(2)}
 
-Período: ${deactivationDate.toLocaleDateString('pt-BR')} até ${today.toLocaleDateString('pt-BR')}
+Generated on: ${new Date().toLocaleString()}
+  `.trim();
 
-VALORES CALCULADOS
-------------------
-
-Perda Semanal: ${formatCurrency(losses.weekly)}
-Perda Mensal: ${formatCurrency(losses.monthly)}
-Perda Acumulada (${losses.daysSince} dias): ${formatCurrency(losses.accumulated)}
-
-PROJEÇÕES
----------
-
-30 dias: ${formatCurrency(losses.projection30)}
-60 dias: ${formatCurrency(losses.projection60)}
-90 dias: ${formatCurrency(losses.projection90)}
-
----
-
-Este documento serve como estimativa de danos materiais causados pela desativação.
-
-Documento gerado em ${today.toLocaleDateString('pt-BR')}
-`;
-
-  const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
-
-  if (returnBlob) {
-    return blob;
-  } else {
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `relatorio-perdas-${Date.now()}.txt`;
-    a.click();
-    URL.revokeObjectURL(url);
-    return null;
-  }
+  return new Blob([reportText], { type: 'text/plain' });
 }

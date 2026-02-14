@@ -8,40 +8,31 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
-export const WeatherCondition = IDL.Variant({
-  'cloudy' : IDL.Null,
-  'clear' : IDL.Null,
-  'nublado' : IDL.Null,
-  'soleado' : IDL.Null,
-  'tempestuoso' : IDL.Null,
-  'windy' : IDL.Null,
-  'rainy' : IDL.Null,
-});
-export const Time = IDL.Int;
-export const WeatherSample = IDL.Record({
-  'city' : IDL.Text,
-  'timestamp' : Time,
-  'temperatureC' : IDL.Float64,
-  'condition' : WeatherCondition,
-});
-export const WorkSession = IDL.Record({
-  'id' : IDL.Nat,
-  'startTime' : Time,
-  'endTime' : IDL.Opt(Time),
-  'owner' : IDL.Principal,
-  'city' : IDL.Text,
-  'weatherSamples' : IDL.Vec(WeatherSample),
-});
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
   'guest' : IDL.Null,
+});
+export const PaymentStatus = IDL.Record({
+  'status' : IDL.Text,
+  'paymentId' : IDL.Text,
+  'rawResponse' : IDL.Text,
+});
+export const SubscriptionPlan = IDL.Variant({
+  'free_24h' : IDL.Null,
+  'pro_monthly' : IDL.Null,
+  'pro_annual' : IDL.Null,
+});
+export const PaymentCheckoutResponse = IDL.Record({
+  'paymentId' : IDL.Text,
+  'checkoutUrl' : IDL.Opt(IDL.Text),
 });
 export const Region = IDL.Variant({
   'maracanau' : IDL.Null,
   'caucaia' : IDL.Null,
   'fortaleza' : IDL.Null,
 });
+export const Principal = IDL.Principal;
 export const Platform = IDL.Variant({
   'uber' : IDL.Null,
   'ninetyNine' : IDL.Null,
@@ -49,43 +40,23 @@ export const Platform = IDL.Variant({
   'rappi' : IDL.Null,
 });
 export const EvidenceType = IDL.Variant({
+  'audio' : IDL.Null,
+  'video' : IDL.Null,
   'selfie' : IDL.Null,
   'screenshot' : IDL.Null,
 });
 export const Evidence = IDL.Record({
   'id' : IDL.Nat,
   'regiao' : IDL.Opt(Region),
-  'owner' : IDL.Principal,
+  'duration' : IDL.Opt(IDL.Nat),
+  'owner' : Principal,
   'bairro' : IDL.Opt(IDL.Text),
+  'audioQuality' : IDL.Opt(IDL.Text),
+  'videoQuality' : IDL.Opt(IDL.Text),
   'platform' : IDL.Opt(Platform),
   'notes' : IDL.Text,
   'uploadTime' : IDL.Int,
   'evidenceType' : EvidenceType,
-});
-export const ReasonCategory = IDL.Variant({
-  'lowRating' : IDL.Null,
-  'other' : IDL.Null,
-  'documentsExpired' : IDL.Null,
-  'fraudSuspicion' : IDL.Null,
-  'selfieInvalid' : IDL.Null,
-  'dangerousConduct' : IDL.Null,
-  'multipleAccounts' : IDL.Null,
-});
-export const Appeal = IDL.Record({
-  'id' : IDL.Nat,
-  'owner' : IDL.Principal,
-  'createdTime' : IDL.Int,
-  'platform' : Platform,
-  'userExplanation' : IDL.Text,
-  'reasonCategory' : ReasonCategory,
-  'generatedText' : IDL.Text,
-  'evidenceIds' : IDL.Vec(IDL.Nat),
-});
-export const Principal = IDL.Principal;
-export const SubscriptionPlan = IDL.Variant({
-  'free_24h' : IDL.Null,
-  'pro_monthly' : IDL.Null,
-  'pro_annual' : IDL.Null,
 });
 export const SubscriptionStatus = IDL.Record({
   'startTime' : IDL.Opt(IDL.Int),
@@ -102,18 +73,36 @@ export const UserAccessInfo = IDL.Record({
   'subscriptionStatus' : SubscriptionStatus,
   'profile' : IDL.Opt(UserProfile),
 });
-export const PublicLossProfile = IDL.Record({
-  'dailyEarnings' : IDL.Float64,
-  'deactivationDate' : IDL.Int,
-  'platform' : Platform,
-  'daysPerWeek' : IDL.Nat,
+export const PublicPaymentProviderConfig = IDL.Record({
+  'publicKey' : IDL.Text,
+  'enabled' : IDL.Bool,
 });
-export const CollectiveReport = IDL.Record({
-  'region' : Region,
-  'neighborhood' : IDL.Text,
-  'platform' : Platform,
+export const PublicPaymentConfig = IDL.Record({
+  'mercadoPago' : PublicPaymentProviderConfig,
+});
+export const Time = IDL.Int;
+export const WeatherCondition = IDL.Variant({
+  'cloudy' : IDL.Null,
+  'clear' : IDL.Null,
+  'nublado' : IDL.Null,
+  'soleado' : IDL.Null,
+  'tempestuoso' : IDL.Null,
+  'windy' : IDL.Null,
+  'rainy' : IDL.Null,
+});
+export const WeatherSample = IDL.Record({
+  'city' : IDL.Text,
   'timestamp' : Time,
-  'reason' : ReasonCategory,
+  'temperatureC' : IDL.Float64,
+  'condition' : WeatherCondition,
+});
+export const WorkSession = IDL.Record({
+  'id' : IDL.Nat,
+  'startTime' : Time,
+  'endTime' : IDL.Opt(Time),
+  'owner' : Principal,
+  'city' : IDL.Text,
+  'weatherSamples' : IDL.Vec(WeatherSample),
 });
 export const LossProfile = IDL.Record({
   'dailyEarnings' : IDL.Float64,
@@ -121,96 +110,55 @@ export const LossProfile = IDL.Record({
   'platform' : Platform,
   'daysPerWeek' : IDL.Nat,
 });
+export const PaymentProviderConfig = IDL.Record({
+  'publicKey' : IDL.Text,
+  'enabled' : IDL.Bool,
+  'accessToken' : IDL.Text,
+});
+export const PaymentConfig = IDL.Record({
+  'mercadoPago' : PaymentProviderConfig,
+});
+export const http_header = IDL.Record({
+  'value' : IDL.Text,
+  'name' : IDL.Text,
+});
+export const http_request_result = IDL.Record({
+  'status' : IDL.Nat,
+  'body' : IDL.Vec(IDL.Nat8),
+  'headers' : IDL.Vec(http_header),
+});
+export const TransformationInput = IDL.Record({
+  'context' : IDL.Vec(IDL.Nat8),
+  'response' : http_request_result,
+});
+export const TransformationOutput = IDL.Record({
+  'status' : IDL.Nat,
+  'body' : IDL.Vec(IDL.Nat8),
+  'headers' : IDL.Vec(http_header),
+});
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
-  'addWeatherSample' : IDL.Func(
-      [
-        IDL.Nat,
-        IDL.Record({
-          'temperatureC' : IDL.Float64,
-          'condition' : WeatherCondition,
-        }),
-      ],
-      [WorkSession],
-      [],
-    ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'blockUser' : IDL.Func([IDL.Principal], [], []),
-  'createEvidence' : IDL.Func(
-      [
-        IDL.Record({
-          'regiao' : IDL.Opt(Region),
-          'bairro' : IDL.Opt(IDL.Text),
-          'platform' : IDL.Opt(Platform),
-          'notes' : IDL.Text,
-          'evidenceType' : EvidenceType,
-        }),
-      ],
-      [Evidence],
+  'checkPaymentStatus' : IDL.Func([IDL.Text], [PaymentStatus], []),
+  'createMercadoPagoCheckout' : IDL.Func(
+      [SubscriptionPlan],
+      [PaymentCheckoutResponse],
       [],
     ),
-  'endWorkSession' : IDL.Func([IDL.Nat], [WorkSession], []),
-  'generateAppeal' : IDL.Func(
-      [
-        IDL.Record({
-          'platform' : Platform,
-          'userExplanation' : IDL.Text,
-          'reasonCategory' : ReasonCategory,
-          'evidenceIds' : IDL.Vec(IDL.Nat),
-        }),
-      ],
-      [Appeal],
+  'createPaymentPreference' : IDL.Func(
+      [SubscriptionPlan],
+      [PaymentCheckoutResponse],
       [],
     ),
   'getAllEvidence' : IDL.Func([], [IDL.Vec(Evidence)], ['query']),
   'getAllUserAccessInfo' : IDL.Func([], [IDL.Vec(UserAccessInfo)], ['query']),
-  'getAppeal' : IDL.Func([IDL.Nat], [IDL.Opt(Appeal)], ['query']),
-  'getCallerAppeals' : IDL.Func([], [IDL.Vec(Appeal)], ['query']),
-  'getCallerLossProfile' : IDL.Func(
-      [],
-      [IDL.Opt(PublicLossProfile)],
-      ['query'],
-    ),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-  'getCollectiveReports' : IDL.Func([], [IDL.Vec(CollectiveReport)], ['query']),
-  'getEvidenceById' : IDL.Func([IDL.Nat], [IDL.Opt(Evidence)], ['query']),
-  'getEvidenceFiltered' : IDL.Func(
-      [IDL.Opt(EvidenceType), IDL.Opt(Platform)],
-      [IDL.Vec(Evidence)],
-      ['query'],
-    ),
-  'getLossProfile' : IDL.Func(
-      [IDL.Principal],
-      [IDL.Opt(PublicLossProfile)],
-      ['query'],
-    ),
-  'getPlatformStats' : IDL.Func([Platform], [IDL.Nat], ['query']),
-  'getReasonStats' : IDL.Func([ReasonCategory], [IDL.Nat], ['query']),
-  'getRegionStats' : IDL.Func([Region], [IDL.Nat], ['query']),
-  'getRevisoMotivadaMessage' : IDL.Func([], [IDL.Text], ['query']),
+  'getPublicPaymentConfig' : IDL.Func([], [PublicPaymentConfig], ['query']),
   'getSubscriptionStatus' : IDL.Func([], [SubscriptionStatus], ['query']),
-  'getTimeline' : IDL.Func(
-      [
-        IDL.Record({
-          'startTime' : IDL.Opt(IDL.Int),
-          'endTime' : IDL.Opt(IDL.Int),
-          'platformFilter' : IDL.Opt(Platform),
-          'typeFilter' : IDL.Opt(EvidenceType),
-        }),
-      ],
-      [IDL.Vec(Evidence)],
-      ['query'],
-    ),
-  'getUserProfile' : IDL.Func(
-      [IDL.Principal],
-      [IDL.Opt(UserProfile)],
-      ['query'],
-    ),
-  'getWorkSession' : IDL.Func([IDL.Nat], [IDL.Opt(WorkSession)], ['query']),
+  'getUserProfile' : IDL.Func([Principal], [IDL.Opt(UserProfile)], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-  'isCurrentUserBlocked' : IDL.Func([], [IDL.Bool], ['query']),
   'logWorkSession' : IDL.Func(
       [IDL.Record({ 'city' : IDL.Text })],
       [WorkSession],
@@ -218,59 +166,42 @@ export const idlService = IDL.Service({
     ),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'setLossProfile' : IDL.Func([LossProfile], [], []),
-  'submitCollectiveReport' : IDL.Func(
-      [
-        IDL.Record({
-          'region' : Region,
-          'neighborhood' : IDL.Text,
-          'platform' : Platform,
-          'reason' : ReasonCategory,
-        }),
-      ],
-      [],
-      [],
+  'setPaymentConfig' : IDL.Func([PaymentConfig], [], []),
+  'transform' : IDL.Func(
+      [TransformationInput],
+      [TransformationOutput],
+      ['query'],
     ),
-  'unblockUser' : IDL.Func([IDL.Principal], [], []),
-  'upgradeSubscription' : IDL.Func([SubscriptionPlan], [], []),
 });
 
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
-  const WeatherCondition = IDL.Variant({
-    'cloudy' : IDL.Null,
-    'clear' : IDL.Null,
-    'nublado' : IDL.Null,
-    'soleado' : IDL.Null,
-    'tempestuoso' : IDL.Null,
-    'windy' : IDL.Null,
-    'rainy' : IDL.Null,
-  });
-  const Time = IDL.Int;
-  const WeatherSample = IDL.Record({
-    'city' : IDL.Text,
-    'timestamp' : Time,
-    'temperatureC' : IDL.Float64,
-    'condition' : WeatherCondition,
-  });
-  const WorkSession = IDL.Record({
-    'id' : IDL.Nat,
-    'startTime' : Time,
-    'endTime' : IDL.Opt(Time),
-    'owner' : IDL.Principal,
-    'city' : IDL.Text,
-    'weatherSamples' : IDL.Vec(WeatherSample),
-  });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
     'guest' : IDL.Null,
+  });
+  const PaymentStatus = IDL.Record({
+    'status' : IDL.Text,
+    'paymentId' : IDL.Text,
+    'rawResponse' : IDL.Text,
+  });
+  const SubscriptionPlan = IDL.Variant({
+    'free_24h' : IDL.Null,
+    'pro_monthly' : IDL.Null,
+    'pro_annual' : IDL.Null,
+  });
+  const PaymentCheckoutResponse = IDL.Record({
+    'paymentId' : IDL.Text,
+    'checkoutUrl' : IDL.Opt(IDL.Text),
   });
   const Region = IDL.Variant({
     'maracanau' : IDL.Null,
     'caucaia' : IDL.Null,
     'fortaleza' : IDL.Null,
   });
+  const Principal = IDL.Principal;
   const Platform = IDL.Variant({
     'uber' : IDL.Null,
     'ninetyNine' : IDL.Null,
@@ -278,43 +209,23 @@ export const idlFactory = ({ IDL }) => {
     'rappi' : IDL.Null,
   });
   const EvidenceType = IDL.Variant({
+    'audio' : IDL.Null,
+    'video' : IDL.Null,
     'selfie' : IDL.Null,
     'screenshot' : IDL.Null,
   });
   const Evidence = IDL.Record({
     'id' : IDL.Nat,
     'regiao' : IDL.Opt(Region),
-    'owner' : IDL.Principal,
+    'duration' : IDL.Opt(IDL.Nat),
+    'owner' : Principal,
     'bairro' : IDL.Opt(IDL.Text),
+    'audioQuality' : IDL.Opt(IDL.Text),
+    'videoQuality' : IDL.Opt(IDL.Text),
     'platform' : IDL.Opt(Platform),
     'notes' : IDL.Text,
     'uploadTime' : IDL.Int,
     'evidenceType' : EvidenceType,
-  });
-  const ReasonCategory = IDL.Variant({
-    'lowRating' : IDL.Null,
-    'other' : IDL.Null,
-    'documentsExpired' : IDL.Null,
-    'fraudSuspicion' : IDL.Null,
-    'selfieInvalid' : IDL.Null,
-    'dangerousConduct' : IDL.Null,
-    'multipleAccounts' : IDL.Null,
-  });
-  const Appeal = IDL.Record({
-    'id' : IDL.Nat,
-    'owner' : IDL.Principal,
-    'createdTime' : IDL.Int,
-    'platform' : Platform,
-    'userExplanation' : IDL.Text,
-    'reasonCategory' : ReasonCategory,
-    'generatedText' : IDL.Text,
-    'evidenceIds' : IDL.Vec(IDL.Nat),
-  });
-  const Principal = IDL.Principal;
-  const SubscriptionPlan = IDL.Variant({
-    'free_24h' : IDL.Null,
-    'pro_monthly' : IDL.Null,
-    'pro_annual' : IDL.Null,
   });
   const SubscriptionStatus = IDL.Record({
     'startTime' : IDL.Opt(IDL.Int),
@@ -331,18 +242,36 @@ export const idlFactory = ({ IDL }) => {
     'subscriptionStatus' : SubscriptionStatus,
     'profile' : IDL.Opt(UserProfile),
   });
-  const PublicLossProfile = IDL.Record({
-    'dailyEarnings' : IDL.Float64,
-    'deactivationDate' : IDL.Int,
-    'platform' : Platform,
-    'daysPerWeek' : IDL.Nat,
+  const PublicPaymentProviderConfig = IDL.Record({
+    'publicKey' : IDL.Text,
+    'enabled' : IDL.Bool,
   });
-  const CollectiveReport = IDL.Record({
-    'region' : Region,
-    'neighborhood' : IDL.Text,
-    'platform' : Platform,
+  const PublicPaymentConfig = IDL.Record({
+    'mercadoPago' : PublicPaymentProviderConfig,
+  });
+  const Time = IDL.Int;
+  const WeatherCondition = IDL.Variant({
+    'cloudy' : IDL.Null,
+    'clear' : IDL.Null,
+    'nublado' : IDL.Null,
+    'soleado' : IDL.Null,
+    'tempestuoso' : IDL.Null,
+    'windy' : IDL.Null,
+    'rainy' : IDL.Null,
+  });
+  const WeatherSample = IDL.Record({
+    'city' : IDL.Text,
     'timestamp' : Time,
-    'reason' : ReasonCategory,
+    'temperatureC' : IDL.Float64,
+    'condition' : WeatherCondition,
+  });
+  const WorkSession = IDL.Record({
+    'id' : IDL.Nat,
+    'startTime' : Time,
+    'endTime' : IDL.Opt(Time),
+    'owner' : Principal,
+    'city' : IDL.Text,
+    'weatherSamples' : IDL.Vec(WeatherSample),
   });
   const LossProfile = IDL.Record({
     'dailyEarnings' : IDL.Float64,
@@ -350,100 +279,50 @@ export const idlFactory = ({ IDL }) => {
     'platform' : Platform,
     'daysPerWeek' : IDL.Nat,
   });
+  const PaymentProviderConfig = IDL.Record({
+    'publicKey' : IDL.Text,
+    'enabled' : IDL.Bool,
+    'accessToken' : IDL.Text,
+  });
+  const PaymentConfig = IDL.Record({ 'mercadoPago' : PaymentProviderConfig });
+  const http_header = IDL.Record({ 'value' : IDL.Text, 'name' : IDL.Text });
+  const http_request_result = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(http_header),
+  });
+  const TransformationInput = IDL.Record({
+    'context' : IDL.Vec(IDL.Nat8),
+    'response' : http_request_result,
+  });
+  const TransformationOutput = IDL.Record({
+    'status' : IDL.Nat,
+    'body' : IDL.Vec(IDL.Nat8),
+    'headers' : IDL.Vec(http_header),
+  });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
-    'addWeatherSample' : IDL.Func(
-        [
-          IDL.Nat,
-          IDL.Record({
-            'temperatureC' : IDL.Float64,
-            'condition' : WeatherCondition,
-          }),
-        ],
-        [WorkSession],
-        [],
-      ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'blockUser' : IDL.Func([IDL.Principal], [], []),
-    'createEvidence' : IDL.Func(
-        [
-          IDL.Record({
-            'regiao' : IDL.Opt(Region),
-            'bairro' : IDL.Opt(IDL.Text),
-            'platform' : IDL.Opt(Platform),
-            'notes' : IDL.Text,
-            'evidenceType' : EvidenceType,
-          }),
-        ],
-        [Evidence],
+    'checkPaymentStatus' : IDL.Func([IDL.Text], [PaymentStatus], []),
+    'createMercadoPagoCheckout' : IDL.Func(
+        [SubscriptionPlan],
+        [PaymentCheckoutResponse],
         [],
       ),
-    'endWorkSession' : IDL.Func([IDL.Nat], [WorkSession], []),
-    'generateAppeal' : IDL.Func(
-        [
-          IDL.Record({
-            'platform' : Platform,
-            'userExplanation' : IDL.Text,
-            'reasonCategory' : ReasonCategory,
-            'evidenceIds' : IDL.Vec(IDL.Nat),
-          }),
-        ],
-        [Appeal],
+    'createPaymentPreference' : IDL.Func(
+        [SubscriptionPlan],
+        [PaymentCheckoutResponse],
         [],
       ),
     'getAllEvidence' : IDL.Func([], [IDL.Vec(Evidence)], ['query']),
     'getAllUserAccessInfo' : IDL.Func([], [IDL.Vec(UserAccessInfo)], ['query']),
-    'getAppeal' : IDL.Func([IDL.Nat], [IDL.Opt(Appeal)], ['query']),
-    'getCallerAppeals' : IDL.Func([], [IDL.Vec(Appeal)], ['query']),
-    'getCallerLossProfile' : IDL.Func(
-        [],
-        [IDL.Opt(PublicLossProfile)],
-        ['query'],
-      ),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-    'getCollectiveReports' : IDL.Func(
-        [],
-        [IDL.Vec(CollectiveReport)],
-        ['query'],
-      ),
-    'getEvidenceById' : IDL.Func([IDL.Nat], [IDL.Opt(Evidence)], ['query']),
-    'getEvidenceFiltered' : IDL.Func(
-        [IDL.Opt(EvidenceType), IDL.Opt(Platform)],
-        [IDL.Vec(Evidence)],
-        ['query'],
-      ),
-    'getLossProfile' : IDL.Func(
-        [IDL.Principal],
-        [IDL.Opt(PublicLossProfile)],
-        ['query'],
-      ),
-    'getPlatformStats' : IDL.Func([Platform], [IDL.Nat], ['query']),
-    'getReasonStats' : IDL.Func([ReasonCategory], [IDL.Nat], ['query']),
-    'getRegionStats' : IDL.Func([Region], [IDL.Nat], ['query']),
-    'getRevisoMotivadaMessage' : IDL.Func([], [IDL.Text], ['query']),
+    'getPublicPaymentConfig' : IDL.Func([], [PublicPaymentConfig], ['query']),
     'getSubscriptionStatus' : IDL.Func([], [SubscriptionStatus], ['query']),
-    'getTimeline' : IDL.Func(
-        [
-          IDL.Record({
-            'startTime' : IDL.Opt(IDL.Int),
-            'endTime' : IDL.Opt(IDL.Int),
-            'platformFilter' : IDL.Opt(Platform),
-            'typeFilter' : IDL.Opt(EvidenceType),
-          }),
-        ],
-        [IDL.Vec(Evidence)],
-        ['query'],
-      ),
-    'getUserProfile' : IDL.Func(
-        [IDL.Principal],
-        [IDL.Opt(UserProfile)],
-        ['query'],
-      ),
-    'getWorkSession' : IDL.Func([IDL.Nat], [IDL.Opt(WorkSession)], ['query']),
+    'getUserProfile' : IDL.Func([Principal], [IDL.Opt(UserProfile)], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
-    'isCurrentUserBlocked' : IDL.Func([], [IDL.Bool], ['query']),
     'logWorkSession' : IDL.Func(
         [IDL.Record({ 'city' : IDL.Text })],
         [WorkSession],
@@ -451,20 +330,12 @@ export const idlFactory = ({ IDL }) => {
       ),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'setLossProfile' : IDL.Func([LossProfile], [], []),
-    'submitCollectiveReport' : IDL.Func(
-        [
-          IDL.Record({
-            'region' : Region,
-            'neighborhood' : IDL.Text,
-            'platform' : Platform,
-            'reason' : ReasonCategory,
-          }),
-        ],
-        [],
-        [],
+    'setPaymentConfig' : IDL.Func([PaymentConfig], [], []),
+    'transform' : IDL.Func(
+        [TransformationInput],
+        [TransformationOutput],
+        ['query'],
       ),
-    'unblockUser' : IDL.Func([IDL.Principal], [], []),
-    'upgradeSubscription' : IDL.Func([SubscriptionPlan], [], []),
   });
 };
 

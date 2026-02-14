@@ -1,27 +1,25 @@
 import { Platform } from '../backend';
 
-const platformEmails: Record<Platform, string> = {
-  [Platform.ifood]: 'suporte@ifood.com.br',
-  [Platform.uber]: 'suporte@uber.com',
-  [Platform.rappi]: 'ajuda@rappi.com',
-  [Platform.ninetyNine]: 'suporte@99app.com',
+const PLATFORM_EMAILS: Record<Platform, string> = {
+  ifood: 'suporte@ifood.com.br',
+  uber: 'support@uber.com',
+  rappi: 'soporte@rappi.com',
+  ninetyNine: 'suporte@99app.com',
 };
 
-const platformSubjects: Record<Platform, string> = {
-  [Platform.ifood]: 'Recurso - Desativação',
-  [Platform.uber]: 'Appeal: Driver deactivation',
-  [Platform.rappi]: 'Revisão de conta - Entregador',
-  [Platform.ninetyNine]: 'Recurso de desativação - Motorista',
-};
+export function getPlatformEmail(platform: Platform): string {
+  return PLATFORM_EMAILS[platform] || 'support@example.com';
+}
 
-export function buildMailtoLink(platform: Platform, appealText: string): string {
-  const email = platformEmails[platform];
-  const subject = platformSubjects[platform];
+export function createAppealMailto(platform: Platform, subject: string, body: string): string {
+  const email = getPlatformEmail(platform);
+  const encodedSubject = encodeURIComponent(subject);
+  const encodedBody = encodeURIComponent(body);
+  return `mailto:${email}?subject=${encodedSubject}&body=${encodedBody}`;
+}
 
-  const params = new URLSearchParams({
-    subject,
-    body: appealText,
-  });
-
-  return `mailto:${email}?${params.toString()}`;
+export function createSupportMailto(subject: string, body: string, email: string = 'support@rotasedireitos.com'): string {
+  const encodedSubject = encodeURIComponent(subject);
+  const encodedBody = encodeURIComponent(body);
+  return `mailto:${email}?subject=${encodedSubject}&body=${encodedBody}`;
 }

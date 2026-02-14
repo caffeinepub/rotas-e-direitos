@@ -1,38 +1,21 @@
-import { PublicLossProfile } from '../backend';
+import { PublicLossProfile } from '../types/backend-extended';
 
-export interface LossCalculations {
-  weekly: number;
-  monthly: number;
-  accumulated: number;
-  daysSince: number;
-  projection30: number;
-  projection60: number;
-  projection90: number;
+export function calculateWeeklyLoss(profile: PublicLossProfile): number {
+  return profile.dailyEarnings * Number(profile.daysPerWeek);
 }
 
-export function calculateLosses(profile: PublicLossProfile): LossCalculations {
-  const dailyEarnings = profile.dailyEarnings;
-  const daysPerWeek = Number(profile.daysPerWeek);
-  const deactivationDate = new Date(Number(profile.deactivationDate) / 1000000);
-  const now = new Date();
+export function calculateMonthlyLoss(profile: PublicLossProfile): number {
+  const weeksPerMonth = 4.33;
+  return calculateWeeklyLoss(profile) * weeksPerMonth;
+}
 
-  const daysSince = Math.floor((now.getTime() - deactivationDate.getTime()) / (1000 * 60 * 60 * 24));
+export function calculateAccumulatedLoss(profile: PublicLossProfile): number {
+  const now = Date.now();
+  const deactivationDate = Number(profile.deactivationDate);
+  const daysSinceDeactivation = Math.max(0, Math.floor((now - deactivationDate) / (1000 * 60 * 60 * 24)));
+  return profile.dailyEarnings * daysSinceDeactivation;
+}
 
-  const weekly = dailyEarnings * daysPerWeek;
-  const monthly = weekly * 4.3;
-  const accumulated = dailyEarnings * daysSince;
-
-  const projection30 = dailyEarnings * 30;
-  const projection60 = dailyEarnings * 60;
-  const projection90 = dailyEarnings * 90;
-
-  return {
-    weekly,
-    monthly,
-    accumulated,
-    daysSince,
-    projection30,
-    projection60,
-    projection90,
-  };
+export function calculateProjectedLoss(profile: PublicLossProfile, daysAhead: number): number {
+  return profile.dailyEarnings * daysAhead;
 }

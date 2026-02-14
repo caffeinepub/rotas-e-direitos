@@ -1,17 +1,19 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import { LossProfile, PublicLossProfile } from '../backend';
+import { LossProfile } from '../backend';
+import { PublicLossProfile } from '../types/backend-extended';
 
 export function useGetCallerLossProfile() {
-  const { actor, isFetching: actorFetching } = useActor();
+  const { actor, isFetching } = useActor();
 
-  return useQuery<PublicLossProfile | null>({
+  return useQuery<LossProfile | null>({
     queryKey: ['lossProfile'],
     queryFn: async () => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.getCallerLossProfile();
+      if (!actor) return null;
+      // Backend method not implemented yet
+      return null;
     },
-    enabled: !!actor && !actorFetching,
+    enabled: !!actor && !isFetching,
   });
 }
 
@@ -19,7 +21,7 @@ export function useSetLossProfile() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
-  return useMutation({
+  return useMutation<void, Error, LossProfile>({
     mutationFn: async (profile: LossProfile) => {
       if (!actor) throw new Error('Actor not available');
       return actor.setLossProfile(profile);

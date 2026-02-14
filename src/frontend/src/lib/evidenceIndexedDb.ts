@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 
 const DB_NAME = 'RotasEDireitosDB';
-const STORE_NAME = 'evidenceImages';
-const DB_VERSION = 1;
+const STORE_NAME = 'evidenceMedia';
+const DB_VERSION = 2;
 
 let dbPromise: Promise<IDBDatabase> | null = null;
 
@@ -26,11 +26,24 @@ function getDB(): Promise<IDBDatabase> {
   return dbPromise;
 }
 
-export async function storeEvidenceImage(evidenceId: number, imageData: ArrayBuffer): Promise<void> {
+export interface StoredMedia {
+  data: ArrayBuffer;
+  mimeType: string;
+  mediaType: 'image' | 'audio' | 'video';
+}
+
+export async function storeEvidenceMedia(
+  evidenceId: number,
+  data: ArrayBuffer,
+  mimeType: string,
+  mediaType: 'image' | 'audio' | 'video'
+): Promise<void> {
   const db = await getDB();
   const transaction = db.transaction(STORE_NAME, 'readwrite');
   const store = transaction.objectStore(STORE_NAME);
-  store.put(imageData, evidenceId);
+  
+  const media: StoredMedia = { data, mimeType, mediaType };
+  store.put(media, evidenceId);
 
   return new Promise((resolve, reject) => {
     transaction.oncomplete = () => resolve();
@@ -38,7 +51,7 @@ export async function storeEvidenceImage(evidenceId: number, imageData: ArrayBuf
   });
 }
 
-export async function getEvidenceImage(evidenceId: number): Promise<ArrayBuffer | null> {
+export async function getEvidenceMedia(evidenceId: number): Promise<StoredMedia | null> {
   const db = await getDB();
   const transaction = db.transaction(STORE_NAME, 'readonly');
   const store = transaction.objectStore(STORE_NAME);
@@ -50,22 +63,24 @@ export async function getEvidenceImage(evidenceId: number): Promise<ArrayBuffer 
   });
 }
 
-export function useEvidenceImage(evidenceId: number): string | null {
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+export function useEvidenceMedia(evidenceId: number): { url: string | null; mediaType: string | null } {
+  const [url, setUrl] = useState<string | null>(null);
+  const [mediaType, setMediaType] = useState<string | null>(null);
 
   useEffect(() => {
     let objectUrl: string | null = null;
 
-    getEvidenceImage(evidenceId)
-      .then((data) => {
-        if (data) {
-          const blob = new Blob([data], { type: 'image/jpeg' });
+    getEvidenceMedia(evidenceId)
+      .then((media) => {
+        if (media) {
+          const blob = new Blob([media.data], { type: media.mimeType });
           objectUrl = URL.createObjectURL(blob);
-          setImageUrl(objectUrl);
+          setUrl(objectUrl);
+          setMediaType(media.mediaType);
         }
       })
       .catch((error) => {
-        console.error('Failed to load evidence image:', error);
+        console.error('Failed to load evidence media:', error);
       });
 
     return () => {
@@ -75,5 +90,20 @@ export function useEvidenceImage(evidenceId: number): string | null {
     };
   }, [evidenceId]);
 
-  return imageUrl;
+  return { url, mediaType };
+}
+
+// Legacy support for existing image-only code
+export async function storeEvidenceImage(evidenceId: number, imageData: ArrayBuffer): Promise<void> {
+  return storeEvidenceMedia(evidenceId, imageData, 'image/jpeg', 'image');
+}
+
+export async function getEvidenceImage(evidenceId: number): Promise<ArrayBuffer | null> {
+  const media = await getEvidenceMedia(evidenceId);
+  return media?.data || null;
+}
+
+export function useEvidenceImage(evidenceId: number): string | null {
+  const { url } = useEvidenceMedia(evidenceId);
+  return url;
 }

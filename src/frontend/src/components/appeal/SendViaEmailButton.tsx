@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Platform } from '../../backend';
-import { buildMailtoLink } from '../../lib/mailto';
+import { createAppealMailto } from '../../lib/mailto';
 import { Mail, Info } from 'lucide-react';
 
 interface SendViaEmailButtonProps {
@@ -11,7 +11,8 @@ interface SendViaEmailButtonProps {
 
 export default function SendViaEmailButton({ platform, appealText }: SendViaEmailButtonProps) {
   const handleSend = () => {
-    const mailtoLink = buildMailtoLink(platform, appealText);
+    const subject = `Recurso de Reativação - ${platform}`;
+    const mailtoLink = createAppealMailto(platform, subject, appealText);
     window.location.href = mailtoLink;
   };
 

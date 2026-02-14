@@ -1,65 +1,74 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Responsive gig-driver marketing banner on public landing page",
+  "title": "Fix Mercado Pago checkout flow bugs (frontend)",
   "requirements": [
     {
-      "id": "REQ-27",
-      "summary": "Create a reusable responsive MarketingBanner component highlighting existing app services/benefits for gig drivers, explicitly mentioning Uber, 99, iFood, and InDriver.",
+      "id": "REQ-3",
+      "summary": "Update Mercado Pago payment hooks and Checkout page to use real backend payment status + confirmation APIs and support return/resume flow without placeholder errors.",
       "acceptanceCriteria": [
-        "A new React component exists for the marketing banner (reusable; not hardcoded only inside a single page).",
-        "The banner layout is responsive: stacks cleanly on small screens and uses a multi-column layout on larger screens.",
-        "The banner content visually includes the target platforms (Uber, 99, iFood, InDriver) via text and/or badges/chips/icons.",
-        "The banner highlights at least 3 distinct benefits/services already provided by the app (e.g., evidence tracking, loss calculation, appeal generation, collective insights, privacy/security), without introducing new product features.",
-        "No changes are required to backend canisters for this banner."
+        "useCreateMercadoPagoPayment uses the backend createPaymentPreference response and receives a real checkoutUrl in normal conditions; errors are mapped to safe English messages via sanitizePaymentError.",
+        "useCheckPaymentStatus calls the new backend payment-status method and returns a real status (not a hardcoded 'pending').",
+        "useConfirmPaymentAndUpgrade no longer throws 'Payment confirmation not yet implemented in backend' and calls the new backend confirmation/upgrade method.",
+        "Checkout page supports resuming a checkout after returning from Mercado Pago (e.g., by reading a payment identifier from the URL and showing PaymentStatusPanel to poll/refresh status).",
+        "All user-facing text introduced/changed by this work is in English."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/marketing/MarketingBanner.tsx",
-          "operation": "create",
-          "description": "Add a reusable MarketingBanner React component using Tailwind for a responsive (stack-on-mobile, multi-column-on-desktop) layout; include platform callouts (Uber, 99, iFood, InDriver, and optional “e outros”) and at least 3 existing benefits (e.g., Evidências, Calculadora de Perdas, Recursos, Dados Coletivos, Segurança/Privacidade). Reference the static hero images at frontend/public/assets/generated/banner-hero.dim_1600x600.png and frontend/public/assets/generated/banner-hero-mobile.dim_900x900.png. Ensure dark-first theme consistency and accessible contrast. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/hooks/useMercadoPagoPayment.ts",
+          "operation": "modify",
+          "description": "Replace placeholder Mercado Pago logic: keep createPaymentPreference mapping, update useCheckPaymentStatus to call backend checkPaymentStatus and map returned status string into the frontend PaymentStatus union, and update useConfirmPaymentAndUpgrade to call the new backend confirmation/upgrade capability (remove the 'not implemented' throw). Ensure all errors are sanitized to safe English messages via sanitizePaymentError (no sensitive data)."
+        },
+        {
+          "path": "frontend/src/pages/CheckoutPage.tsx",
+          "operation": "modify",
+          "description": "Support resuming checkout after returning from Mercado Pago by reading a payment identifier from the URL (and/or persisted session state) and initializing paymentData accordingly so PaymentStatusPanel can poll/refresh. Ensure the normal flow (create -> redirect -> return -> poll -> confirm -> navigate) works without runtime 'not implemented' errors, and any new/changed user-facing text remains English."
+        },
+        {
+          "path": "frontend/src/backend.d.ts",
+          "operation": "modify",
+          "description": "Update frontend backend interface typings to include the new backend payment confirmation/upgrade method used by useConfirmPaymentAndUpgrade, and ensure payment-status typing expectations align with the existing checkPaymentStatus return type used by the updated hook."
+        },
+        {
+          "path": "frontend/src/lib/payments/paymentErrorMessages.ts",
+          "operation": "modify",
+          "description": "Extend/adjust sanitizePaymentError mappings as needed to cover new backend error messages from payment status/confirmation flows while keeping messages safe and English-only (no credential echo, no raw provider responses)."
+        },
+        {
+          "path": "frontend/src/types/mercadopago.ts",
+          "operation": "modify",
+          "description": "Ensure frontend Mercado Pago payment status types remain aligned with the statuses returned from the backend payment-status method (pending/approved/rejected/cancelled/in_process/error) and are used consistently by hooks/pages."
+        },
+        {
+          "path": "frontend/src/utils/urlParams.ts",
+          "operation": "modify",
+          "description": "If needed for the return/resume flow, extend URL-param utilities to robustly extract the Mercado Pago return payment identifier from query or hash routing without exposing sensitive data; keep behavior generic and safe for reuse by Checkout."
         }
       ]
     },
     {
-      "id": "REQ-28",
-      "summary": "Integrate the MarketingBanner into the unauthenticated PublicOverviewPage near the top while preserving existing CTAs and structure.",
+      "id": "REQ-4",
+      "summary": "Make the admin Mercado Pago configuration UI reliably validate supported key formats, save successfully, and reflect updated enabled/publicKey state from getPublicPaymentConfig after save with safe English errors.",
       "acceptanceCriteria": [
-        "When not authenticated, the home route renders PublicOverviewPage and the new banner is visible without scrolling excessively (near the top section).",
-        "Existing navigation actions (e.g., view plans, learn more) still work as before.",
-        "The page remains visually consistent with the current dark-first theme and Tailwind token usage."
+        "Admin can enter Mercado Pago Public Key values in the formats shown in the UI placeholders (e.g., APP_USR-... and TEST-...) without front-end validation incorrectly rejecting them.",
+        "On successful save, the UI re-fetches getPublicPaymentConfig and displays the updated enabled + publicKey state so the admin can confirm configuration is active.",
+        "If saving fails, the admin sees an English, non-sensitive error message (no credential echo)."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/PublicOverviewPage.tsx",
+          "path": "frontend/src/pages/AdminDashboardPage.tsx",
           "operation": "modify",
-          "description": "Import and render the new MarketingBanner prominently near the top of the PublicOverviewPage content (before/around the current hero section) without removing or breaking existing headings, CTAs (Ver Planos / Saiba Mais), and existing sections/cards. Keep styling consistent with the current Tailwind token usage and dark-first theme. Verify the component's usage instructions before implementing."
-        }
-      ]
-    },
-    {
-      "id": "REQ-29",
-      "summary": "Add required banner image assets under frontend/public/assets/generated and ensure the banner component references them as static public assets.",
-      "acceptanceCriteria": [
-        "Banner image assets are present under frontend/public/assets/generated and are used by the banner component.",
-        "The banner remains readable and accessible with sufficient contrast on both light/dark backgrounds used by the app theme.",
-        "Images load correctly in the deployed build (no broken links; correct public paths)."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/public/assets/generated/banner-hero.dim_1600x600.png",
-          "operation": "create",
-          "description": "Add the generated wide hero/banner illustration asset as a static file to be used by MarketingBanner (no backend image serving)."
+          "description": "Adjust Mercado Pago Public Key front-end validation to accept the supported placeholder formats reliably (e.g., APP_USR-... and TEST-...) without false rejections; keep validation messaging in English. After saving, ensure the displayed current status (enabled + publicKey from getPublicPaymentConfig) updates reliably (explicit refetch + UI state sync) and that save failures display non-sensitive English errors."
         },
         {
-          "path": "frontend/public/assets/generated/banner-hero-mobile.dim_900x900.png",
-          "operation": "create",
-          "description": "Add the generated square/vertical mobile hero illustration asset as a static file to be used by MarketingBanner (no backend image serving)."
+          "path": "frontend/src/hooks/useAdminPaymentConfig.ts",
+          "operation": "modify",
+          "description": "Harden payment-config save mutation error handling so failures surface a safe, English, non-sensitive message to the UI without leaking credentials; avoid relying on throwing inside onError for control flow and ensure the mutation rejects with the sanitized message when saving fails."
         },
         {
-          "path": "frontend/src/components/marketing/MarketingBanner.tsx",
+          "path": "frontend/src/hooks/usePublicPaymentConfig.ts",
           "operation": "modify",
-          "description": "Verify the component references the exact static asset paths frontend/public/assets/generated/banner-hero.dim_1600x600.png and frontend/public/assets/generated/banner-hero-mobile.dim_900x900.png, uses responsive image presentation (desktop vs mobile), and maintains accessible contrast/readability across theme backgrounds. Verify the component's usage instructions before implementing."
+          "description": "Ensure public payment config query caching/invalidation behavior supports the admin 'save then re-fetch' flow reliably (e.g., consistent queryKey usage and refetch/invalidate semantics) so the UI reflects updated enabled/publicKey state after save."
         }
       ]
     }

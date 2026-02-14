@@ -23,15 +23,15 @@ export default function AdminGate({ children }: AdminGateProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShieldAlert className="h-6 w-6 text-destructive" />
-              Acesso Restrito
+              Restricted Access
             </CardTitle>
             <CardDescription>
-              Você precisa estar autenticado para acessar esta área.
+              You must be authenticated to access this area.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button onClick={() => navigate({ to: '/' })} className="w-full">
-              Voltar ao Início
+              Back to Home
             </Button>
           </CardContent>
         </Card>
@@ -45,7 +45,7 @@ export default function AdminGate({ children }: AdminGateProps) {
       <div className="flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <p className="text-muted-foreground">Verificando permissões...</p>
+          <p className="text-muted-foreground">Verifying permissions...</p>
         </div>
       </div>
     );
@@ -59,20 +59,20 @@ export default function AdminGate({ children }: AdminGateProps) {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <ShieldAlert className="h-6 w-6 text-destructive" />
-              Acesso Negado
+              Access Denied
             </CardTitle>
             <CardDescription>
-              Você não tem permissão para acessar esta área administrativa.
+              You do not have permission to access this administrative area.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Alert variant="destructive" className="mb-4">
               <AlertDescription>
-                Esta área é restrita apenas para administradores do sistema.
+                This area is restricted to system administrators only.
               </AlertDescription>
             </Alert>
             <Button onClick={() => navigate({ to: '/' })} className="w-full">
-              Voltar ao Início
+              Back to Home
             </Button>
           </CardContent>
         </Card>

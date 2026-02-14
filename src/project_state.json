@@ -1,218 +1,26 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 11,
-  "summary": "Aplicativo “ROTAS E DIREITOS” com modelo freemium/assinatura e módulo de pagamentos (PIX QR, cartão até 12x, boleto), dashboard de planos/vantagens e acessos rápidos, selos/políticas; incluir também um dashboard administrativo para rastrear status de assinatura por usuário e permitir bloquear/liberar acessos.",
-  "architectural_notes": [
-    "Plataforma MVP: Android nativo (Kotlin), público-alvo inicial Fortaleza e Região Metropolitana (expansível).",
-    "Arquitetura: offline-first com sincronização/backup opcional (Firebase Storage/Firestore).",
-    "Padrão recomendado: MVVM + Repository; dados locais via Room (tabelas: evidencias, perfil_financeiro, recursos).",
-    "Dependências/SDKs previstas: CameraX, ML Kit (Face Detection + opcional Text Recognition), WorkManager/Foreground Service, MPAndroidChart, iTextPDF, Google Maps SDK, Firebase Auth/Firestore.",
-    "Segurança/privacidade: armazenamento local criptografado (Android Keystore), envio anônimo para dados coletivos sem PII (sem nome/telefone/foto/documento).",
-    "Pagamentos/assinaturas: definir provedor PSP (ex.: Mercado Pago/PagSeguro/Asaas/etc.), fluxo de cobrança (PIX QR, cartão, boleto) e webhooks para confirmação; evitar armazenar dados de cartão (PCI) e validar status de pagamento/assinatura no backend.",
-    "Controle de acesso: implementar feature flags/entitlements por plano (trial 24h vs Pro) com verificação offline-first e sincronização quando online para evitar inconsistências.",
-    "Adicionar módulo/admin dashboard com controle de acesso (roles) separado do usuário final, permitindo override manual de entitlements (bloquear/liberar) e trilha de auditoria das ações."
+  "projectStateVersion": 3,
+  "summary": "New project",
+  "architectural_notes": [],
+  "known_issues": [
+    "Bugs/errors in Mercado Pago payment gateway are preventing the normal payment flow (checkout)."
   ],
-  "known_issues": [],
-  "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Wide responsive hero/banner illustration with delivery rider silhouette and abstract city/road shapes, dark-friendly palette (banner-hero.dim_1600x600.png)\n- Square/vertical banner illustration variant optimized for mobile, same visual style (banner-hero-mobile.dim_900x900.png)",
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-create-the-core-app-structure-for-rotas-e-direitos-as-a-web-app-with-four-main-modules-accessible-from-a-home-dashboard-1-evidence-tracker-2-loss-calculator-3-appeal-generator-4-collective-data-include-navigation-module-landing-pages-and-empty-state-guidance-for-first-time-users",
-      "title": "Create the core app structure for “ROTAS E DIREITOS” as a web app with four main modules accessible from a home dashboard: (1) Evidence Tracker, (2) Loss Calculator, (3) Appeal Generator, (4) Collective Data. Include navigation, module landing pages, and empty-state guidance for first-time users.",
-      "reqIds": [
-        "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-implement-authentication-using-internet-identity-and-associate-user-owned-data-to-the-authenticated-principal-unauthenticated-users-may-browse-a-read-only-overview-page-but-must-sign-in-to-create-upload-or-export-any-personal-evidence-records",
-      "title": "Implement authentication using Internet Identity and associate user-owned data to the authenticated principal. Unauthenticated users may browse a read-only overview page but must sign in to create, upload, or export any personal evidence/records.",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-evidence-tracker-allow-users-to-add-two-evidence-types-a-daily-selfie-photos-and-b-platform-screenshots-ratings-prints-via-file-upload-for-each-evidence-item-capture-type-selfie-print-upload-timestamp-user-provided-notes-tags-and-optional-platform-ifood-uber-99-rappi-provide-a-chronological-timeline-view-with-filters-type-platform-date-range",
-      "title": "Evidence Tracker: allow users to add two evidence types—(a) daily selfie photos and (b) platform screenshots/ratings prints—via file upload. For each evidence item, capture: type (selfie/print), upload timestamp, user-provided notes/tags, and optional platform (iFood/Uber/99/Rappi). Provide a chronological timeline view with filters (type, platform, date range).",
+      "id": "feature-update-the-frontend-mercado-pago-hooks-and-checkout-page-to-use-the-real-backend-payment-status-confirmation-apis-remove-placeholder-logic-handle-redirect-return-to-the-app-and-ensure-the-normal-checkout-flow-completes-without-throwing-not-implemented-errors",
+      "title": "Update the frontend Mercado Pago hooks and Checkout page to use the real backend payment status + confirmation APIs (remove placeholder logic), handle redirect/return to the app, and ensure the normal checkout flow completes without throwing “not implemented” errors.",
       "reqIds": [
         "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-evidence-storage-store-evidence-metadata-in-the-motoko-backend-and-store-the-image-files-in-the-frontend-using-browser-storage-indexeddb-for-offline-first-access-with-an-option-to-export-selected-evidence-items-as-a-single-downloadable-zip-file-client-side",
-      "title": "Evidence storage: store evidence metadata in the Motoko backend and store the image files in the frontend using browser storage (IndexedDB) for offline-first access, with an option to export selected evidence items as a single downloadable ZIP file (client-side).",
+      "id": "feature-ensure-the-admin-mercado-pago-configuration-ui-reliably-enables-the-gateway-for-real-payments-by-validating-supported-key-formats-saving-successfully-and-reflecting-the-updated-enabled-publickey-state-from-getpublicpaymentconfig-after-save",
+      "title": "Ensure the admin Mercado Pago configuration UI reliably enables the gateway for real payments by validating supported key formats, saving successfully, and reflecting the updated enabled/publicKey state from getPublicPaymentConfig after save.",
       "reqIds": [
         "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-work-session-logging-simplified-add-a-start-work-session-end-work-session-control-that-records-session-start-end-timestamps-and-periodically-fetches-weather-conditions-for-the-user-selected-city-region-no-gps-store-weather-samples-timestamp-condition-temperature-city-linked-to-the-session-and-show-them-on-a-session-detail-page",
-      "title": "Work Session logging (simplified): add a “Start Work Session / End Work Session” control that records session start/end timestamps and periodically fetches weather conditions for the user-selected city/region (no GPS). Store weather samples (timestamp, condition, temperature, city) linked to the session, and show them on a session detail page.",
-      "reqIds": [
-        "REQ-5"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-loss-calculator-implement-a-profile-form-that-collects-average-daily-earnings-brl-days-worked-per-week-1-7-and-deactivation-date-persist-the-profile-per-user-and-compute-weekly-loss-daily-days-week-monthly-loss-weekly-4-3-and-accumulated-loss-daily-days-since-deactivation-display-results-in-cards-and-show-a-simple-30-60-90-day-projection-bar-chart",
-      "title": "Loss Calculator: implement a profile form that collects average daily earnings (BRL), days worked per week (1–7), and deactivation date. Persist the profile per user and compute: weekly loss (daily * days/week), monthly loss (weekly * 4.3), and accumulated loss (daily * days since deactivation). Display results in cards and show a simple 30/60/90-day projection bar chart.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-generate-a-downloadable-pdf-report-for-the-loss-calculator-containing-title-anonymous-user-identifier-e-g-courier-short-id-period-deactivation-date-to-today-a-table-of-values-daily-weekly-monthly-accumulated-and-the-projection-chart-rendered-into-the-pdf-include-a-download-and-share-action-share-uses-the-browser-s-share-sheet-when-available-otherwise-downloads",
-      "title": "Generate a downloadable PDF report for the Loss Calculator containing: title, anonymous user identifier (e.g., “Courier #<short id>”), period (deactivation date to today), a table of values (daily/weekly/monthly/accumulated), and the projection chart rendered into the PDF. Include a “Download” and “Share” action (Share uses the browser’s share sheet when available, otherwise downloads).",
-      "reqIds": [
-        "REQ-7"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-appeal-generator-no-external-ai-implement-a-step-by-step-form-with-platform-selection-ifood-uber-99-rappi-stated-reason-category-documents-expired-selfie-invalid-low-rating-dangerous-conduct-fraud-suspicion-multiple-accounts-other-user-s-free-text-explanation-and-evidence-selection-checkbox-list-from-saved-evidence-generate-a-professional-appeal-text-using-predefined-templates-that-vary-by-platform-reason-and-allow-the-user-to-edit-the-generated-text-before-exporting",
-      "title": "Appeal Generator (no external AI): implement a step-by-step form with: platform selection (iFood/Uber/99/Rappi), stated reason category (documents expired/selfie invalid/low rating/dangerous conduct/fraud suspicion/multiple accounts/other), user’s free-text explanation, and evidence selection (checkbox list from saved evidence). Generate a professional appeal text using predefined templates that vary by platform + reason, and allow the user to edit the generated text before exporting.",
-      "reqIds": [
-        "REQ-8"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-appeal-sending-web-compatible-provide-a-send-via-email-action-that-opens-the-user-s-email-client-using-a-mailto-link-with-pre-filled-recipient-and-subject-for-each-platform-include-the-edited-appeal-text-in-the-email-body-and-present-a-clear-instruction-to-attach-exported-evidence-zip-pdf-manually-since-web-mailto-cannot-reliably-attach-files",
-      "title": "Appeal sending (web-compatible): provide a “Send via Email” action that opens the user’s email client using a mailto: link with pre-filled recipient and subject for each platform. Include the edited appeal text in the email body and present a clear instruction to attach exported evidence ZIP/PDF manually (since web mailto cannot reliably attach files).",
-      "reqIds": [
-        "REQ-9"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-collective-data-anonymous-reporting-no-precise-location-after-generating-an-appeal-prompt-the-user-to-optionally-submit-an-anonymous-report-containing-only-platform-region-city-selection-e-g-fortaleza-caucaia-maracana-neighborhood-selection-from-a-predefined-list-reason-category-and-date-never-collect-name-phone-documents-or-photos-in-the-collective-dataset-store-collective-records-in-the-motoko-backend-and-expose-aggregated-statistics",
-      "title": "Collective Data (anonymous reporting, no precise location): after generating an appeal, prompt the user to optionally submit an anonymous report containing only: platform, region/city selection (e.g., Fortaleza, Caucaia, Maracanaú), neighborhood selection from a predefined list, reason category, and date. Never collect name, phone, documents, or photos in the collective dataset. Store collective records in the Motoko backend and expose aggregated statistics.",
-      "reqIds": [
-        "REQ-10"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-collective-data-visualization-no-maps-build-a-collective-insights-page-that-shows-charts-tables-for-anonymous-reports-counts-by-platform-counts-by-reason-trend-over-last-30-90-days-with-filters-platform-reason-period-region-city",
-      "title": "Collective Data visualization (no maps): build a “Collective Insights” page that shows charts/tables for anonymous reports (counts by platform, counts by reason, trend over last 30/90 days) with filters (platform, reason, period, region/city).",
-      "reqIds": [
-        "REQ-11"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-apply-a-coherent-accessible-visual-theme-suitable-for-an-android-entry-level-audience-but-implemented-on-the-web-dark-first-ui-large-touch-friendly-controls-plain-language-and-portuguese-only-content-inside-the-app-ensure-consistent-typography-spacing-and-component-styling-across-modules-avoid-a-blue-purple-primary-palette",
-      "title": "Apply a coherent, accessible visual theme suitable for an Android-entry-level audience but implemented on the web: dark-first UI, large touch-friendly controls, plain language, and Portuguese-only content inside the app. Ensure consistent typography, spacing, and component styling across modules (avoid a blue/purple primary palette).",
-      "reqIds": [
-        "REQ-12"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-replace-the-app-s-current-icon-logo-with-the-user-uploaded-image-882a043b-a2cc-4acc-b01a-b72a200fc0d4-jpg-by-generating-a-complete-set-of-web-pwa-icon-assets-and-adding-them-to-the-project-as-static-files-under-frontend-public-assets-generated",
-      "title": "Replace the app’s current icon/logo with the user-uploaded image (882a043b-a2cc-4acc-b01a-b72a200fc0d4.jpg) by generating a complete set of web/PWA icon assets and adding them to the project as static files under frontend/public/assets/generated.",
-      "reqIds": [
-        "REQ-13"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-wire-the-new-icon-assets-into-the-web-app-entrypoint-by-updating-frontend-index-html-to-include-favicon-and-app-icon-link-tags-referencing-the-new-generated-assets-and-add-a-web-manifest-frontend-public-manifest-webmanifest-that-references-the-192x192-and-512x512-icons",
-      "title": "Wire the new icon assets into the web app entrypoint by updating frontend/index.html to include favicon and app icon link tags referencing the new generated assets, and add a web manifest (frontend/public/manifest.webmanifest) that references the 192x192 and 512x512 icons.",
-      "reqIds": [
-        "REQ-14"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-new-plans-billing-area-that-defines-three-subscription-plans-in-brl-with-clear-plan-rules-1-free-plan-available-for-24-hours-2-pro-monthly-for-r-29-99-3-pro-annual-for-r-329-90-with-all-features-unlocked-for-pro-plans",
-      "title": "Add a new “Plans & Billing” area that defines three subscription plans in BRL with clear plan rules: (1) Free plan available for 24 hours, (2) Pro Monthly for R$ 29,99, (3) Pro Annual for R$ 329,90, with all features unlocked for Pro plans.",
-      "reqIds": [
-        "REQ-15"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-access-control-by-subscription-plan-so-that-app-features-can-be-marked-as-free-trial-limited-vs-pro-only-the-ui-must-clearly-indicate-when-a-feature-is-locked-and-direct-the-user-to-upgrade-in-the-plans-billing-area",
-      "title": "Add access control by subscription plan so that app features can be marked as Free-trial-limited vs Pro-only; the UI must clearly indicate when a feature is locked and direct the user to upgrade in the “Plans & Billing” area.",
-      "reqIds": [
-        "REQ-17"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-a-payments-checkout-flow-that-supports-three-payment-methods-pix-via-qr-code-card-payment-with-installment-selection-up-to-12x-and-boleto-the-flow-must-be-available-from-the-new-payments-quick-menu-and-from-the-plan-upgrade-actions",
-      "title": "Create a payments checkout flow that supports three payment methods: PIX via QR code, card payment with installment selection up to 12x, and boleto; the flow must be available from the new Payments quick menu and from the plan upgrade actions.",
-      "reqIds": [
-        "REQ-18"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-a-plans-dashboard-page-that-compares-plan-advantages-benefits-and-shows-the-user-s-current-plan-status-free-trial-active-expired-pro-active-renewal-end-date",
-      "title": "Add a “Plans Dashboard” page that compares plan advantages/benefits and shows the user’s current plan status (Free trial active/expired, Pro active, renewal/end date).",
-      "reqIds": [
-        "REQ-19"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-quick-access-menus-entries-for-payments-profile-and-a-quick-process-lookup-screen-integrate-them-into-the-existing-navigation-layout-in-a-touch-friendly-way",
-      "title": "Add quick access menus/entries for: Payments, Profile, and a “Quick Process Lookup” screen; integrate them into the existing navigation layout in a touch-friendly way.",
-      "reqIds": [
-        "REQ-20"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-trust-security-badges-authenticity-and-security-seals-and-create-in-app-pages-for-privacy-policy-and-data-policy-link-to-these-pages-from-relevant-places-e-g-footer-onboarding-overview-and-or-dashboard",
-      "title": "Add trust/security badges (“authenticity and security seals”) and create in-app pages for Privacy Policy and Data Policy; link to these pages from relevant places (e.g., footer, onboarding/overview, and/or dashboard).",
-      "reqIds": [
-        "REQ-21"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-a-new-admin-dashboard-page-in-the-frontend-that-is-accessible-only-to-admins-and-provides-1-a-table-list-of-users-with-principal-profile-fields-when-present-plan-name-start-end-timestamps-entitlement-like-status-and-current-blocked-state-2-controls-to-block-unblock-a-selected-user-with-confirmation-3-basic-search-filter-by-principal-and-or-name-email-when-present",
-      "title": "Create a new Admin Dashboard page in the frontend that is accessible only to admins and provides: (1) a table/list of users with principal, profile fields when present, plan name, start/end timestamps, entitlement-like status, and current blocked state; (2) controls to block/unblock a selected user with confirmation; (3) basic search/filter by principal and/or name/email (when present).",
-      "reqIds": [
-        "REQ-25"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-integrate-the-admin-dashboard-into-the-existing-navigation-layout-so-that-the-entry-point-is-visible-only-when-the-authenticated-user-is-an-admin",
-      "title": "Integrate the Admin Dashboard into the existing navigation/layout so that the entry point is visible only when the authenticated user is an admin.",
-      "reqIds": [
-        "REQ-26"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-a-reusable-responsive-marketing-banner-component-that-highlights-the-app-s-key-services-and-advantages-for-gig-workers-explicitly-mentioning-platforms-like-uber-99-ifood-and-indriver-and-optionally-and-others",
-      "title": "Create a reusable, responsive marketing banner component that highlights the app’s key services and advantages for gig workers, explicitly mentioning platforms like Uber, 99, iFood, and InDriver (and optionally “and others”).",
-      "reqIds": [
-        "REQ-27"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-integrate-the-responsive-marketing-banner-into-the-public-landing-experience-by-placing-it-prominently-on-the-unauthenticated-entry-page-frontend-src-pages-publicoverviewpage-tsx-keeping-the-page-s-existing-ctas-and-overall-structure-intact",
-      "title": "Integrate the responsive marketing banner into the public landing experience by placing it prominently on the unauthenticated entry page (frontend/src/pages/PublicOverviewPage.tsx), keeping the page’s existing CTAs and overall structure intact.",
-      "reqIds": [
-        "REQ-28"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-the-required-banner-image-assets-as-static-files-under-frontend-public-assets-generated-and-reference-them-from-the-banner-component-no-backend-image-serving",
-      "title": "Add the required banner image assets as static files under frontend/public/assets/generated and reference them from the banner component (no backend image serving).",
-      "reqIds": [
-        "REQ-29"
       ],
       "version": 1
     }
@@ -220,111 +28,22 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Módulo 1: Rastreador de evidências (selfie diária com prova de vida, linha do tempo de prints/avaliações, registro automático de condições, backup opcional criptografado)",
-      "reqIds": [],
+      "summary": "Implement a working Mercado Pago checkout flow in the Motoko backend so that creating a payment returns a valid Mercado Pago checkout URL and subsequent status checks can confirm the payment and upgrade the user subscription.",
+      "reqIds": [
+        "REQ-1"
+      ],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Módulo 2: Calculadora de perdas (perfil financeiro, cálculo semanal/mensal/acumulado, gráfico de projeção, relatório PDF compartilhável)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Módulo 3: Gerador automático de recursos (formulário guiado, geração de texto via Gemini/OpenAI, editor e envio por e-mail com anexos)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "Módulo 4: Mapa coletivo de desativações (compartilhamento anônimo, backend Firestore, mapa/heatmap com filtros; painel web futuro)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-5",
-      "summary": "Atualizar a foto/ícone do aplicativo para a imagem anexada pelo usuário (substituir a atual)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Implementar gateway de pagamento com PIX via QR Code, cartão (até 12x) e boleto para venda de assinaturas",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-7",
-      "summary": "Criar sistema de planos/assinaturas com regras por plano: Gratuito (24h), Pro Mensal (R$29,99) e Pro Anual (R$329,90) com todos os recursos liberados; incluir controle de acesso por assinatura",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-8",
-      "summary": "Dashboard de planos exibindo vantagens/benefícios de cada plano e status da assinatura do usuário",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-9",
-      "summary": "Adicionar menus de acesso rápido para: Pagamentos, Perfil e Consulta rápida de processos",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-10",
-      "summary": "Adicionar selos de autenticidade/segurança e criar páginas de Política de Privacidade e Política de Dados (LGPD) dentro do app",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-12",
-      "summary": "Implement subscription status tracking per authenticated user, including: current plan, start date/time, end/renewal date/time, and whether the Free 24h access window is still valid; expose this status to the frontend so pages can render the correct entitlement state.",
+      "summary": "Persist Mercado Pago configuration across canister upgrades and fix backend validation messaging so enabling Mercado Pago requires both accessToken and publicKey, with a correct, clear, non-sensitive error.",
       "reqIds": [
-        "REQ-16"
+        "REQ-2"
       ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-13",
-      "summary": "Criar dashboard administrativo para rastrear status/entitlements por usuário e permitir bloquear ou liberar acesso (override de assinatura/trial)",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-14",
-      "summary": "Add backend support for an administrator to list users and track each user’s access status, including: principal, optional user profile (name/email if present), subscription status (plan, startTime, endTime), and an admin override flag indicating whether the user is blocked from using the app’s protected features.",
-      "reqIds": [
-        "REQ-22"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-15",
-      "summary": "Add backend admin-only actions to block and unblock a specific user principal, and expose a backend query that allows any authenticated user to read their own blocked/unblocked status.",
-      "reqIds": [
-        "REQ-23"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-16",
-      "summary": "Enforce the admin block override in backend write/update entrypoints that represent protected feature usage so blocked users cannot create/modify protected data even if they have an active subscription/trial.",
-      "reqIds": [
-        "REQ-24"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-17",
-      "summary": "Criar um banner responsivo (marketing) destacando serviços e vantagens do app para usuários de Uber/99/iFood/InDriver etc., para uso em telas/web/app",
-      "reqIds": [],
       "status": "pending"
     }
   ],
-  "gameProjectType": "none",
-  "projectName": "ROTAS E DIREITOS",
+  "projectName": "Fix Mercado Pago payment gateway bugs blocking checkout flow",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

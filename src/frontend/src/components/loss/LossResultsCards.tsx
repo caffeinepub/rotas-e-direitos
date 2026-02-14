@@ -1,62 +1,49 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { PublicLossProfile } from '../../backend';
-import { calculateLosses } from '../../lib/lossCalculations';
-import { DollarSign, TrendingDown } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { PublicLossProfile } from '../../types/backend-extended';
+import { calculateWeeklyLoss, calculateMonthlyLoss, calculateAccumulatedLoss } from '../../lib/lossCalculations';
+import { TrendingDown, Calendar, DollarSign } from 'lucide-react';
 
 interface LossResultsCardsProps {
   profile: PublicLossProfile;
 }
 
 export default function LossResultsCards({ profile }: LossResultsCardsProps) {
-  const losses = calculateLosses(profile);
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL',
-    }).format(value);
-  };
+  const weeklyLoss = calculateWeeklyLoss(profile);
+  const monthlyLoss = calculateMonthlyLoss(profile);
+  const accumulatedLoss = calculateAccumulatedLoss(profile);
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-4 md:grid-cols-3">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Perda Semanal</CardTitle>
-          <TrendingDown className="h-4 w-4 text-muted-foreground" />
+          <CardTitle className="text-sm font-medium">Weekly Loss</CardTitle>
+          <Calendar className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{formatCurrency(losses.weekly)}</div>
+          <div className="text-2xl font-bold">R$ {weeklyLoss.toFixed(2)}</div>
+          <p className="text-xs text-muted-foreground">Per week</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Perda Mensal</CardTitle>
+          <CardTitle className="text-sm font-medium">Monthly Loss</CardTitle>
           <TrendingDown className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{formatCurrency(losses.monthly)}</div>
+          <div className="text-2xl font-bold">R$ {monthlyLoss.toFixed(2)}</div>
+          <p className="text-xs text-muted-foreground">Per month</p>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Perda Acumulada</CardTitle>
+          <CardTitle className="text-sm font-medium">Accumulated Loss</CardTitle>
           <DollarSign className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{formatCurrency(losses.accumulated)}</div>
-          <p className="text-xs text-muted-foreground mt-1">{losses.daysSince} dias desde desativação</p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium">Projeção 90 Dias</CardTitle>
-          <TrendingDown className="h-4 w-4 text-muted-foreground" />
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{formatCurrency(losses.projection90)}</div>
+          <div className="text-2xl font-bold">R$ {accumulatedLoss.toFixed(2)}</div>
+          <p className="text-xs text-muted-foreground">Since deactivation</p>
         </CardContent>
       </Card>
     </div>

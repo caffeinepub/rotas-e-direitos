@@ -1,60 +1,61 @@
 import { Button } from '@/components/ui/button';
-import { PublicLossProfile } from '../../backend';
-import { generateLossPDF } from '../../lib/pdfReport';
+import { PublicLossProfile } from '../../types/backend-extended';
 import { Download, Share2 } from 'lucide-react';
+import { generateLossReport } from '../../lib/pdfReport';
+import { toast } from 'sonner';
 
 interface LossReportActionsProps {
   profile: PublicLossProfile;
 }
 
 export default function LossReportActions({ profile }: LossReportActionsProps) {
-  const handleDownload = async () => {
-    await generateLossPDF(profile);
+  const handleDownload = () => {
+    try {
+      const blob = generateLossReport(profile);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `loss-report-${Date.now()}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success('Report downloaded');
+    } catch (error) {
+      toast.error('Failed to download report');
+    }
   };
 
   const handleShare = async () => {
-    const blob = await generateLossPDF(profile, true);
-    if (!blob) return;
+    try {
+      const blob = generateLossReport(profile);
+      const text = await blob.text();
 
-    const file = new File([blob], 'relatorio-perdas.txt', { type: 'text/plain' });
-
-    if (navigator.share && navigator.canShare?.({ files: [file] })) {
-      try {
+      if (navigator.share) {
         await navigator.share({
-          title: 'Relatório de Perdas Financeiras',
-          text: 'Relatório de perdas causadas pela desativação',
-          files: [file],
+          title: 'Loss Report',
+          text: text,
         });
-      } catch (error) {
-        console.error('Share failed:', error);
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'relatorio-perdas.txt';
-        a.click();
-        URL.revokeObjectURL(url);
+        toast.success('Report shared');
+      } else {
+        await navigator.clipboard.writeText(text);
+        toast.success('Report copied to clipboard');
       }
-    } else {
-      await handleDownload();
+    } catch (error) {
+      toast.error('Failed to share report');
     }
   };
 
   return (
-    <div className="space-y-4">
-      <h3 className="text-xl font-semibold">Exportar Relatório</h3>
-      <p className="text-base text-muted-foreground">
-        Baixe ou compartilhe um relatório em texto com todos os cálculos de perdas financeiras
-      </p>
-      <div className="flex gap-4">
-        <Button onClick={handleDownload} size="lg" className="flex-1">
-          <Download className="mr-2 h-4 w-4" />
-          Baixar TXT
-        </Button>
-        <Button onClick={handleShare} variant="outline" size="lg" className="flex-1">
-          <Share2 className="mr-2 h-4 w-4" />
-          Compartilhar
-        </Button>
-      </div>
+    <div className="flex gap-2">
+      <Button onClick={handleDownload} variant="outline">
+        <Download className="h-4 w-4 mr-2" />
+        Download Report
+      </Button>
+      <Button onClick={handleShare} variant="outline">
+        <Share2 className="h-4 w-4 mr-2" />
+        Share Report
+      </Button>
     </div>
   );
 }

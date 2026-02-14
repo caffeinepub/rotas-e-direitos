@@ -2,10 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-a-reusable-responsive-marketing-banner-component-that-highlights-the-app-s-key-services-and-advantages-for-gig-workers-explicitly-mentioning-platforms-like-uber-99-ifood-and-indriver-and-optionally-and-others",
-      "featureTitle": "Create a reusable, responsive marketing banner component that highlights the app’s key services and advantages for gig workers, explicitly mentioning platforms like Uber, 99, iFood, and InDriver (and optionally “and others”).",
+      "featureId": "feature-update-the-frontend-mercado-pago-hooks-and-checkout-page-to-use-the-real-backend-payment-status-confirmation-apis-remove-placeholder-logic-handle-redirect-return-to-the-app-and-ensure-the-normal-checkout-flow-completes-without-throwing-not-implemented-errors",
+      "featureTitle": "Update the frontend Mercado Pago hooks and Checkout page to use the real backend payment status + confirmation APIs (remove placeholder logic), handle redirect/return to the app, and ensure the normal checkout flow completes without throwing “not implemented” errors.",
       "files": [
-        "frontend/src/components/marketing/MarketingBanner.tsx"
+        "frontend/src/hooks/useMercadoPagoPayment.ts",
+        "frontend/src/lib/payments/paymentErrorMessages.ts",
+        "frontend/src/pages/CheckoutPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -13,18 +15,21 @@
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0"
       ],
       "testIds": [
-        "REQ-27"
+        "REQ-3"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-integrate-the-responsive-marketing-banner-into-the-public-landing-experience-by-placing-it-prominently-on-the-unauthenticated-entry-page-frontend-src-pages-publicoverviewpage-tsx-keeping-the-page-s-existing-ctas-and-overall-structure-intact",
-      "featureTitle": "Integrate the responsive marketing banner into the public landing experience by placing it prominently on the unauthenticated entry page (frontend/src/pages/PublicOverviewPage.tsx), keeping the page’s existing CTAs and overall structure intact.",
+      "featureId": "feature-ensure-the-admin-mercado-pago-configuration-ui-reliably-enables-the-gateway-for-real-payments-by-validating-supported-key-formats-saving-successfully-and-reflecting-the-updated-enabled-publickey-state-from-getpublicpaymentconfig-after-save",
+      "featureTitle": "Ensure the admin Mercado Pago configuration UI reliably enables the gateway for real payments by validating supported key formats, saving successfully, and reflecting the updated enabled/publicKey state from getPublicPaymentConfig after save.",
       "files": [
-        "frontend/src/pages/PublicOverviewPage.tsx"
+        "frontend/src/hooks/useAdminPaymentConfig.ts",
+        "frontend/src/pages/AdminDashboardPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -32,29 +37,12 @@
         "shadcn-ui@1.0.0",
         "build-template-react@1.0.0",
         "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0"
       ],
       "testIds": [
-        "REQ-28"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-the-required-banner-image-assets-as-static-files-under-frontend-public-assets-generated-and-reference-them-from-the-banner-component-no-backend-image-serving",
-      "featureTitle": "Add the required banner image assets as static files under frontend/public/assets/generated and reference them from the banner component (no backend image serving).",
-      "files": [
-        "frontend/src/components/marketing/MarketingBanner.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-29"
+        "REQ-4"
       ],
       "confidence": "high"
     }

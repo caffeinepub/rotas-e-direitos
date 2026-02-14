@@ -22,6 +22,8 @@ const platformLabels: Record<Platform, string> = {
 const typeLabels: Record<EvidenceType, string> = {
   [EvidenceType.selfie]: 'Selfie',
   [EvidenceType.screenshot]: 'Print',
+  [EvidenceType.audio]: 'Áudio',
+  [EvidenceType.video]: 'Vídeo',
 };
 
 export default function EvidencePicker({ selectedIds, onSelectionChange }: EvidencePickerProps) {
