@@ -81,15 +81,32 @@ export const Appeal = IDL.Record({
   'generatedText' : IDL.Text,
   'evidenceIds' : IDL.Vec(IDL.Nat),
 });
+export const Principal = IDL.Principal;
+export const SubscriptionPlan = IDL.Variant({
+  'free_24h' : IDL.Null,
+  'pro_monthly' : IDL.Null,
+  'pro_annual' : IDL.Null,
+});
+export const SubscriptionStatus = IDL.Record({
+  'startTime' : IDL.Opt(IDL.Int),
+  'endTime' : IDL.Opt(IDL.Int),
+  'currentPlan' : SubscriptionPlan,
+});
+export const UserProfile = IDL.Record({
+  'name' : IDL.Text,
+  'email' : IDL.Opt(IDL.Text),
+});
+export const UserAccessInfo = IDL.Record({
+  'principal' : Principal,
+  'isBlockedByAdmin' : IDL.Bool,
+  'subscriptionStatus' : SubscriptionStatus,
+  'profile' : IDL.Opt(UserProfile),
+});
 export const PublicLossProfile = IDL.Record({
   'dailyEarnings' : IDL.Float64,
   'deactivationDate' : IDL.Int,
   'platform' : Platform,
   'daysPerWeek' : IDL.Nat,
-});
-export const UserProfile = IDL.Record({
-  'name' : IDL.Text,
-  'email' : IDL.Opt(IDL.Text),
 });
 export const CollectiveReport = IDL.Record({
   'region' : Region,
@@ -119,6 +136,7 @@ export const idlService = IDL.Service({
       [],
     ),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+  'blockUser' : IDL.Func([IDL.Principal], [], []),
   'createEvidence' : IDL.Func(
       [
         IDL.Record({
@@ -146,6 +164,7 @@ export const idlService = IDL.Service({
       [],
     ),
   'getAllEvidence' : IDL.Func([], [IDL.Vec(Evidence)], ['query']),
+  'getAllUserAccessInfo' : IDL.Func([], [IDL.Vec(UserAccessInfo)], ['query']),
   'getAppeal' : IDL.Func([IDL.Nat], [IDL.Opt(Appeal)], ['query']),
   'getCallerAppeals' : IDL.Func([], [IDL.Vec(Appeal)], ['query']),
   'getCallerLossProfile' : IDL.Func(
@@ -171,6 +190,7 @@ export const idlService = IDL.Service({
   'getReasonStats' : IDL.Func([ReasonCategory], [IDL.Nat], ['query']),
   'getRegionStats' : IDL.Func([Region], [IDL.Nat], ['query']),
   'getRevisoMotivadaMessage' : IDL.Func([], [IDL.Text], ['query']),
+  'getSubscriptionStatus' : IDL.Func([], [SubscriptionStatus], ['query']),
   'getTimeline' : IDL.Func(
       [
         IDL.Record({
@@ -190,6 +210,7 @@ export const idlService = IDL.Service({
     ),
   'getWorkSession' : IDL.Func([IDL.Nat], [IDL.Opt(WorkSession)], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+  'isCurrentUserBlocked' : IDL.Func([], [IDL.Bool], ['query']),
   'logWorkSession' : IDL.Func(
       [IDL.Record({ 'city' : IDL.Text })],
       [WorkSession],
@@ -209,6 +230,8 @@ export const idlService = IDL.Service({
       [],
       [],
     ),
+  'unblockUser' : IDL.Func([IDL.Principal], [], []),
+  'upgradeSubscription' : IDL.Func([SubscriptionPlan], [], []),
 });
 
 export const idlInitArgs = [];
@@ -287,15 +310,32 @@ export const idlFactory = ({ IDL }) => {
     'generatedText' : IDL.Text,
     'evidenceIds' : IDL.Vec(IDL.Nat),
   });
+  const Principal = IDL.Principal;
+  const SubscriptionPlan = IDL.Variant({
+    'free_24h' : IDL.Null,
+    'pro_monthly' : IDL.Null,
+    'pro_annual' : IDL.Null,
+  });
+  const SubscriptionStatus = IDL.Record({
+    'startTime' : IDL.Opt(IDL.Int),
+    'endTime' : IDL.Opt(IDL.Int),
+    'currentPlan' : SubscriptionPlan,
+  });
+  const UserProfile = IDL.Record({
+    'name' : IDL.Text,
+    'email' : IDL.Opt(IDL.Text),
+  });
+  const UserAccessInfo = IDL.Record({
+    'principal' : Principal,
+    'isBlockedByAdmin' : IDL.Bool,
+    'subscriptionStatus' : SubscriptionStatus,
+    'profile' : IDL.Opt(UserProfile),
+  });
   const PublicLossProfile = IDL.Record({
     'dailyEarnings' : IDL.Float64,
     'deactivationDate' : IDL.Int,
     'platform' : Platform,
     'daysPerWeek' : IDL.Nat,
-  });
-  const UserProfile = IDL.Record({
-    'name' : IDL.Text,
-    'email' : IDL.Opt(IDL.Text),
   });
   const CollectiveReport = IDL.Record({
     'region' : Region,
@@ -325,6 +365,7 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
+    'blockUser' : IDL.Func([IDL.Principal], [], []),
     'createEvidence' : IDL.Func(
         [
           IDL.Record({
@@ -352,6 +393,7 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'getAllEvidence' : IDL.Func([], [IDL.Vec(Evidence)], ['query']),
+    'getAllUserAccessInfo' : IDL.Func([], [IDL.Vec(UserAccessInfo)], ['query']),
     'getAppeal' : IDL.Func([IDL.Nat], [IDL.Opt(Appeal)], ['query']),
     'getCallerAppeals' : IDL.Func([], [IDL.Vec(Appeal)], ['query']),
     'getCallerLossProfile' : IDL.Func(
@@ -381,6 +423,7 @@ export const idlFactory = ({ IDL }) => {
     'getReasonStats' : IDL.Func([ReasonCategory], [IDL.Nat], ['query']),
     'getRegionStats' : IDL.Func([Region], [IDL.Nat], ['query']),
     'getRevisoMotivadaMessage' : IDL.Func([], [IDL.Text], ['query']),
+    'getSubscriptionStatus' : IDL.Func([], [SubscriptionStatus], ['query']),
     'getTimeline' : IDL.Func(
         [
           IDL.Record({
@@ -400,6 +443,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     'getWorkSession' : IDL.Func([IDL.Nat], [IDL.Opt(WorkSession)], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
+    'isCurrentUserBlocked' : IDL.Func([], [IDL.Bool], ['query']),
     'logWorkSession' : IDL.Func(
         [IDL.Record({ 'city' : IDL.Text })],
         [WorkSession],
@@ -419,6 +463,8 @@ export const idlFactory = ({ IDL }) => {
         [],
         [],
       ),
+    'unblockUser' : IDL.Func([IDL.Principal], [], []),
+    'upgradeSubscription' : IDL.Func([SubscriptionPlan], [], []),
   });
 };
 

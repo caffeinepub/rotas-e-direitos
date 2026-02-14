@@ -49,6 +49,7 @@ export type Platform = { 'uber' : null } |
   { 'ninetyNine' : null } |
   { 'ifood' : null } |
   { 'rappi' : null };
+export type Principal = Principal;
 export interface PublicLossProfile {
   'dailyEarnings' : number,
   'deactivationDate' : bigint,
@@ -65,7 +66,21 @@ export type ReasonCategory = { 'lowRating' : null } |
 export type Region = { 'maracanau' : null } |
   { 'caucaia' : null } |
   { 'fortaleza' : null };
+export type SubscriptionPlan = { 'free_24h' : null } |
+  { 'pro_monthly' : null } |
+  { 'pro_annual' : null };
+export interface SubscriptionStatus {
+  'startTime' : [] | [bigint],
+  'endTime' : [] | [bigint],
+  'currentPlan' : SubscriptionPlan,
+}
 export type Time = bigint;
+export interface UserAccessInfo {
+  'principal' : Principal,
+  'isBlockedByAdmin' : boolean,
+  'subscriptionStatus' : SubscriptionStatus,
+  'profile' : [] | [UserProfile],
+}
 export interface UserProfile { 'name' : string, 'email' : [] | [string] }
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
@@ -98,6 +113,7 @@ export interface _SERVICE {
     WorkSession
   >,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
+  'blockUser' : ActorMethod<[Principal], undefined>,
   'createEvidence' : ActorMethod<
     [
       {
@@ -123,6 +139,7 @@ export interface _SERVICE {
     Appeal
   >,
   'getAllEvidence' : ActorMethod<[], Array<Evidence>>,
+  'getAllUserAccessInfo' : ActorMethod<[], Array<UserAccessInfo>>,
   'getAppeal' : ActorMethod<[bigint], [] | [Appeal]>,
   'getCallerAppeals' : ActorMethod<[], Array<Appeal>>,
   'getCallerLossProfile' : ActorMethod<[], [] | [PublicLossProfile]>,
@@ -139,6 +156,7 @@ export interface _SERVICE {
   'getReasonStats' : ActorMethod<[ReasonCategory], bigint>,
   'getRegionStats' : ActorMethod<[Region], bigint>,
   'getRevisoMotivadaMessage' : ActorMethod<[], string>,
+  'getSubscriptionStatus' : ActorMethod<[], SubscriptionStatus>,
   'getTimeline' : ActorMethod<
     [
       {
@@ -153,6 +171,7 @@ export interface _SERVICE {
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'getWorkSession' : ActorMethod<[bigint], [] | [WorkSession]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
+  'isCurrentUserBlocked' : ActorMethod<[], boolean>,
   'logWorkSession' : ActorMethod<[{ 'city' : string }], WorkSession>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setLossProfile' : ActorMethod<[LossProfile], undefined>,
@@ -167,6 +186,8 @@ export interface _SERVICE {
     ],
     undefined
   >,
+  'unblockUser' : ActorMethod<[Principal], undefined>,
+  'upgradeSubscription' : ActorMethod<[SubscriptionPlan], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

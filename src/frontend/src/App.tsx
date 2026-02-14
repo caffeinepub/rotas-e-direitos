@@ -9,6 +9,15 @@ import WorkSessionDetailPage from './pages/WorkSessionDetailPage';
 import LossCalculatorPage from './pages/LossCalculatorPage';
 import AppealGeneratorPage from './pages/AppealGeneratorPage';
 import CollectiveInsightsPage from './pages/CollectiveInsightsPage';
+import PlansBillingPage from './pages/PlansBillingPage';
+import PlansDashboardPage from './pages/PlansDashboardPage';
+import PaymentsPage from './pages/PaymentsPage';
+import CheckoutPage from './pages/CheckoutPage';
+import ProfilePage from './pages/ProfilePage';
+import QuickProcessLookupPage from './pages/QuickProcessLookupPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
+import DataPolicyPage from './pages/DataPolicyPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
 import ProfileSetupModal from './components/ProfileSetupModal';
 
 function RootComponent() {
@@ -76,6 +85,60 @@ const collectiveRoute = createRoute({
   component: CollectiveInsightsPage,
 });
 
+const plansBillingRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/planos',
+  component: PlansBillingPage,
+});
+
+const plansDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/dashboard-planos',
+  component: PlansDashboardPage,
+});
+
+const paymentsRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/pagamentos',
+  component: PaymentsPage,
+});
+
+const checkoutRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/checkout',
+  component: CheckoutPage,
+});
+
+const profileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/perfil',
+  component: ProfilePage,
+});
+
+const quickLookupRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/consulta-rapida',
+  component: QuickProcessLookupPage,
+});
+
+const privacyRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/privacidade',
+  component: PrivacyPolicyPage,
+});
+
+const dataRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/politica-dados',
+  component: DataPolicyPage,
+});
+
+const adminRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/admin',
+  component: AdminDashboardPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   evidenceRoute,
@@ -84,6 +147,15 @@ const routeTree = rootRoute.addChildren([
   lossCalculatorRoute,
   appealRoute,
   collectiveRoute,
+  plansBillingRoute,
+  plansDashboardRoute,
+  paymentsRoute,
+  checkoutRoute,
+  profileRoute,
+  quickLookupRoute,
+  privacyRoute,
+  dataRoute,
+  adminRoute,
 ]);
 
 const router = createRouter({ routeTree });

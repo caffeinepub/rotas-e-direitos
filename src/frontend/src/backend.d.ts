@@ -7,17 +7,29 @@ export interface None {
     __kind__: "None";
 }
 export type Option<T> = Some<T> | None;
+export interface UserProfile {
+    name: string;
+    email?: string;
+}
+export interface SubscriptionStatus {
+    startTime?: bigint;
+    endTime?: bigint;
+    currentPlan: SubscriptionPlan;
+}
 export interface LossProfile {
     dailyEarnings: number;
     deactivationDate: bigint;
     platform: Platform;
     daysPerWeek: bigint;
 }
-export interface UserProfile {
-    name: string;
-    email?: string;
-}
 export type Time = bigint;
+export interface UserAccessInfo {
+    principal: Principal;
+    isBlockedByAdmin: boolean;
+    subscriptionStatus: SubscriptionStatus;
+    profile?: UserProfile;
+}
+export type Principal = Principal;
 export interface Appeal {
     id: bigint;
     owner: Principal;
@@ -89,6 +101,11 @@ export enum Region {
     caucaia = "caucaia",
     fortaleza = "fortaleza"
 }
+export enum SubscriptionPlan {
+    free_24h = "free_24h",
+    pro_monthly = "pro_monthly",
+    pro_annual = "pro_annual"
+}
 export enum UserRole {
     admin = "admin",
     user = "user",
@@ -109,6 +126,7 @@ export interface backendInterface {
         condition: WeatherCondition;
     }): Promise<WorkSession>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
+    blockUser(target: Principal): Promise<void>;
     createEvidence(params: {
         regiao?: Region;
         bairro?: string;
@@ -124,6 +142,7 @@ export interface backendInterface {
         evidenceIds: Array<bigint>;
     }): Promise<Appeal>;
     getAllEvidence(): Promise<Array<Evidence>>;
+    getAllUserAccessInfo(): Promise<Array<UserAccessInfo>>;
     getAppeal(appealId: bigint): Promise<Appeal | null>;
     getCallerAppeals(): Promise<Array<Appeal>>;
     getCallerLossProfile(): Promise<PublicLossProfile | null>;
@@ -137,6 +156,7 @@ export interface backendInterface {
     getReasonStats(reason: ReasonCategory): Promise<bigint>;
     getRegionStats(region: Region): Promise<bigint>;
     getRevisoMotivadaMessage(): Promise<string>;
+    getSubscriptionStatus(): Promise<SubscriptionStatus>;
     getTimeline(params: {
         startTime?: bigint;
         endTime?: bigint;
@@ -146,6 +166,7 @@ export interface backendInterface {
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     getWorkSession(sessionId: bigint): Promise<WorkSession | null>;
     isCallerAdmin(): Promise<boolean>;
+    isCurrentUserBlocked(): Promise<boolean>;
     logWorkSession(params: {
         city: string;
     }): Promise<WorkSession>;
@@ -157,4 +178,6 @@ export interface backendInterface {
         platform: Platform;
         reason: ReasonCategory;
     }): Promise<void>;
+    unblockUser(target: Principal): Promise<void>;
+    upgradeSubscription(newPlan: SubscriptionPlan): Promise<void>;
 }

@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { FileText, Calculator, MessageSquare, BarChart3 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { FileText, Calculator, MessageSquare, BarChart3, CreditCard, User, Search } from 'lucide-react';
 
 export default function Dashboard() {
   const modules = [
@@ -34,14 +35,59 @@ export default function Dashboard() {
     },
   ];
 
+  const quickAccess = [
+    {
+      to: '/pagamentos',
+      title: 'Pagamentos',
+      icon: CreditCard,
+    },
+    {
+      to: '/perfil',
+      title: 'Perfil',
+      icon: User,
+    },
+    {
+      to: '/consulta-rapida',
+      title: 'Consulta Rápida',
+      icon: Search,
+    },
+  ];
+
   return (
     <div className="space-y-8">
       <div className="space-y-2">
         <h1 className="text-4xl font-bold tracking-tight">Painel Principal</h1>
         <p className="text-xl text-muted-foreground">
-          Ferramenta gratuita para defender seus direitos como entregador
+          Ferramenta para defender seus direitos como entregador
         </p>
       </div>
+
+      <Card className="bg-primary/5 border-primary/20">
+        <CardHeader>
+          <CardTitle className="text-xl">Acesso Rápido</CardTitle>
+          <CardDescription>Atalhos para funcionalidades importantes</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-3 gap-4">
+            {quickAccess.map((item) => {
+              const Icon = item.icon;
+              return (
+                <Button
+                  key={item.to}
+                  variant="outline"
+                  className="h-24 flex-col gap-2"
+                  asChild
+                >
+                  <Link to={item.to}>
+                    <Icon className="h-6 w-6" />
+                    <span className="text-sm">{item.title}</span>
+                  </Link>
+                </Button>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
       <div className="grid gap-6 md:grid-cols-2">
         {modules.map((module) => {
@@ -69,7 +115,7 @@ export default function Dashboard() {
       <Card className="bg-accent/50">
         <CardContent className="pt-6">
           <p className="text-base leading-relaxed">
-            <strong>Importante:</strong> Este aplicativo é uma iniciativa colaborativa e gratuita criada para
+            <strong>Importante:</strong> Este aplicativo é uma iniciativa colaborativa criada para
             ajudar entregadores de Fortaleza-CE e região metropolitana. Todos os seus dados são privados e
             protegidos. Compartilhe apenas informações anônimas quando solicitado.
           </p>

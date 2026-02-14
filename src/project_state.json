@@ -1,17 +1,19 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 3,
-  "summary": "Aplicativo Android nativo (Kotlin) \"ROTAS E DIREITOS\" (MVP offline-first com sincronização opcional) para ajudar entregadores desativados injustamente, com 4 módulos: rastreador de evidências, calculadora de perdas, gerador automático de recursos (IA) e mapa coletivo de desativações (Firebase + Google Maps).",
+  "projectStateVersion": 9,
+  "summary": "Aplicativo “ROTAS E DIREITOS” com modelo freemium/assinatura e módulo de pagamentos (PIX QR, cartão até 12x, boleto), dashboard de planos/vantagens e acessos rápidos, selos/políticas; incluir também um dashboard administrativo para rastrear status de assinatura por usuário e permitir bloquear/liberar acessos.",
   "architectural_notes": [
     "Plataforma MVP: Android nativo (Kotlin), público-alvo inicial Fortaleza e Região Metropolitana (expansível).",
     "Arquitetura: offline-first com sincronização/backup opcional (Firebase Storage/Firestore).",
     "Padrão recomendado: MVVM + Repository; dados locais via Room (tabelas: evidencias, perfil_financeiro, recursos).",
     "Dependências/SDKs previstas: CameraX, ML Kit (Face Detection + opcional Text Recognition), WorkManager/Foreground Service, MPAndroidChart, iTextPDF, Google Maps SDK, Firebase Auth/Firestore.",
-    "Segurança/privacidade: armazenamento local criptografado (Android Keystore), envio anônimo para dados coletivos sem PII (sem nome/telefone/foto/documento)."
+    "Segurança/privacidade: armazenamento local criptografado (Android Keystore), envio anônimo para dados coletivos sem PII (sem nome/telefone/foto/documento).",
+    "Pagamentos/assinaturas: definir provedor PSP (ex.: Mercado Pago/PagSeguro/Asaas/etc.), fluxo de cobrança (PIX QR, cartão, boleto) e webhooks para confirmação; evitar armazenar dados de cartão (PCI) e validar status de pagamento/assinatura no backend.",
+    "Controle de acesso: implementar feature flags/entitlements por plano (trial 24h vs Pro) com verificação offline-first e sincronização quando online para evitar inconsistências.",
+    "Adicionar módulo/admin dashboard com controle de acesso (roles) separado do usuário final, permitindo override manual de entitlements (bloquear/liberar) e trilha de auditoria das ações."
   ],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- App logo: simplified shield + route line icon, dark-theme friendly (logo-rotas-e-direitos.dim_512x512.png)\n- Four module icons in a consistent style (evidence, calculator, appeal, collective) (module-icons-sprite.dim_1024x256.png)",
   "existing_features": [
     {
       "id": "feature-create-the-core-app-structure-for-rotas-e-direitos-as-a-web-app-with-four-main-modules-accessible-from-a-home-dashboard-1-evidence-tracker-2-loss-calculator-3-appeal-generator-4-collective-data-include-navigation-module-landing-pages-and-empty-state-guidance-for-first-time-users",
@@ -108,6 +110,86 @@
         "REQ-12"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-replace-the-app-s-current-icon-logo-with-the-user-uploaded-image-882a043b-a2cc-4acc-b01a-b72a200fc0d4-jpg-by-generating-a-complete-set-of-web-pwa-icon-assets-and-adding-them-to-the-project-as-static-files-under-frontend-public-assets-generated",
+      "title": "Replace the app’s current icon/logo with the user-uploaded image (882a043b-a2cc-4acc-b01a-b72a200fc0d4.jpg) by generating a complete set of web/PWA icon assets and adding them to the project as static files under frontend/public/assets/generated.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-wire-the-new-icon-assets-into-the-web-app-entrypoint-by-updating-frontend-index-html-to-include-favicon-and-app-icon-link-tags-referencing-the-new-generated-assets-and-add-a-web-manifest-frontend-public-manifest-webmanifest-that-references-the-192x192-and-512x512-icons",
+      "title": "Wire the new icon assets into the web app entrypoint by updating frontend/index.html to include favicon and app icon link tags referencing the new generated assets, and add a web manifest (frontend/public/manifest.webmanifest) that references the 192x192 and 512x512 icons.",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-new-plans-billing-area-that-defines-three-subscription-plans-in-brl-with-clear-plan-rules-1-free-plan-available-for-24-hours-2-pro-monthly-for-r-29-99-3-pro-annual-for-r-329-90-with-all-features-unlocked-for-pro-plans",
+      "title": "Add a new “Plans & Billing” area that defines three subscription plans in BRL with clear plan rules: (1) Free plan available for 24 hours, (2) Pro Monthly for R$ 29,99, (3) Pro Annual for R$ 329,90, with all features unlocked for Pro plans.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-access-control-by-subscription-plan-so-that-app-features-can-be-marked-as-free-trial-limited-vs-pro-only-the-ui-must-clearly-indicate-when-a-feature-is-locked-and-direct-the-user-to-upgrade-in-the-plans-billing-area",
+      "title": "Add access control by subscription plan so that app features can be marked as Free-trial-limited vs Pro-only; the UI must clearly indicate when a feature is locked and direct the user to upgrade in the “Plans & Billing” area.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-payments-checkout-flow-that-supports-three-payment-methods-pix-via-qr-code-card-payment-with-installment-selection-up-to-12x-and-boleto-the-flow-must-be-available-from-the-new-payments-quick-menu-and-from-the-plan-upgrade-actions",
+      "title": "Create a payments checkout flow that supports three payment methods: PIX via QR code, card payment with installment selection up to 12x, and boleto; the flow must be available from the new Payments quick menu and from the plan upgrade actions.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-a-plans-dashboard-page-that-compares-plan-advantages-benefits-and-shows-the-user-s-current-plan-status-free-trial-active-expired-pro-active-renewal-end-date",
+      "title": "Add a “Plans Dashboard” page that compares plan advantages/benefits and shows the user’s current plan status (Free trial active/expired, Pro active, renewal/end date).",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-quick-access-menus-entries-for-payments-profile-and-a-quick-process-lookup-screen-integrate-them-into-the-existing-navigation-layout-in-a-touch-friendly-way",
+      "title": "Add quick access menus/entries for: Payments, Profile, and a “Quick Process Lookup” screen; integrate them into the existing navigation layout in a touch-friendly way.",
+      "reqIds": [
+        "REQ-20"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-trust-security-badges-authenticity-and-security-seals-and-create-in-app-pages-for-privacy-policy-and-data-policy-link-to-these-pages-from-relevant-places-e-g-footer-onboarding-overview-and-or-dashboard",
+      "title": "Add trust/security badges (“authenticity and security seals”) and create in-app pages for Privacy Policy and Data Policy; link to these pages from relevant places (e.g., footer, onboarding/overview, and/or dashboard).",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-admin-dashboard-page-in-the-frontend-that-is-accessible-only-to-admins-and-provides-1-a-table-list-of-users-with-principal-profile-fields-when-present-plan-name-start-end-timestamps-entitlement-like-status-and-current-blocked-state-2-controls-to-block-unblock-a-selected-user-with-confirmation-3-basic-search-filter-by-principal-and-or-name-email-when-present",
+      "title": "Create a new Admin Dashboard page in the frontend that is accessible only to admins and provides: (1) a table/list of users with principal, profile fields when present, plan name, start/end timestamps, entitlement-like status, and current blocked state; (2) controls to block/unblock a selected user with confirmation; (3) basic search/filter by principal and/or name/email (when present).",
+      "reqIds": [
+        "REQ-25"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-integrate-the-admin-dashboard-into-the-existing-navigation-layout-so-that-the-entry-point-is-visible-only-when-the-authenticated-user-is-an-admin",
+      "title": "Integrate the Admin Dashboard into the existing navigation/layout so that the entry point is visible only when the authenticated user is an admin.",
+      "reqIds": [
+        "REQ-26"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -133,6 +215,80 @@
       "id": "AR-4",
       "summary": "Módulo 4: Mapa coletivo de desativações (compartilhamento anônimo, backend Firestore, mapa/heatmap com filtros; painel web futuro)",
       "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Atualizar a foto/ícone do aplicativo para a imagem anexada pelo usuário (substituir a atual)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Implementar gateway de pagamento com PIX via QR Code, cartão (até 12x) e boleto para venda de assinaturas",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Criar sistema de planos/assinaturas com regras por plano: Gratuito (24h), Pro Mensal (R$29,99) e Pro Anual (R$329,90) com todos os recursos liberados; incluir controle de acesso por assinatura",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Dashboard de planos exibindo vantagens/benefícios de cada plano e status da assinatura do usuário",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Adicionar menus de acesso rápido para: Pagamentos, Perfil e Consulta rápida de processos",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "Adicionar selos de autenticidade/segurança e criar páginas de Política de Privacidade e Política de Dados (LGPD) dentro do app",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Implement subscription status tracking per authenticated user, including: current plan, start date/time, end/renewal date/time, and whether the Free 24h access window is still valid; expose this status to the frontend so pages can render the correct entitlement state.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Criar dashboard administrativo para rastrear status/entitlements por usuário e permitir bloquear ou liberar acesso (override de assinatura/trial)",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Add backend support for an administrator to list users and track each user’s access status, including: principal, optional user profile (name/email if present), subscription status (plan, startTime, endTime), and an admin override flag indicating whether the user is blocked from using the app’s protected features.",
+      "reqIds": [
+        "REQ-22"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Add backend admin-only actions to block and unblock a specific user principal, and expose a backend query that allows any authenticated user to read their own blocked/unblocked status.",
+      "reqIds": [
+        "REQ-23"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Enforce the admin block override in backend write/update entrypoints that represent protected feature usage so blocked users cannot create/modify protected data even if they have an active subscription/trial.",
+      "reqIds": [
+        "REQ-24"
+      ],
       "status": "pending"
     }
   ],

@@ -1,12 +1,12 @@
 import Runtime "mo:core/Runtime";
 import List "mo:core/List";
-import Nat "mo:core/Nat";
+import Iter "mo:core/Iter";
 import Map "mo:core/Map";
 import Order "mo:core/Order";
 import Array "mo:core/Array";
 import Time "mo:core/Time";
+import Nat "mo:core/Nat";
 import Text "mo:core/Text";
-import Iter "mo:core/Iter";
 import Principal "mo:core/Principal";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
@@ -110,6 +110,29 @@ actor {
     platform : Platform;
   };
 
+  public type SubscriptionPlan = {
+    #free_24h;
+    #pro_monthly;
+    #pro_annual;
+  };
+
+  public type SubscriptionStatus = {
+    currentPlan : SubscriptionPlan;
+    startTime : ?Int;
+    endTime : ?Int;
+  };
+
+  public type UserAccessInfo = {
+    principal : Principal.Principal;
+    profile : ?UserProfile;
+    subscriptionStatus : SubscriptionStatus;
+    isBlockedByAdmin : Bool;
+  };
+
+  type UserAccessInternalInfo = {
+    isBlockedByAdmin : Bool;
+  };
+
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
@@ -123,6 +146,8 @@ actor {
   let workSessions = Map.empty<Nat, WorkSession>();
   let appeals = Map.empty<Nat, Appeal>();
   let userProfiles = Map.empty<Principal, UserProfile>();
+  let subscriptions = Map.empty<Principal, SubscriptionStatus>();
+  let userAccess = Map.empty<Principal, UserAccessInternalInfo>();
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
@@ -138,6 +163,43 @@ actor {
     userProfiles.get(user);
   };
 
+  public query ({ caller }) func getAllUserAccessInfo() : async [UserAccessInfo] {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admin can query all users");
+    };
+
+    let allUserPrincipals = userProfiles.keys();
+    let resultList = List.empty<UserAccessInfo>();
+
+    for (principal in allUserPrincipals) {
+      let profile = userProfiles.get(principal);
+      let subscriptionStatus = switch (subscriptions.get(principal)) {
+        case (?status) { status };
+        case (null) {
+          {
+            currentPlan = #free_24h;
+            startTime = null;
+            endTime = null;
+          };
+        };
+      };
+      let userAccessStatus = userAccess.get(principal);
+
+      let info : UserAccessInfo = {
+        principal;
+        profile;
+        subscriptionStatus;
+        isBlockedByAdmin = switch (userAccessStatus) {
+          case (null) { false };
+          case (?status) { status.isBlockedByAdmin };
+        };
+      };
+      resultList.add(info);
+    };
+
+    resultList.toArray();
+  };
+
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can save profiles");
@@ -145,10 +207,33 @@ actor {
     userProfiles.add(caller, profile);
   };
 
+  public query ({ caller }) func getSubscriptionStatus() : async SubscriptionStatus {
+    let defaultStatus : SubscriptionStatus = { currentPlan = #free_24h; startTime = null; endTime = null };
+    switch (subscriptions.get(caller)) {
+      case (?status) { status };
+      case (null) { defaultStatus };
+    };
+  };
+
+  public shared ({ caller }) func upgradeSubscription(newPlan : SubscriptionPlan) : async () {
+    let now = Time.now();
+    let status : SubscriptionStatus = {
+      currentPlan = newPlan;
+      startTime = ?now;
+      endTime = switch (newPlan) {
+        case (#free_24h) { ?(now + 24 * 60 * 60 * 1000000000) };
+        case (#pro_monthly) { ?(now + 30 * 24 * 60 * 60 * 1000000000) };
+        case (#pro_annual) { ?(now + 365 * 24 * 60 * 60 * 1000000000) };
+      };
+    };
+    subscriptions.add(caller, status);
+  };
+
   public shared ({ caller }) func createEvidence(params : { evidenceType : EvidenceType; notes : Text; platform : ?Platform; regiao : ?Region; bairro : ?Text }) : async Evidence {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can create evidence");
     };
+    checkFeatureAccess(caller);
 
     let evidenceId = nextEvidenceId;
     nextEvidenceId += 1;
@@ -261,6 +346,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can log work sessions");
     };
+    checkFeatureAccess(caller);
 
     let sessionId = nextSessionId;
     nextSessionId += 1;
@@ -283,6 +369,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can end work sessions");
     };
+    checkFeatureAccess(caller);
 
     switch (workSessions.get(sessionId)) {
       case (null) { Runtime.trap("Session not found") };
@@ -309,6 +396,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can add weather samples");
     };
+    checkFeatureAccess(caller);
 
     switch (workSessions.get(sessionId)) {
       case (null) { Runtime.trap("Session not found") };
@@ -360,6 +448,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can set loss profiles");
     };
+    checkFeatureAccess(caller);
 
     lossProfiles.add(caller, profile);
   };
@@ -413,6 +502,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can generate appeals");
     };
+    checkFeatureAccess(caller);
 
     for (evidenceId in params.evidenceIds.vals()) {
       switch (evidenceEntries.get(evidenceId)) {
@@ -530,6 +620,7 @@ actor {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can submit collective reports");
     };
+    checkFeatureAccess(caller);
 
     let report : CollectiveReport = {
       platform = params.platform;
@@ -575,5 +666,70 @@ actor {
 
   public query ({ caller }) func getRevisoMotivadaMessage() : async Text {
     "Prezado entregador, este aplicativo é uma iniciativa colaborativa e gratuita criada para ajudar todos os colegas de trabalho em Fortaleza-CE e cidades próximas. Saiba que a revisão completa e acompanhamentos motivados podem levar tempo, mas você será informado assim que houver qualquer alteração.";
+  };
+
+  // Admin block functions
+  public shared ({ caller }) func blockUser(target : Principal) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admin can block users");
+    };
+    userAccess.add(target, { isBlockedByAdmin = true });
+  };
+
+  public shared ({ caller }) func unblockUser(target : Principal) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Only admin can unblock users");
+    };
+    userAccess.add(target, { isBlockedByAdmin = false });
+  };
+
+  // Query for users to check own block status
+  public query ({ caller }) func isCurrentUserBlocked() : async Bool {
+    switch (userAccess.get(caller)) {
+      case (?status) { status.isBlockedByAdmin };
+      case (null) { false };
+    };
+  };
+
+  func checkFeatureAccess(caller : Principal) {
+    // Check if user is blocked by admin first
+    let isBlocked = switch (userAccess.get(caller)) {
+      case (?status) { status.isBlockedByAdmin };
+      case (null) { false };
+    };
+    if (isBlocked) {
+      Runtime.trap("Your account has been blocked by admin. Access denied.");
+    };
+
+    let now = Time.now();
+    let status = switch (subscriptions.get(caller)) {
+      case (?s) { s };
+      case (null) {
+        {
+          currentPlan = #free_24h;
+          startTime = ?now;
+          endTime = ?(now + 24 * 60 * 60 * 1000000000);
+        };
+      };
+    };
+
+    switch (status.currentPlan, status.endTime) {
+      case (#free_24h, ?end) {
+        if (now > end) {
+          Runtime.trap("Free trial expired. Please upgrade to access this feature.");
+        };
+      };
+      case (#pro_monthly, ?end) {
+        if (now > end) {
+          Runtime.trap("Monthly subscription expired. Please renew to access this feature.");
+        };
+      };
+      case (#pro_annual, ?end) {
+        if (now > end) {
+          Runtime.trap("Annual subscription expired. Please renew to access this feature.");
+        };
+      };
+      case (_, null) { Runtime.trap("Invalid subscription status. Please contact support."); };
+    };
   };
 };

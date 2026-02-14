@@ -2,16 +2,33 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-the-core-app-structure-for-rotas-e-direitos-as-a-web-app-with-four-main-modules-accessible-from-a-home-dashboard-1-evidence-tracker-2-loss-calculator-3-appeal-generator-4-collective-data-include-navigation-module-landing-pages-and-empty-state-guidance-for-first-time-users",
-      "featureTitle": "Create the core app structure for “ROTAS E DIREITOS” as a web app with four main modules accessible from a home dashboard: (1) Evidence Tracker, (2) Loss Calculator, (3) Appeal Generator, (4) Collective Data. Include navigation, module landing pages, and empty-state guidance for first-time users.",
+      "featureId": "feature-create-a-new-admin-dashboard-page-in-the-frontend-that-is-accessible-only-to-admins-and-provides-1-a-table-list-of-users-with-principal-profile-fields-when-present-plan-name-start-end-timestamps-entitlement-like-status-and-current-blocked-state-2-controls-to-block-unblock-a-selected-user-with-confirmation-3-basic-search-filter-by-principal-and-or-name-email-when-present",
+      "featureTitle": "Create a new Admin Dashboard page in the frontend that is accessible only to admins and provides: (1) a table/list of users with principal, profile fields when present, plan name, start/end timestamps, entitlement-like status, and current blocked state; (2) controls to block/unblock a selected user with confirmation; (3) basic search/filter by principal and/or name/email (when present).",
+      "files": [
+        "frontend/src/components/AdminGate.tsx",
+        "frontend/src/hooks/useAdmin.ts",
+        "frontend/src/hooks/useIsAdmin.ts",
+        "frontend/src/pages/AdminDashboardPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-25"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-integrate-the-admin-dashboard-into-the-existing-navigation-layout-so-that-the-entry-point-is-visible-only-when-the-authenticated-user-is-an-admin",
+      "featureTitle": "Integrate the Admin Dashboard into the existing navigation/layout so that the entry point is visible only when the authenticated user is an admin.",
       "files": [
         "frontend/src/App.tsx",
-        "frontend/src/components/AppLayout.tsx",
-        "frontend/src/pages/AppealGeneratorPage.tsx",
-        "frontend/src/pages/CollectiveInsightsPage.tsx",
-        "frontend/src/pages/Dashboard.tsx",
-        "frontend/src/pages/EvidenceTrackerPage.tsx",
-        "frontend/src/pages/LossCalculatorPage.tsx"
+        "frontend/src/components/AppLayout.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -22,262 +39,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-implement-authentication-using-internet-identity-and-associate-user-owned-data-to-the-authenticated-principal-unauthenticated-users-may-browse-a-read-only-overview-page-but-must-sign-in-to-create-upload-or-export-any-personal-evidence-records",
-      "featureTitle": "Implement authentication using Internet Identity and associate user-owned data to the authenticated principal. Unauthenticated users may browse a read-only overview page but must sign in to create, upload, or export any personal evidence/records.",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/AuthGate.tsx",
-        "frontend/src/components/LoginButton.tsx",
-        "frontend/src/components/ProfileSetupModal.tsx",
-        "frontend/src/hooks/useCurrentUser.ts",
-        "frontend/src/hooks/useUserProfile.ts",
-        "frontend/src/pages/PublicOverviewPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-evidence-tracker-allow-users-to-add-two-evidence-types-a-daily-selfie-photos-and-b-platform-screenshots-ratings-prints-via-file-upload-for-each-evidence-item-capture-type-selfie-print-upload-timestamp-user-provided-notes-tags-and-optional-platform-ifood-uber-99-rappi-provide-a-chronological-timeline-view-with-filters-type-platform-date-range",
-      "featureTitle": "Evidence Tracker: allow users to add two evidence types—(a) daily selfie photos and (b) platform screenshots/ratings prints—via file upload. For each evidence item, capture: type (selfie/print), upload timestamp, user-provided notes/tags, and optional platform (iFood/Uber/99/Rappi). Provide a chronological timeline view with filters (type, platform, date range).",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/evidence/EvidenceFilters.tsx",
-        "frontend/src/components/evidence/EvidenceTimeline.tsx",
-        "frontend/src/components/evidence/EvidenceUploadForm.tsx",
-        "frontend/src/hooks/useEvidence.ts",
-        "frontend/src/pages/EvidenceDetailPage.tsx",
-        "frontend/src/pages/EvidenceTrackerPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-evidence-storage-store-evidence-metadata-in-the-motoko-backend-and-store-the-image-files-in-the-frontend-using-browser-storage-indexeddb-for-offline-first-access-with-an-option-to-export-selected-evidence-items-as-a-single-downloadable-zip-file-client-side",
-      "featureTitle": "Evidence storage: store evidence metadata in the Motoko backend and store the image files in the frontend using browser storage (IndexedDB) for offline-first access, with an option to export selected evidence items as a single downloadable ZIP file (client-side).",
-      "files": [
-        "frontend/src/components/evidence/EvidenceSelectionToolbar.tsx",
-        "frontend/src/components/evidence/EvidenceTimeline.tsx",
-        "frontend/src/lib/evidenceIndexedDb.ts",
-        "frontend/src/lib/zipExport.ts",
-        "frontend/src/pages/EvidenceTrackerPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-work-session-logging-simplified-add-a-start-work-session-end-work-session-control-that-records-session-start-end-timestamps-and-periodically-fetches-weather-conditions-for-the-user-selected-city-region-no-gps-store-weather-samples-timestamp-condition-temperature-city-linked-to-the-session-and-show-them-on-a-session-detail-page",
-      "featureTitle": "Work Session logging (simplified): add a “Start Work Session / End Work Session” control that records session start/end timestamps and periodically fetches weather conditions for the user-selected city/region (no GPS). Store weather samples (timestamp, condition, temperature, city) linked to the session, and show them on a session detail page.",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/sessions/WorkSessionControls.tsx",
-        "frontend/src/hooks/useWorkSessions.ts",
-        "frontend/src/lib/weatherClient.ts",
-        "frontend/src/pages/EvidenceTrackerPage.tsx",
-        "frontend/src/pages/WorkSessionDetailPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-5"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-loss-calculator-implement-a-profile-form-that-collects-average-daily-earnings-brl-days-worked-per-week-1-7-and-deactivation-date-persist-the-profile-per-user-and-compute-weekly-loss-daily-days-week-monthly-loss-weekly-4-3-and-accumulated-loss-daily-days-since-deactivation-display-results-in-cards-and-show-a-simple-30-60-90-day-projection-bar-chart",
-      "featureTitle": "Loss Calculator: implement a profile form that collects average daily earnings (BRL), days worked per week (1–7), and deactivation date. Persist the profile per user and compute: weekly loss (daily * days/week), monthly loss (weekly * 4.3), and accumulated loss (daily * days since deactivation). Display results in cards and show a simple 30/60/90-day projection bar chart.",
-      "files": [
-        "frontend/src/components/loss/LossProfileForm.tsx",
-        "frontend/src/components/loss/LossProjectionChart.tsx",
-        "frontend/src/components/loss/LossResultsCards.tsx",
-        "frontend/src/hooks/useLossProfile.ts",
-        "frontend/src/lib/lossCalculations.ts",
-        "frontend/src/pages/LossCalculatorPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-generate-a-downloadable-pdf-report-for-the-loss-calculator-containing-title-anonymous-user-identifier-e-g-courier-short-id-period-deactivation-date-to-today-a-table-of-values-daily-weekly-monthly-accumulated-and-the-projection-chart-rendered-into-the-pdf-include-a-download-and-share-action-share-uses-the-browser-s-share-sheet-when-available-otherwise-downloads",
-      "featureTitle": "Generate a downloadable PDF report for the Loss Calculator containing: title, anonymous user identifier (e.g., “Courier #<short id>”), period (deactivation date to today), a table of values (daily/weekly/monthly/accumulated), and the projection chart rendered into the PDF. Include a “Download” and “Share” action (Share uses the browser’s share sheet when available, otherwise downloads).",
-      "files": [
-        "frontend/src/components/loss/LossReportActions.tsx",
-        "frontend/src/lib/pdfReport.ts",
-        "frontend/src/pages/LossCalculatorPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-7"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-appeal-generator-no-external-ai-implement-a-step-by-step-form-with-platform-selection-ifood-uber-99-rappi-stated-reason-category-documents-expired-selfie-invalid-low-rating-dangerous-conduct-fraud-suspicion-multiple-accounts-other-user-s-free-text-explanation-and-evidence-selection-checkbox-list-from-saved-evidence-generate-a-professional-appeal-text-using-predefined-templates-that-vary-by-platform-reason-and-allow-the-user-to-edit-the-generated-text-before-exporting",
-      "featureTitle": "Appeal Generator (no external AI): implement a step-by-step form with: platform selection (iFood/Uber/99/Rappi), stated reason category (documents expired/selfie invalid/low rating/dangerous conduct/fraud suspicion/multiple accounts/other), user’s free-text explanation, and evidence selection (checkbox list from saved evidence). Generate a professional appeal text using predefined templates that vary by platform + reason, and allow the user to edit the generated text before exporting.",
-      "files": [
-        "frontend/src/components/appeal/AppealEditor.tsx",
-        "frontend/src/components/appeal/AppealWizard.tsx",
-        "frontend/src/components/appeal/EvidencePicker.tsx",
-        "frontend/src/hooks/useAppeals.ts",
-        "frontend/src/pages/AppealGeneratorPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-8"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-appeal-sending-web-compatible-provide-a-send-via-email-action-that-opens-the-user-s-email-client-using-a-mailto-link-with-pre-filled-recipient-and-subject-for-each-platform-include-the-edited-appeal-text-in-the-email-body-and-present-a-clear-instruction-to-attach-exported-evidence-zip-pdf-manually-since-web-mailto-cannot-reliably-attach-files",
-      "featureTitle": "Appeal sending (web-compatible): provide a “Send via Email” action that opens the user’s email client using a mailto: link with pre-filled recipient and subject for each platform. Include the edited appeal text in the email body and present a clear instruction to attach exported evidence ZIP/PDF manually (since web mailto cannot reliably attach files).",
-      "files": [
-        "frontend/src/components/appeal/AppealEditor.tsx",
-        "frontend/src/components/appeal/SendViaEmailButton.tsx",
-        "frontend/src/lib/mailto.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-9"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-collective-data-anonymous-reporting-no-precise-location-after-generating-an-appeal-prompt-the-user-to-optionally-submit-an-anonymous-report-containing-only-platform-region-city-selection-e-g-fortaleza-caucaia-maracana-neighborhood-selection-from-a-predefined-list-reason-category-and-date-never-collect-name-phone-documents-or-photos-in-the-collective-dataset-store-collective-records-in-the-motoko-backend-and-expose-aggregated-statistics",
-      "featureTitle": "Collective Data (anonymous reporting, no precise location): after generating an appeal, prompt the user to optionally submit an anonymous report containing only: platform, region/city selection (e.g., Fortaleza, Caucaia, Maracanaú), neighborhood selection from a predefined list, reason category, and date. Never collect name, phone, documents, or photos in the collective dataset. Store collective records in the Motoko backend and expose aggregated statistics.",
-      "files": [
-        "frontend/src/components/appeal/AppealWizard.tsx",
-        "frontend/src/components/collective/CollectiveSharePrompt.tsx",
-        "frontend/src/hooks/useCollectiveReports.ts",
-        "frontend/src/lib/collectiveOptions.ts",
-        "frontend/src/pages/PublicOverviewPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-10"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-collective-data-visualization-no-maps-build-a-collective-insights-page-that-shows-charts-tables-for-anonymous-reports-counts-by-platform-counts-by-reason-trend-over-last-30-90-days-with-filters-platform-reason-period-region-city",
-      "featureTitle": "Collective Data visualization (no maps): build a “Collective Insights” page that shows charts/tables for anonymous reports (counts by platform, counts by reason, trend over last 30/90 days) with filters (platform, reason, period, region/city).",
-      "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/components/collective/CollectiveFilters.tsx",
-        "frontend/src/components/collective/PlatformDistribution.tsx",
-        "frontend/src/components/collective/ReasonDistribution.tsx",
-        "frontend/src/components/collective/TrendChart.tsx",
-        "frontend/src/pages/CollectiveInsightsPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-11"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-apply-a-coherent-accessible-visual-theme-suitable-for-an-android-entry-level-audience-but-implemented-on-the-web-dark-first-ui-large-touch-friendly-controls-plain-language-and-portuguese-only-content-inside-the-app-ensure-consistent-typography-spacing-and-component-styling-across-modules-avoid-a-blue-purple-primary-palette",
-      "featureTitle": "Apply a coherent, accessible visual theme suitable for an Android-entry-level audience but implemented on the web: dark-first UI, large touch-friendly controls, plain language, and Portuguese-only content inside the app. Ensure consistent typography, spacing, and component styling across modules (avoid a blue/purple primary palette).",
-      "files": [
-        "frontend/index.html",
-        "frontend/src/components/AppLayout.tsx",
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-12"
+        "REQ-26"
       ],
       "confidence": "high"
     }
