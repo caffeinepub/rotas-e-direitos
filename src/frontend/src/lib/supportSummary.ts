@@ -1,52 +1,65 @@
-import { Evidence } from '../backend';
+import { Evidence } from '../types/backend-extended';
 import { Appeal } from '../types/backend-extended';
 
 export function generateCaseSummary(
-  caseData: {
-    platform: string;
-    blockDate: number;
-    reasonCategory: string;
-    incidentSummary: string;
-  },
-  evidence: Evidence[],
-  appeals: Appeal[]
+  caseTitle: string,
+  platform: string,
+  blockDate: string,
+  reason: string,
+  summary: string,
+  evidenceCount: number,
+  appealGenerated: boolean
 ): string {
-  const blockDateStr = new Date(caseData.blockDate).toLocaleDateString();
+  return `
+Resumo do Caso: ${caseTitle}
 
-  let summary = `CASE SUMMARY\n\n`;
-  summary += `Platform: ${caseData.platform}\n`;
-  summary += `Block Date: ${blockDateStr}\n`;
-  summary += `Reason: ${caseData.reasonCategory}\n\n`;
-  summary += `Incident Summary:\n${caseData.incidentSummary}\n\n`;
+Plataforma: ${platform}
+Data do Bloqueio: ${blockDate}
+Motivo: ${reason}
 
-  if (evidence.length > 0) {
-    summary += `Evidence Attached: ${evidence.length} item(s)\n`;
-    evidence.forEach((e, i) => {
-      summary += `  ${i + 1}. ${e.evidenceType} - ${e.notes}\n`;
-    });
-    summary += `\n`;
-  }
+Descrição:
+${summary}
 
-  if (appeals.length > 0) {
-    summary += `Appeals Generated: ${appeals.length}\n\n`;
-  }
+Evidências Anexadas: ${evidenceCount}
+Recurso Gerado: ${appealGenerated ? 'Sim' : 'Não'}
 
-  return summary;
+---
+Este resumo foi gerado automaticamente pelo aplicativo Rotas e Direitos.
+  `.trim();
 }
 
-export function createSupportMailto(
+export function createSupportEmailWithCase(
   subject: string,
-  body: string,
-  attachmentReminder: boolean = true
+  caseTitle: string,
+  platform: string,
+  blockDate: string,
+  reason: string,
+  summary: string,
+  evidenceCount: number,
+  appealGenerated: boolean
 ): string {
-  let finalBody = body;
+  const caseSummary = generateCaseSummary(
+    caseTitle,
+    platform,
+    blockDate,
+    reason,
+    summary,
+    evidenceCount,
+    appealGenerated
+  );
 
-  if (attachmentReminder) {
-    finalBody += `\n\n[IMPORTANT: Please attach your evidence files before sending]`;
-  }
+  const body = `
+Olá, equipe de suporte,
+
+${caseSummary}
+
+Por favor, revise meu caso e me ajude com os próximos passos.
+
+Atenciosamente
+  `.trim();
 
   const encodedSubject = encodeURIComponent(subject);
-  const encodedBody = encodeURIComponent(finalBody);
+  const encodedBody = encodeURIComponent(body);
 
-  return `mailto:support@example.com?subject=${encodedSubject}&body=${encodedBody}`;
+  return `mailto:suporte@rotasedireitos.com?subject=${encodedSubject}&body=${encodedBody}`;
 }

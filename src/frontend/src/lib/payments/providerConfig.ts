@@ -1,59 +1,52 @@
 /**
- * Payment provider configuration layer.
- * This module manages provider identifiers and UI state derivation.
- * SECURITY: Never store or log API keys or secrets in frontend code.
+ * Payment provider configuration layer
+ * Manages provider identifiers and local storage for selected provider UI state
+ * Does not store secrets - only provider selection preferences
  */
 
-export type PaymentProvider = 'mercadoPago' | 'pagSeguro';
+export type PaymentProvider = 'gateway';
 
-export interface ProviderInfo {
-  id: PaymentProvider;
-  name: string;
-  displayName: string;
-}
+export const availableProviders: PaymentProvider[] = ['gateway'];
 
-export const PAYMENT_PROVIDERS: ProviderInfo[] = [
-  {
-    id: 'mercadoPago',
-    name: 'Mercado Pago',
-    displayName: 'Mercado Pago',
-  },
-  {
-    id: 'pagSeguro',
-    name: 'PagSeguro',
-    displayName: 'PagSeguro',
-  },
-];
+const STORAGE_KEY = 'selected_payment_provider';
 
 /**
- * Get provider info by ID
+ * Get the currently selected payment provider from localStorage
  */
-export function getProviderInfo(providerId: PaymentProvider): ProviderInfo | undefined {
-  return PAYMENT_PROVIDERS.find((p) => p.id === providerId);
-}
-
-/**
- * Get selected provider from local storage (UI state only)
- */
-export function getSelectedProvider(): PaymentProvider {
+export function getSelectedProvider(): PaymentProvider | null {
   try {
-    const stored = localStorage.getItem('selectedPixProvider');
-    if (stored === 'mercadoPago' || stored === 'pagSeguro') {
-      return stored;
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored && availableProviders.includes(stored as PaymentProvider)) {
+      return stored as PaymentProvider;
     }
-  } catch {
-    // Ignore storage errors
+  } catch (error) {
+    console.error('Failed to read selected provider from localStorage:', error);
   }
-  return 'mercadoPago'; // Default
+  return null;
 }
 
 /**
- * Save selected provider to local storage (UI state only)
+ * Set the selected payment provider in localStorage
  */
 export function setSelectedProvider(provider: PaymentProvider): void {
   try {
-    localStorage.setItem('selectedPixProvider', provider);
-  } catch {
-    // Ignore storage errors
+    if (!availableProviders.includes(provider)) {
+      console.warn(`Invalid provider: ${provider}`);
+      return;
+    }
+    localStorage.setItem(STORAGE_KEY, provider);
+  } catch (error) {
+    console.error('Failed to save selected provider to localStorage:', error);
+  }
+}
+
+/**
+ * Clear the selected payment provider from localStorage
+ */
+export function clearSelectedProvider(): void {
+  try {
+    localStorage.removeItem(STORAGE_KEY);
+  } catch (error) {
+    console.error('Failed to clear selected provider from localStorage:', error);
   }
 }

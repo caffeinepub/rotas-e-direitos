@@ -1,9 +1,9 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
+import { Platform, Region } from '../types/backend-extended';
 import { CollectiveReport, ReasonCategory } from '../types/backend-extended';
-import { Platform, Region } from '../backend';
 
-interface SubmitReportParams {
+export interface CollectiveReportSubmission {
   platform: Platform;
   region: Region;
   neighborhood: string;
@@ -14,11 +14,12 @@ export function useSubmitCollectiveReport() {
   const { actor } = useActor();
   const queryClient = useQueryClient();
 
-  return useMutation<void, Error, SubmitReportParams>({
-    mutationFn: async (params: SubmitReportParams) => {
+  return useMutation<void, Error, CollectiveReportSubmission>({
+    mutationFn: async (report: CollectiveReportSubmission) => {
       if (!actor) throw new Error('Actor not available');
-      // Backend method not implemented yet
-      throw new Error('Submit collective report functionality not yet implemented in backend');
+      
+      // Backend doesn't implement collective report submission
+      throw new Error('Collective report submission not implemented');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['collectiveReports'] });
@@ -27,15 +28,16 @@ export function useSubmitCollectiveReport() {
 }
 
 export function useGetCollectiveReports() {
-  const { actor, isFetching } = useActor();
+  const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<CollectiveReport[]>({
     queryKey: ['collectiveReports'],
     queryFn: async () => {
-      if (!actor) return [];
-      // Backend method not implemented yet
+      if (!actor) throw new Error('Actor not available');
+      
+      // Backend doesn't implement collective reports retrieval
       return [];
     },
-    enabled: !!actor && !isFetching,
+    enabled: !!actor && !actorFetching,
   });
 }

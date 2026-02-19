@@ -1,37 +1,28 @@
-import { useGetAllEvidence } from '../../hooks/useEvidence';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Badge } from '@/components/ui/badge';
-import { EvidenceType, Platform } from '../../backend';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { Loader2 } from 'lucide-react';
+import { EvidenceType, Platform } from '../../types/backend-extended';
+import { useEvidenceFromIndexedDB } from '../../lib/evidenceIndexedDb';
 
 interface EvidencePickerProps {
-  selectedIds: number[];
-  onSelectionChange: (ids: number[]) => void;
+  selectedIds: bigint[];
+  onSelectionChange: (ids: bigint[]) => void;
 }
 
-const platformLabels: Record<Platform, string> = {
-  [Platform.ifood]: 'iFood',
-  [Platform.uber]: 'Uber',
-  [Platform.rappi]: 'Rappi',
-  [Platform.ninetyNine]: '99',
-};
-
-const typeLabels: Record<EvidenceType, string> = {
+const evidenceTypeLabels = {
   [EvidenceType.selfie]: 'Selfie',
-  [EvidenceType.screenshot]: 'Print',
+  [EvidenceType.screenshot]: 'Screenshot',
   [EvidenceType.audio]: 'Áudio',
   [EvidenceType.video]: 'Vídeo',
 };
 
 export default function EvidencePicker({ selectedIds, onSelectionChange }: EvidencePickerProps) {
-  const { data: evidence = [], isLoading } = useGetAllEvidence();
+  const { evidence, isLoading } = useEvidenceFromIndexedDB();
 
-  const toggleSelection = (id: number) => {
+  const toggleSelection = (id: bigint) => {
     if (selectedIds.includes(id)) {
-      onSelectionChange(selectedIds.filter((i) => i !== id));
+      onSelectionChange(selectedIds.filter((selectedId) => selectedId !== id));
     } else {
       onSelectionChange([...selectedIds, id]);
     }
@@ -39,54 +30,53 @@ export default function EvidencePicker({ selectedIds, onSelectionChange }: Evide
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  if (evidence.length === 0) {
-    return (
       <Card>
-        <CardContent className="text-center py-12">
-          <p className="text-muted-foreground">
-            Você ainda não tem evidências cadastradas. Vá para o Rastreador de Evidências para adicionar.
-          </p>
-        </CardContent>
+        <CardHeader>
+          <CardTitle>Selecionar Evidências</CardTitle>
+          <CardDescription>Carregando evidências...</CardDescription>
+        </CardHeader>
       </Card>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <p className="text-sm text-muted-foreground">
-        Selecione as evidências que deseja mencionar no recurso ({selectedIds.length} selecionada(s))
-      </p>
-      {evidence.map((item) => (
-        <Card key={Number(item.id)} className="cursor-pointer" onClick={() => toggleSelection(Number(item.id))}>
-          <CardContent className="p-4">
-            <div className="flex items-start gap-4">
-              <Checkbox
-                checked={selectedIds.includes(Number(item.id))}
-                onCheckedChange={() => toggleSelection(Number(item.id))}
-                className="mt-1"
-              />
-              <div className="flex-1 space-y-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <Badge variant="outline">{typeLabels[item.evidenceType]}</Badge>
-                  {item.platform && <Badge variant="secondary">{platformLabels[item.platform]}</Badge>}
+    <Card>
+      <CardHeader>
+        <CardTitle>Selecionar Evidências</CardTitle>
+        <CardDescription>
+          Escolha as evidências que deseja anexar ao recurso ({selectedIds.length} selecionada(s))
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {evidence.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground">
+            Nenhuma evidência disponível
+          </div>
+        ) : (
+          <div className="space-y-2">
+            {evidence.map((item) => (
+              <div
+                key={item.id.toString()}
+                className="flex items-center gap-3 p-3 border rounded-lg hover:bg-accent transition-colors"
+              >
+                <Checkbox
+                  checked={selectedIds.includes(item.id)}
+                  onCheckedChange={() => toggleSelection(item.id)}
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <Badge variant="outline">{evidenceTypeLabels[item.evidenceType]}</Badge>
+                    {item.platform && <Badge variant="secondary">{item.platform}</Badge>}
+                  </div>
+                  <p className="text-sm text-muted-foreground line-clamp-1">
+                    {item.notes || 'Sem notas'}
+                  </p>
                 </div>
-                <p className="text-sm text-muted-foreground">
-                  {format(new Date(Number(item.uploadTime) / 1000000), "dd 'de' MMMM 'de' yyyy", {
-                    locale: ptBR,
-                  })}
-                </p>
-                {item.notes && <p className="text-sm line-clamp-2">{item.notes}</p>}
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      ))}
-    </div>
+            ))}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

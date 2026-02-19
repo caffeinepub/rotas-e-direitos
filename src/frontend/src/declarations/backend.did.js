@@ -27,37 +27,7 @@ export const PaymentCheckoutResponse = IDL.Record({
   'paymentId' : IDL.Text,
   'checkoutUrl' : IDL.Opt(IDL.Text),
 });
-export const Region = IDL.Variant({
-  'maracanau' : IDL.Null,
-  'caucaia' : IDL.Null,
-  'fortaleza' : IDL.Null,
-});
 export const Principal = IDL.Principal;
-export const Platform = IDL.Variant({
-  'uber' : IDL.Null,
-  'ninetyNine' : IDL.Null,
-  'ifood' : IDL.Null,
-  'rappi' : IDL.Null,
-});
-export const EvidenceType = IDL.Variant({
-  'audio' : IDL.Null,
-  'video' : IDL.Null,
-  'selfie' : IDL.Null,
-  'screenshot' : IDL.Null,
-});
-export const Evidence = IDL.Record({
-  'id' : IDL.Nat,
-  'regiao' : IDL.Opt(Region),
-  'duration' : IDL.Opt(IDL.Nat),
-  'owner' : Principal,
-  'bairro' : IDL.Opt(IDL.Text),
-  'audioQuality' : IDL.Opt(IDL.Text),
-  'videoQuality' : IDL.Opt(IDL.Text),
-  'platform' : IDL.Opt(Platform),
-  'notes' : IDL.Text,
-  'uploadTime' : IDL.Int,
-  'evidenceType' : EvidenceType,
-});
 export const SubscriptionStatus = IDL.Record({
   'startTime' : IDL.Opt(IDL.Int),
   'endTime' : IDL.Opt(IDL.Int),
@@ -85,12 +55,9 @@ export const Testimonial = IDL.Record({
   'submitter' : Principal,
   'timestamp' : IDL.Int,
 });
-export const PublicPaymentProviderConfig = IDL.Record({
-  'publicKey' : IDL.Text,
-  'enabled' : IDL.Bool,
-});
+export const PublicPaymentProviderConfig = IDL.Record({ 'enabled' : IDL.Bool });
 export const PublicPaymentConfig = IDL.Record({
-  'mercadoPago' : PublicPaymentProviderConfig,
+  'gatewayProvider' : PublicPaymentProviderConfig,
 });
 export const Time = IDL.Int;
 export const WeatherCondition = IDL.Variant({
@@ -116,54 +83,32 @@ export const WorkSession = IDL.Record({
   'city' : IDL.Text,
   'weatherSamples' : IDL.Vec(WeatherSample),
 });
+export const Platform = IDL.Variant({
+  'uber' : IDL.Null,
+  'ninetyNine' : IDL.Null,
+  'ifood' : IDL.Null,
+  'rappi' : IDL.Null,
+});
 export const LossProfile = IDL.Record({
   'dailyEarnings' : IDL.Float64,
   'deactivationDate' : IDL.Int,
   'platform' : Platform,
   'daysPerWeek' : IDL.Nat,
 });
-export const PaymentProviderConfig = IDL.Record({
-  'publicKey' : IDL.Text,
-  'enabled' : IDL.Bool,
-  'accessToken' : IDL.Text,
-});
+export const PaymentProviderConfig = IDL.Record({ 'enabled' : IDL.Bool });
 export const PaymentConfig = IDL.Record({
-  'mercadoPago' : PaymentProviderConfig,
-});
-export const http_header = IDL.Record({
-  'value' : IDL.Text,
-  'name' : IDL.Text,
-});
-export const http_request_result = IDL.Record({
-  'status' : IDL.Nat,
-  'body' : IDL.Vec(IDL.Nat8),
-  'headers' : IDL.Vec(http_header),
-});
-export const TransformationInput = IDL.Record({
-  'context' : IDL.Vec(IDL.Nat8),
-  'response' : http_request_result,
-});
-export const TransformationOutput = IDL.Record({
-  'status' : IDL.Nat,
-  'body' : IDL.Vec(IDL.Nat8),
-  'headers' : IDL.Vec(http_header),
+  'gatewayProvider' : PaymentProviderConfig,
 });
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'checkPaymentStatus' : IDL.Func([IDL.Text], [PaymentStatus], []),
-  'createMercadoPagoCheckout' : IDL.Func(
+  'createPaymentSession' : IDL.Func(
       [SubscriptionPlan],
       [PaymentCheckoutResponse],
       [],
     ),
-  'createPaymentPreference' : IDL.Func(
-      [SubscriptionPlan],
-      [PaymentCheckoutResponse],
-      [],
-    ),
-  'getAllEvidence' : IDL.Func([], [IDL.Vec(Evidence)], ['query']),
   'getAllUserAccessInfo' : IDL.Func([], [IDL.Vec(UserAccessInfo)], ['query']),
   'getApprovedTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
@@ -182,11 +127,6 @@ export const idlService = IDL.Service({
   'setLossProfile' : IDL.Func([LossProfile], [], []),
   'setPaymentConfig' : IDL.Func([PaymentConfig], [], []),
   'submitTestimonial' : IDL.Func([IDL.Text], [IDL.Nat], []),
-  'transform' : IDL.Func(
-      [TransformationInput],
-      [TransformationOutput],
-      ['query'],
-    ),
   'updateTestimonialStatus' : IDL.Func([IDL.Nat, TestimonialStatus], [], []),
 });
 
@@ -212,37 +152,7 @@ export const idlFactory = ({ IDL }) => {
     'paymentId' : IDL.Text,
     'checkoutUrl' : IDL.Opt(IDL.Text),
   });
-  const Region = IDL.Variant({
-    'maracanau' : IDL.Null,
-    'caucaia' : IDL.Null,
-    'fortaleza' : IDL.Null,
-  });
   const Principal = IDL.Principal;
-  const Platform = IDL.Variant({
-    'uber' : IDL.Null,
-    'ninetyNine' : IDL.Null,
-    'ifood' : IDL.Null,
-    'rappi' : IDL.Null,
-  });
-  const EvidenceType = IDL.Variant({
-    'audio' : IDL.Null,
-    'video' : IDL.Null,
-    'selfie' : IDL.Null,
-    'screenshot' : IDL.Null,
-  });
-  const Evidence = IDL.Record({
-    'id' : IDL.Nat,
-    'regiao' : IDL.Opt(Region),
-    'duration' : IDL.Opt(IDL.Nat),
-    'owner' : Principal,
-    'bairro' : IDL.Opt(IDL.Text),
-    'audioQuality' : IDL.Opt(IDL.Text),
-    'videoQuality' : IDL.Opt(IDL.Text),
-    'platform' : IDL.Opt(Platform),
-    'notes' : IDL.Text,
-    'uploadTime' : IDL.Int,
-    'evidenceType' : EvidenceType,
-  });
   const SubscriptionStatus = IDL.Record({
     'startTime' : IDL.Opt(IDL.Int),
     'endTime' : IDL.Opt(IDL.Int),
@@ -270,12 +180,9 @@ export const idlFactory = ({ IDL }) => {
     'submitter' : Principal,
     'timestamp' : IDL.Int,
   });
-  const PublicPaymentProviderConfig = IDL.Record({
-    'publicKey' : IDL.Text,
-    'enabled' : IDL.Bool,
-  });
+  const PublicPaymentProviderConfig = IDL.Record({ 'enabled' : IDL.Bool });
   const PublicPaymentConfig = IDL.Record({
-    'mercadoPago' : PublicPaymentProviderConfig,
+    'gatewayProvider' : PublicPaymentProviderConfig,
   });
   const Time = IDL.Int;
   const WeatherCondition = IDL.Variant({
@@ -301,49 +208,32 @@ export const idlFactory = ({ IDL }) => {
     'city' : IDL.Text,
     'weatherSamples' : IDL.Vec(WeatherSample),
   });
+  const Platform = IDL.Variant({
+    'uber' : IDL.Null,
+    'ninetyNine' : IDL.Null,
+    'ifood' : IDL.Null,
+    'rappi' : IDL.Null,
+  });
   const LossProfile = IDL.Record({
     'dailyEarnings' : IDL.Float64,
     'deactivationDate' : IDL.Int,
     'platform' : Platform,
     'daysPerWeek' : IDL.Nat,
   });
-  const PaymentProviderConfig = IDL.Record({
-    'publicKey' : IDL.Text,
-    'enabled' : IDL.Bool,
-    'accessToken' : IDL.Text,
-  });
-  const PaymentConfig = IDL.Record({ 'mercadoPago' : PaymentProviderConfig });
-  const http_header = IDL.Record({ 'value' : IDL.Text, 'name' : IDL.Text });
-  const http_request_result = IDL.Record({
-    'status' : IDL.Nat,
-    'body' : IDL.Vec(IDL.Nat8),
-    'headers' : IDL.Vec(http_header),
-  });
-  const TransformationInput = IDL.Record({
-    'context' : IDL.Vec(IDL.Nat8),
-    'response' : http_request_result,
-  });
-  const TransformationOutput = IDL.Record({
-    'status' : IDL.Nat,
-    'body' : IDL.Vec(IDL.Nat8),
-    'headers' : IDL.Vec(http_header),
+  const PaymentProviderConfig = IDL.Record({ 'enabled' : IDL.Bool });
+  const PaymentConfig = IDL.Record({
+    'gatewayProvider' : PaymentProviderConfig,
   });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'checkPaymentStatus' : IDL.Func([IDL.Text], [PaymentStatus], []),
-    'createMercadoPagoCheckout' : IDL.Func(
+    'createPaymentSession' : IDL.Func(
         [SubscriptionPlan],
         [PaymentCheckoutResponse],
         [],
       ),
-    'createPaymentPreference' : IDL.Func(
-        [SubscriptionPlan],
-        [PaymentCheckoutResponse],
-        [],
-      ),
-    'getAllEvidence' : IDL.Func([], [IDL.Vec(Evidence)], ['query']),
     'getAllUserAccessInfo' : IDL.Func([], [IDL.Vec(UserAccessInfo)], ['query']),
     'getApprovedTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
@@ -362,11 +252,6 @@ export const idlFactory = ({ IDL }) => {
     'setLossProfile' : IDL.Func([LossProfile], [], []),
     'setPaymentConfig' : IDL.Func([PaymentConfig], [], []),
     'submitTestimonial' : IDL.Func([IDL.Text], [IDL.Nat], []),
-    'transform' : IDL.Func(
-        [TransformationInput],
-        [TransformationOutput],
-        ['query'],
-      ),
     'updateTestimonialStatus' : IDL.Func([IDL.Nat, TestimonialStatus], [], []),
   });
 };

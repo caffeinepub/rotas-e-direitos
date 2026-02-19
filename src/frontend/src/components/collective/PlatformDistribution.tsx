@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Platform, Region } from '../../backend';
-import { ReasonCategory, CollectiveReport } from '../../types/backend-extended';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { Platform, Region } from '../../types/backend-extended';
+import { CollectiveReport } from '../../types/backend-extended';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
 interface PlatformDistributionProps {
   reports: CollectiveReport[];
@@ -9,38 +9,32 @@ interface PlatformDistributionProps {
 
 export default function PlatformDistribution({ reports }: PlatformDistributionProps) {
   const platformCounts = reports.reduce((acc, report) => {
-    const platform = report.platform;
-    acc[platform] = (acc[platform] || 0) + 1;
+    acc[report.platform] = (acc[report.platform] || 0) + 1;
     return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<Platform, number>);
 
   const data = Object.entries(platformCounts).map(([platform, count]) => ({
-    platform: platform === 'ninetyNine' ? '99' : platform,
+    platform,
     count,
   }));
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Blocks by Platform</CardTitle>
-        <CardDescription>Distribution of reported blocks across platforms</CardDescription>
+        <CardTitle>Distribuição por Plataforma</CardTitle>
+        <CardDescription>Número de relatos por plataforma</CardDescription>
       </CardHeader>
       <CardContent>
-        {data.length > 0 ? (
-          <ResponsiveContainer width="100%" height={300}>
-            <BarChart data={data}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="platform" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="count" fill="hsl(var(--primary))" />
-            </BarChart>
-          </ResponsiveContainer>
-        ) : (
-          <div className="flex items-center justify-center h-[300px] text-muted-foreground">
-            No data available
-          </div>
-        )}
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="platform" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            <Bar dataKey="count" fill="hsl(var(--primary))" name="Relatos" />
+          </BarChart>
+        </ResponsiveContainer>
       </CardContent>
     </Card>
   );

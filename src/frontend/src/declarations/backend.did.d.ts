@@ -10,23 +10,6 @@ import type { ActorMethod } from '@icp-sdk/core/agent';
 import type { IDL } from '@icp-sdk/core/candid';
 import type { Principal } from '@icp-sdk/core/principal';
 
-export interface Evidence {
-  'id' : bigint,
-  'regiao' : [] | [Region],
-  'duration' : [] | [bigint],
-  'owner' : Principal,
-  'bairro' : [] | [string],
-  'audioQuality' : [] | [string],
-  'videoQuality' : [] | [string],
-  'platform' : [] | [Platform],
-  'notes' : string,
-  'uploadTime' : bigint,
-  'evidenceType' : EvidenceType,
-}
-export type EvidenceType = { 'audio' : null } |
-  { 'video' : null } |
-  { 'selfie' : null } |
-  { 'screenshot' : null };
 export interface LossProfile {
   'dailyEarnings' : number,
   'deactivationDate' : bigint,
@@ -37,12 +20,8 @@ export interface PaymentCheckoutResponse {
   'paymentId' : string,
   'checkoutUrl' : [] | [string],
 }
-export interface PaymentConfig { 'mercadoPago' : PaymentProviderConfig }
-export interface PaymentProviderConfig {
-  'publicKey' : string,
-  'enabled' : boolean,
-  'accessToken' : string,
-}
+export interface PaymentConfig { 'gatewayProvider' : PaymentProviderConfig }
+export interface PaymentProviderConfig { 'enabled' : boolean }
 export interface PaymentStatus {
   'status' : string,
   'paymentId' : string,
@@ -54,15 +33,9 @@ export type Platform = { 'uber' : null } |
   { 'rappi' : null };
 export type Principal = Principal;
 export interface PublicPaymentConfig {
-  'mercadoPago' : PublicPaymentProviderConfig,
+  'gatewayProvider' : PublicPaymentProviderConfig,
 }
-export interface PublicPaymentProviderConfig {
-  'publicKey' : string,
-  'enabled' : boolean,
-}
-export type Region = { 'maracanau' : null } |
-  { 'caucaia' : null } |
-  { 'fortaleza' : null };
+export interface PublicPaymentProviderConfig { 'enabled' : boolean }
 export type SubscriptionPlan = { 'free_24h' : null } |
   { 'pro_monthly' : null } |
   { 'pro_annual' : null };
@@ -82,15 +55,6 @@ export type TestimonialStatus = { 'pending' : null } |
   { 'approved' : null } |
   { 'rejected' : null };
 export type Time = bigint;
-export interface TransformationInput {
-  'context' : Uint8Array,
-  'response' : http_request_result,
-}
-export interface TransformationOutput {
-  'status' : bigint,
-  'body' : Uint8Array,
-  'headers' : Array<http_header>,
-}
 export interface UserAccessInfo {
   'principal' : Principal,
   'isBlockedByAdmin' : boolean,
@@ -122,25 +86,14 @@ export interface WorkSession {
   'city' : string,
   'weatherSamples' : Array<WeatherSample>,
 }
-export interface http_header { 'value' : string, 'name' : string }
-export interface http_request_result {
-  'status' : bigint,
-  'body' : Uint8Array,
-  'headers' : Array<http_header>,
-}
 export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'checkPaymentStatus' : ActorMethod<[string], PaymentStatus>,
-  'createMercadoPagoCheckout' : ActorMethod<
+  'createPaymentSession' : ActorMethod<
     [SubscriptionPlan],
     PaymentCheckoutResponse
   >,
-  'createPaymentPreference' : ActorMethod<
-    [SubscriptionPlan],
-    PaymentCheckoutResponse
-  >,
-  'getAllEvidence' : ActorMethod<[], Array<Evidence>>,
   'getAllUserAccessInfo' : ActorMethod<[], Array<UserAccessInfo>>,
   'getApprovedTestimonials' : ActorMethod<[], Array<Testimonial>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
@@ -155,7 +108,6 @@ export interface _SERVICE {
   'setLossProfile' : ActorMethod<[LossProfile], undefined>,
   'setPaymentConfig' : ActorMethod<[PaymentConfig], undefined>,
   'submitTestimonial' : ActorMethod<[string], bigint>,
-  'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
   'updateTestimonialStatus' : ActorMethod<
     [bigint, TestimonialStatus],
     undefined

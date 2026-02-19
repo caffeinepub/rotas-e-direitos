@@ -1,125 +1,181 @@
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, XCircle, Clock, AlertCircle, Loader2, RefreshCw } from 'lucide-react';
-import { PaymentStatusResponse } from '../../types/mercadopago';
+import { Loader2, CheckCircle2, XCircle, AlertCircle, ArrowRight, ArrowLeft } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
+import { PaymentFlowStatus } from '../../hooks/useGatewayPayment';
 
 interface PaymentStatusPanelProps {
-  status: PaymentStatusResponse | null;
-  isLoading: boolean;
-  onRefresh: () => void;
-  isRefreshing?: boolean;
+  flowStatus: PaymentFlowStatus;
+  onRetry?: () => void;
+  onCheckStatus?: () => void;
+  isCheckingStatus?: boolean;
 }
 
 export default function PaymentStatusPanel({ 
-  status, 
-  isLoading, 
-  onRefresh,
-  isRefreshing = false 
+  flowStatus, 
+  onRetry, 
+  onCheckStatus,
+  isCheckingStatus = false 
 }: PaymentStatusPanelProps) {
-  const getStatusIcon = () => {
-    if (isLoading) return <Loader2 className="h-5 w-5 animate-spin" />;
-    
-    switch (status?.status) {
-      case 'approved':
-        return <CheckCircle2 className="h-5 w-5 text-green-600" />;
-      case 'rejected':
-      case 'cancelled':
-        return <XCircle className="h-5 w-5 text-red-600" />;
-      case 'pending':
-      case 'in_process':
-        return <Clock className="h-5 w-5 text-yellow-600" />;
-      default:
-        return <AlertCircle className="h-5 w-5 text-muted-foreground" />;
-    }
+  const navigate = useNavigate();
+
+  const handleGoToDashboard = () => {
+    navigate({ to: '/' });
   };
 
-  const getStatusBadge = () => {
-    if (isLoading) {
-      return <Badge variant="outline">Checking...</Badge>;
-    }
-
-    switch (status?.status) {
-      case 'approved':
-        return <Badge className="bg-green-600">Approved</Badge>;
-      case 'rejected':
-        return <Badge variant="destructive">Rejected</Badge>;
-      case 'cancelled':
-        return <Badge variant="destructive">Cancelled</Badge>;
-      case 'pending':
-        return <Badge variant="outline" className="border-yellow-600 text-yellow-600">Pending</Badge>;
-      case 'in_process':
-        return <Badge variant="outline" className="border-blue-600 text-blue-600">Processing</Badge>;
-      case 'error':
-        return <Badge variant="destructive">Error</Badge>;
-      default:
-        return <Badge variant="outline">Unknown</Badge>;
-    }
+  const handleGoToPlans = () => {
+    navigate({ to: '/planos' });
   };
 
-  const getStatusMessage = () => {
-    if (isLoading) {
-      return 'Checking payment status...';
-    }
+  // Pending state
+  if (flowStatus.state === 'pending') {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            Processando Pagamento
+          </CardTitle>
+          <CardDescription>Aguarde enquanto processamos seu pagamento</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Seu pagamento está sendo processado. Isso pode levar alguns instantes.
+            </AlertDescription>
+          </Alert>
 
-    switch (status?.status) {
-      case 'approved':
-        return 'Payment approved! Your subscription will be activated shortly.';
-      case 'rejected':
-        return 'Payment was rejected. Please try again or use a different payment method.';
-      case 'cancelled':
-        return 'Payment was cancelled. You can start a new payment if needed.';
-      case 'pending':
-        return 'Payment is pending. Please complete the payment to activate your subscription.';
-      case 'in_process':
-        return 'Payment is being processed. This may take a few moments.';
-      case 'error':
-        return status?.statusDetail || 'An error occurred while processing your payment.';
-      default:
-        return 'Unable to determine payment status. Please refresh to check again.';
-    }
-  };
-
-  return (
-    <div className="space-y-4">
-      <Alert>
-        {getStatusIcon()}
-        <AlertDescription className="ml-2">
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <span className="font-medium">Payment Status:</span>
-                {getStatusBadge()}
-              </div>
-              <p className="text-sm">{getStatusMessage()}</p>
-              {status?.statusDetail && status.status !== 'error' && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Details: {status.statusDetail}
-                </p>
-              )}
+          {flowStatus.paymentId && (
+            <div className="text-sm text-muted-foreground">
+              <span className="font-medium">ID do Pagamento:</span> {flowStatus.paymentId}
             </div>
-          </div>
-        </AlertDescription>
-      </Alert>
+          )}
 
-      <Button
-        onClick={onRefresh}
-        disabled={isLoading || isRefreshing}
-        variant="outline"
-        className="w-full"
-      >
-        {isRefreshing ? (
-          <>
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-            Refreshing...
-          </>
-        ) : (
-          <>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Check Payment Status
-          </>
-        )}
-      </Button>
-    </div>
-  );
+          {onCheckStatus && (
+            <Button 
+              onClick={onCheckStatus} 
+              disabled={isCheckingStatus}
+              variant="outline"
+              className="w-full"
+            >
+              {isCheckingStatus ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Verificando...
+                </>
+              ) : (
+                'Verificar Status'
+              )}
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Completed state
+  if (flowStatus.state === 'completed') {
+    return (
+      <Card className="border-green-600">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-green-600">
+            <CheckCircle2 className="h-5 w-5" />
+            Pagamento Aprovado!
+          </CardTitle>
+          <CardDescription>Sua assinatura foi ativada com sucesso</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert className="border-green-600 bg-green-50 dark:bg-green-950">
+            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <AlertDescription className="text-green-800 dark:text-green-200">
+              Parabéns! Seu pagamento foi confirmado e sua assinatura Pro está ativa.
+            </AlertDescription>
+          </Alert>
+
+          {flowStatus.paymentId && (
+            <div className="text-sm text-muted-foreground">
+              <span className="font-medium">ID do Pagamento:</span> {flowStatus.paymentId}
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            <Button onClick={handleGoToDashboard} className="flex-1">
+              Ir para Dashboard
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Failed state
+  if (flowStatus.state === 'failed') {
+    return (
+      <Card className="border-destructive">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-destructive">
+            <XCircle className="h-5 w-5" />
+            Falha no Pagamento
+          </CardTitle>
+          <CardDescription>Não foi possível processar seu pagamento</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Alert variant="destructive">
+            <XCircle className="h-4 w-4" />
+            <AlertDescription>
+              {flowStatus.error || 'Ocorreu um erro ao processar seu pagamento. Tente novamente.'}
+            </AlertDescription>
+          </Alert>
+
+          {flowStatus.paymentId && (
+            <div className="text-sm text-muted-foreground">
+              <span className="font-medium">ID do Pagamento:</span> {flowStatus.paymentId}
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            {onRetry && (
+              <Button onClick={onRetry} variant="default" className="flex-1">
+                Tentar Novamente
+              </Button>
+            )}
+            <Button onClick={handleGoToPlans} variant="outline" className="flex-1">
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Voltar aos Planos
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Initiating state
+  if (flowStatus.state === 'initiating') {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Loader2 className="h-5 w-5 animate-spin text-primary" />
+            Iniciando Pagamento
+          </CardTitle>
+          <CardDescription>Preparando sua sessão de pagamento</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>
+              Aguarde enquanto preparamos seu pagamento...
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Idle state (no payment in progress)
+  return null;
 }

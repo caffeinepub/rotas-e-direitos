@@ -11,17 +11,15 @@ export interface UserProfile {
     name: string;
     email?: string;
 }
-export interface PublicPaymentProviderConfig {
-    publicKey: string;
-    enabled: boolean;
+export interface Testimonial {
+    id: bigint;
+    status: TestimonialStatus;
+    content: string;
+    submitter: Principal;
+    timestamp: bigint;
 }
 export interface PaymentConfig {
-    mercadoPago: PaymentProviderConfig;
-}
-export interface TransformationOutput {
-    status: bigint;
-    body: Uint8Array;
-    headers: Array<http_header>;
+    gatewayProvider: PaymentProviderConfig;
 }
 export type Time = bigint;
 export interface LossProfile {
@@ -37,14 +35,8 @@ export interface UserAccessInfo {
     profile?: UserProfile;
 }
 export type Principal = Principal;
-export interface http_header {
-    value: string;
-    name: string;
-}
-export interface http_request_result {
-    status: bigint;
-    body: Uint8Array;
-    headers: Array<http_header>;
+export interface PaymentProviderConfig {
+    enabled: boolean;
 }
 export interface WeatherSample {
     city: string;
@@ -53,16 +45,7 @@ export interface WeatherSample {
     condition: WeatherCondition;
 }
 export interface PublicPaymentConfig {
-    mercadoPago: PublicPaymentProviderConfig;
-}
-export interface PaymentProviderConfig {
-    publicKey: string;
-    enabled: boolean;
-    accessToken: string;
-}
-export interface TransformationInput {
-    context: Uint8Array;
-    response: http_request_result;
+    gatewayProvider: PublicPaymentProviderConfig;
 }
 export interface PaymentCheckoutResponse {
     paymentId: string;
@@ -73,23 +56,13 @@ export interface PaymentStatus {
     paymentId: string;
     rawResponse: string;
 }
-export interface Evidence {
-    id: bigint;
-    regiao?: Region;
-    duration?: bigint;
-    owner: Principal;
-    bairro?: string;
-    audioQuality?: string;
-    videoQuality?: string;
-    platform?: Platform;
-    notes: string;
-    uploadTime: bigint;
-    evidenceType: EvidenceType;
-}
 export interface SubscriptionStatus {
     startTime?: bigint;
     endTime?: bigint;
     currentPlan: SubscriptionPlan;
+}
+export interface PublicPaymentProviderConfig {
+    enabled: boolean;
 }
 export interface WorkSession {
     id: bigint;
@@ -99,29 +72,11 @@ export interface WorkSession {
     city: string;
     weatherSamples: Array<WeatherSample>;
 }
-export interface Testimonial {
-    id: bigint;
-    status: TestimonialStatus;
-    content: string;
-    submitter: Principal;
-    timestamp: bigint;
-}
-export enum EvidenceType {
-    audio = "audio",
-    video = "video",
-    selfie = "selfie",
-    screenshot = "screenshot"
-}
 export enum Platform {
     uber = "uber",
     ninetyNine = "ninetyNine",
     ifood = "ifood",
     rappi = "rappi"
-}
-export enum Region {
-    maracanau = "maracanau",
-    caucaia = "caucaia",
-    fortaleza = "fortaleza"
 }
 export enum SubscriptionPlan {
     free_24h = "free_24h",
@@ -150,9 +105,7 @@ export enum WeatherCondition {
 export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkPaymentStatus(paymentId: string): Promise<PaymentStatus>;
-    createMercadoPagoCheckout(plan: SubscriptionPlan): Promise<PaymentCheckoutResponse>;
-    createPaymentPreference(plan: SubscriptionPlan): Promise<PaymentCheckoutResponse>;
-    getAllEvidence(): Promise<Array<Evidence>>;
+    createPaymentSession(_plan: SubscriptionPlan): Promise<PaymentCheckoutResponse>;
     getAllUserAccessInfo(): Promise<Array<UserAccessInfo>>;
     getApprovedTestimonials(): Promise<Array<Testimonial>>;
     getCallerUserProfile(): Promise<UserProfile | null>;
@@ -169,6 +122,5 @@ export interface backendInterface {
     setLossProfile(profile: LossProfile): Promise<void>;
     setPaymentConfig(config: PaymentConfig): Promise<void>;
     submitTestimonial(content: string): Promise<bigint>;
-    transform(input: TransformationInput): Promise<TransformationOutput>;
     updateTestimonialStatus(testimonialId: bigint, newStatus: TestimonialStatus): Promise<void>;
 }

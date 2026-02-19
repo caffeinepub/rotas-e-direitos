@@ -1,37 +1,38 @@
 import { Button } from '@/components/ui/button';
-import { Download, CheckSquare, Square } from 'lucide-react';
+import { Download, X } from 'lucide-react';
+import { Evidence } from '../../types/backend-extended';
 import { exportEvidenceFiles } from '../../lib/zipExport';
-import { Evidence } from '../../backend';
 
 interface EvidenceSelectionToolbarProps {
-  selectedIds: Set<number>;
-  allEvidence: Evidence[];
+  selectedEvidence: Evidence[];
   onClearSelection: () => void;
 }
 
 export default function EvidenceSelectionToolbar({
-  selectedIds,
-  allEvidence,
+  selectedEvidence,
   onClearSelection,
 }: EvidenceSelectionToolbarProps) {
   const handleExport = async () => {
-    const selectedEvidence = allEvidence.filter((e) => selectedIds.has(Number(e.id)));
     await exportEvidenceFiles(selectedEvidence);
   };
 
+  if (selectedEvidence.length === 0) return null;
+
   return (
-    <div className="flex items-center justify-between gap-4 p-4 bg-accent rounded-lg">
-      <div className="flex items-center gap-4">
-        <span className="text-sm font-medium">{selectedIds.size} selected</span>
+    <div className="bg-primary text-primary-foreground p-4 rounded-lg flex items-center justify-between">
+      <div className="flex items-center gap-2">
+        <span className="font-medium">{selectedEvidence.length} selecionado(s)</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <Button variant="secondary" size="sm" onClick={handleExport}>
+          <Download className="h-4 w-4 mr-2" />
+          Exportar
+        </Button>
         <Button variant="ghost" size="sm" onClick={onClearSelection}>
-          <Square className="mr-2 h-4 w-4" />
-          Clear Selection
+          <X className="h-4 w-4 mr-2" />
+          Limpar
         </Button>
       </div>
-      <Button onClick={handleExport} disabled={selectedIds.size === 0}>
-        <Download className="mr-2 h-4 w-4" />
-        Download Files
-      </Button>
     </div>
   );
 }

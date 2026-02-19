@@ -5,177 +5,239 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useCreateEvidence } from '../../hooks/useEvidence';
-import { storeEvidenceImage } from '../../lib/evidenceIndexedDb';
-import { EvidenceType, Platform, Region } from '../../backend';
-import { Upload, Loader2 } from 'lucide-react';
-
-const regionLabels: Record<Region, string> = {
-  [Region.fortaleza]: 'Fortaleza',
-  [Region.caucaia]: 'Caucaia',
-  [Region.maracanau]: 'Maracanaú',
-};
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { EvidenceType, Platform, Region } from '../../types/backend-extended';
+import { saveEvidenceToIndexedDB } from '../../lib/evidenceIndexedDb';
+import { toast } from 'sonner';
+import RealTimeCapturePanel from './RealTimeCapturePanel';
 
 export default function EvidenceUploadForm() {
-  const [file, setFile] = useState<File | null>(null);
-  const [type, setType] = useState<EvidenceType>(EvidenceType.selfie);
+  const [evidenceType, setEvidenceType] = useState<EvidenceType>(EvidenceType.selfie);
+  const [notes, setNotes] = useState('');
   const [platform, setPlatform] = useState<Platform | ''>('');
   const [region, setRegion] = useState<Region | ''>('');
   const [neighborhood, setNeighborhood] = useState('');
-  const [notes, setNotes] = useState('');
-  const { mutate: createEvidence, isPending } = useCreateEvidence();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file) return;
+  const handleFileUpload = async (file: File) => {
+    setIsSubmitting(true);
+    try {
+      const reader = new FileReader();
+      reader.onload = async (e) => {
+        const arrayBuffer = e.target?.result as ArrayBuffer;
+        const bytes = new Uint8Array(arrayBuffer);
 
-    const reader = new FileReader();
-    reader.onload = async () => {
-      const arrayBuffer = reader.result as ArrayBuffer;
-
-      createEvidence(
-        {
-          evidenceType: type,
+        await saveEvidenceToIndexedDB({
+          evidenceType,
           notes,
           platform: platform || undefined,
           regiao: region || undefined,
           bairro: neighborhood || undefined,
-        },
-        {
-          onSuccess: async (evidence) => {
-            await storeEvidenceImage(Number(evidence.id), arrayBuffer);
-            setFile(null);
-            setNotes('');
-            setPlatform('');
-            setRegion('');
-            setNeighborhood('');
-            const fileInput = document.getElementById('file-upload') as HTMLInputElement;
-            if (fileInput) fileInput.value = '';
-          },
-        }
-      );
-    };
-    reader.readAsArrayBuffer(file);
+          mediaBytes: bytes,
+        });
+
+        toast.success('Evidência salva com sucesso!');
+        setNotes('');
+        setPlatform('');
+        setRegion('');
+        setNeighborhood('');
+      };
+      reader.readAsArrayBuffer(file);
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Erro ao salvar evidência');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleCapturedMedia = async (file: File) => {
+    await handleFileUpload(file);
   };
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-2xl">Adicionar Nova Evidência</CardTitle>
-        <CardDescription className="text-base">
-          Faça upload de selfies diárias ou prints de avaliações
-        </CardDescription>
+        <CardTitle>Adicionar Evidência</CardTitle>
+        <CardDescription>Capture ou faça upload de evidências</CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid gap-4 md:grid-cols-2">
+        <Tabs defaultValue="capture" className="space-y-4">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="capture">Captura em Tempo Real</TabsTrigger>
+            <TabsTrigger value="upload">Upload de Arquivo</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="capture" className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="type" className="text-base">
-                Tipo de Evidência *
-              </Label>
-              <Select value={type} onValueChange={(v) => setType(v as EvidenceType)}>
-                <SelectTrigger id="type" className="h-12 text-base">
+              <Label htmlFor="capture-type">Tipo de Evidência</Label>
+              <Select
+                value={evidenceType}
+                onValueChange={(value) => setEvidenceType(value as EvidenceType)}
+              >
+                <SelectTrigger id="capture-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={EvidenceType.selfie}>Selfie Diária</SelectItem>
-                  <SelectItem value={EvidenceType.screenshot}>Print de Avaliação</SelectItem>
+                  <SelectItem value={EvidenceType.selfie}>Selfie</SelectItem>
+                  <SelectItem value={EvidenceType.screenshot}>Screenshot</SelectItem>
+                  <SelectItem value={EvidenceType.audio}>Áudio</SelectItem>
+                  <SelectItem value={EvidenceType.video}>Vídeo</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="platform" className="text-base">
-                Plataforma (opcional)
-              </Label>
-              <Select value={platform} onValueChange={(v) => setPlatform(v as Platform | '')}>
-                <SelectTrigger id="platform" className="h-12 text-base">
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Nenhuma</SelectItem>
-                  <SelectItem value={Platform.ifood}>iFood</SelectItem>
-                  <SelectItem value={Platform.uber}>Uber</SelectItem>
-                  <SelectItem value={Platform.rappi}>Rappi</SelectItem>
-                  <SelectItem value={Platform.ninetyNine}>99</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+            <RealTimeCapturePanel
+              onCapture={handleCapturedMedia}
+            />
 
             <div className="space-y-2">
-              <Label htmlFor="region" className="text-base">
-                Região (opcional)
-              </Label>
-              <Select value={region} onValueChange={(v) => setRegion(v as Region | '')}>
-                <SelectTrigger id="region" className="h-12 text-base">
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="">Nenhuma</SelectItem>
-                  {Object.entries(regionLabels).map(([key, label]) => (
-                    <SelectItem key={key} value={key}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="neighborhood" className="text-base">
-                Bairro (opcional)
-              </Label>
-              <Input
-                id="neighborhood"
-                value={neighborhood}
-                onChange={(e) => setNeighborhood(e.target.value)}
-                placeholder="Ex: Aldeota"
-                className="h-12 text-base"
+              <Label htmlFor="capture-notes">Notas</Label>
+              <Textarea
+                id="capture-notes"
+                placeholder="Adicione notas sobre esta evidência..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
               />
             </div>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="file-upload" className="text-base">
-              Arquivo de Imagem *
-            </Label>
-            <Input
-              id="file-upload"
-              type="file"
-              accept="image/*"
-              onChange={(e) => setFile(e.target.files?.[0] || null)}
-              className="h-12 text-base cursor-pointer"
-              required
-            />
-          </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="capture-platform">Plataforma (opcional)</Label>
+                <Select value={platform} onValueChange={(value) => setPlatform(value as Platform)}>
+                  <SelectTrigger id="capture-platform">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={Platform.ifood}>iFood</SelectItem>
+                    <SelectItem value={Platform.uber}>Uber</SelectItem>
+                    <SelectItem value={Platform.rappi}>Rappi</SelectItem>
+                    <SelectItem value={Platform.ninetyNine}>99</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="notes" className="text-base">
-              Observações / Tags
-            </Label>
-            <Textarea
-              id="notes"
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Ex: Chuva forte, trânsito intenso, problema no app..."
-              className="min-h-[100px] text-base"
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="capture-region">Região (opcional)</Label>
+                <Select value={region} onValueChange={(value) => setRegion(value as Region)}>
+                  <SelectTrigger id="capture-region">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={Region.fortaleza}>Fortaleza</SelectItem>
+                    <SelectItem value={Region.caucaia}>Caucaia</SelectItem>
+                    <SelectItem value={Region.maracanau}>Maracanaú</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
 
-          <Button type="submit" disabled={!file || isPending} size="lg" className="w-full">
-            {isPending ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Enviando...
-              </>
-            ) : (
-              <>
-                <Upload className="mr-2 h-4 w-4" />
-                Adicionar Evidência
-              </>
+            {region && (
+              <div className="space-y-2">
+                <Label htmlFor="capture-neighborhood">Bairro (opcional)</Label>
+                <Input
+                  id="capture-neighborhood"
+                  placeholder="Digite o bairro..."
+                  value={neighborhood}
+                  onChange={(e) => setNeighborhood(e.target.value)}
+                />
+              </div>
             )}
-          </Button>
-        </form>
+          </TabsContent>
+
+          <TabsContent value="upload" className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="upload-type">Tipo de Evidência</Label>
+              <Select
+                value={evidenceType}
+                onValueChange={(value) => setEvidenceType(value as EvidenceType)}
+              >
+                <SelectTrigger id="upload-type">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={EvidenceType.selfie}>Selfie</SelectItem>
+                  <SelectItem value={EvidenceType.screenshot}>Screenshot</SelectItem>
+                  <SelectItem value={EvidenceType.audio}>Áudio</SelectItem>
+                  <SelectItem value={EvidenceType.video}>Vídeo</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="file-upload">Arquivo</Label>
+              <Input
+                id="file-upload"
+                type="file"
+                accept={
+                  evidenceType === EvidenceType.audio
+                    ? 'audio/*'
+                    : evidenceType === EvidenceType.video
+                    ? 'video/*'
+                    : 'image/*'
+                }
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) handleFileUpload(file);
+                }}
+                disabled={isSubmitting}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="upload-notes">Notas</Label>
+              <Textarea
+                id="upload-notes"
+                placeholder="Adicione notas sobre esta evidência..."
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="upload-platform">Plataforma (opcional)</Label>
+                <Select value={platform} onValueChange={(value) => setPlatform(value as Platform)}>
+                  <SelectTrigger id="upload-platform">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={Platform.ifood}>iFood</SelectItem>
+                    <SelectItem value={Platform.uber}>Uber</SelectItem>
+                    <SelectItem value={Platform.rappi}>Rappi</SelectItem>
+                    <SelectItem value={Platform.ninetyNine}>99</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="upload-region">Região (opcional)</Label>
+                <Select value={region} onValueChange={(value) => setRegion(value as Region)}>
+                  <SelectTrigger id="upload-region">
+                    <SelectValue placeholder="Selecione..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={Region.fortaleza}>Fortaleza</SelectItem>
+                    <SelectItem value={Region.caucaia}>Caucaia</SelectItem>
+                    <SelectItem value={Region.maracanau}>Maracanaú</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            {region && (
+              <div className="space-y-2">
+                <Label htmlFor="upload-neighborhood">Bairro (opcional)</Label>
+                <Input
+                  id="upload-neighborhood"
+                  placeholder="Digite o bairro..."
+                  value={neighborhood}
+                  onChange={(e) => setNeighborhood(e.target.value)}
+                />
+              </div>
+            )}
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
   );

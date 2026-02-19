@@ -16,7 +16,7 @@ export default function AppealGeneratorPage() {
   const navigate = useNavigate();
   const searchParams = useSearch({ strict: false }) as any;
   
-  const [selectedEvidenceIds, setSelectedEvidenceIds] = useState<number[]>([]);
+  const [selectedEvidenceIds, setSelectedEvidenceIds] = useState<bigint[]>([]);
   const [generatedAppeal, setGeneratedAppeal] = useState<string>('');
   
   const generateAppeal = useGenerateAppeal();
@@ -26,7 +26,7 @@ export default function AppealGeneratorPage() {
     if (searchParams?.evidenceIds) {
       try {
         const ids = JSON.parse(searchParams.evidenceIds);
-        setSelectedEvidenceIds(ids);
+        setSelectedEvidenceIds(ids.map((id: number) => BigInt(id)));
       } catch (e) {
         console.error('Failed to parse evidence IDs');
       }
@@ -74,6 +74,9 @@ export default function AppealGeneratorPage() {
     window.location.href = mailto;
   };
 
+  // Convert bigint[] to number[] for AppealWizard
+  const selectedEvidenceIdsAsNumbers = selectedEvidenceIds.map(id => Number(id));
+
   return (
     <div className="space-y-6">
       <div>
@@ -93,7 +96,7 @@ export default function AppealGeneratorPage() {
           <AppealWizard
             onGenerate={handleGenerate}
             isGenerating={generateAppeal.isPending}
-            selectedEvidenceIds={selectedEvidenceIds}
+            selectedEvidenceIds={selectedEvidenceIdsAsNumbers}
           />
 
           <EvidencePicker

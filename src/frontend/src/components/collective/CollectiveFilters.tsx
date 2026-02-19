@@ -1,21 +1,21 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Platform, Region } from '../../backend';
+import { Platform, Region } from '../../types/backend-extended';
 import { ReasonCategory } from '../../types/backend-extended';
 
 interface CollectiveFiltersProps {
-  platform: Platform | 'all';
-  region: Region | 'all';
-  reason: ReasonCategory | 'all';
+  platformFilter: Platform | 'all';
+  regionFilter: Region | 'all';
+  reasonFilter: ReasonCategory | 'all';
   onPlatformChange: (value: Platform | 'all') => void;
   onRegionChange: (value: Region | 'all') => void;
   onReasonChange: (value: ReasonCategory | 'all') => void;
 }
 
 export default function CollectiveFilters({
-  platform,
-  region,
-  reason,
+  platformFilter,
+  regionFilter,
+  reasonFilter,
   onPlatformChange,
   onRegionChange,
   onReasonChange,
@@ -23,51 +23,51 @@ export default function CollectiveFilters({
   return (
     <div className="grid gap-4 md:grid-cols-3">
       <div className="space-y-2">
-        <Label>Platform</Label>
-        <Select value={platform} onValueChange={onPlatformChange}>
-          <SelectTrigger>
-            <SelectValue />
+        <Label htmlFor="platform-filter">Plataforma</Label>
+        <Select value={platformFilter} onValueChange={onPlatformChange}>
+          <SelectTrigger id="platform-filter">
+            <SelectValue placeholder="Todas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Platforms</SelectItem>
-            <SelectItem value="uber">Uber</SelectItem>
-            <SelectItem value="ninetyNine">99</SelectItem>
-            <SelectItem value="ifood">iFood</SelectItem>
-            <SelectItem value="rappi">Rappi</SelectItem>
+            <SelectItem value="all">Todas</SelectItem>
+            <SelectItem value={Platform.ifood}>iFood</SelectItem>
+            <SelectItem value={Platform.uber}>Uber</SelectItem>
+            <SelectItem value={Platform.rappi}>Rappi</SelectItem>
+            <SelectItem value={Platform.ninetyNine}>99</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="space-y-2">
-        <Label>Region</Label>
-        <Select value={region} onValueChange={onRegionChange}>
-          <SelectTrigger>
-            <SelectValue />
+        <Label htmlFor="region-filter">Região</Label>
+        <Select value={regionFilter} onValueChange={onRegionChange}>
+          <SelectTrigger id="region-filter">
+            <SelectValue placeholder="Todas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Regions</SelectItem>
-            <SelectItem value="fortaleza">Fortaleza</SelectItem>
-            <SelectItem value="caucaia">Caucaia</SelectItem>
-            <SelectItem value="maracanau">Maracanaú</SelectItem>
+            <SelectItem value="all">Todas</SelectItem>
+            <SelectItem value={Region.fortaleza}>Fortaleza</SelectItem>
+            <SelectItem value={Region.caucaia}>Caucaia</SelectItem>
+            <SelectItem value={Region.maracanau}>Maracanaú</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       <div className="space-y-2">
-        <Label>Reason</Label>
-        <Select value={reason} onValueChange={onReasonChange}>
-          <SelectTrigger>
-            <SelectValue />
+        <Label htmlFor="reason-filter">Motivo</Label>
+        <Select value={reasonFilter} onValueChange={onReasonChange}>
+          <SelectTrigger id="reason-filter">
+            <SelectValue placeholder="Todos" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Reasons</SelectItem>
-            <SelectItem value="documentsExpired">Documents Expired</SelectItem>
-            <SelectItem value="selfieInvalid">Selfie Invalid</SelectItem>
-            <SelectItem value="lowRating">Low Rating</SelectItem>
-            <SelectItem value="dangerousConduct">Dangerous Conduct</SelectItem>
-            <SelectItem value="fraudSuspicion">Fraud Suspicion</SelectItem>
-            <SelectItem value="multipleAccounts">Multiple Accounts</SelectItem>
-            <SelectItem value="other">Other</SelectItem>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value={ReasonCategory.documentsExpired}>Documentos Vencidos</SelectItem>
+            <SelectItem value={ReasonCategory.selfieInvalid}>Selfie Inválida</SelectItem>
+            <SelectItem value={ReasonCategory.lowRating}>Avaliação Baixa</SelectItem>
+            <SelectItem value={ReasonCategory.dangerousConduct}>Conduta Perigosa</SelectItem>
+            <SelectItem value={ReasonCategory.fraudSuspicion}>Suspeita de Fraude</SelectItem>
+            <SelectItem value={ReasonCategory.multipleAccounts}>Múltiplas Contas</SelectItem>
+            <SelectItem value={ReasonCategory.other}>Outro</SelectItem>
           </SelectContent>
         </Select>
       </div>

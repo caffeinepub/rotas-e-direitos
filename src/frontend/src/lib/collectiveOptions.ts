@@ -1,4 +1,10 @@
-import { Region } from '../backend';
+import { Region } from '../types/backend-extended';
+
+export const REGIONS: { value: Region; label: string }[] = [
+  { value: Region.fortaleza, label: 'Fortaleza' },
+  { value: Region.caucaia, label: 'Caucaia' },
+  { value: Region.maracanau, label: 'Maracanaú' },
+];
 
 const neighborhoodsByRegion: Record<Region, string[]> = {
   [Region.fortaleza]: [
@@ -13,8 +19,19 @@ const neighborhoodsByRegion: Record<Region, string[]> = {
     'Fátima',
     'Dionísio Torres',
   ],
-  [Region.caucaia]: ['Centro', 'Jurema', 'Iparana', 'Cumbuco', 'Tabuba'],
-  [Region.maracanau]: ['Centro', 'Jereissati', 'Pajuçara', 'Acaracuzinho', 'Piratininga'],
+  [Region.caucaia]: [
+    'Centro',
+    'Jurema',
+    'Icaraí',
+    'Cumbuco',
+    'Tabuba',
+  ],
+  [Region.maracanau]: [
+    'Centro',
+    'Jereissati',
+    'Pajuçara',
+    'Acaracuzinho',
+  ],
 };
 
 export function getNeighborhoods(region: Region): string[] {

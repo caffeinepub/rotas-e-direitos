@@ -1,73 +1,159 @@
 {
   "kind": "build_request",
-  "title": "Add a third homepage color style variation (Style C) for the unauthenticated landing page",
+  "title": "Implement new payment gateway integration",
+  "projectName": "Rotas e Direitos",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-2",
-      "text": "Add an additional homepage style variant (Style C) that provides a distinct, cohesive color palette for the unauthenticated homepage (PublicOverviewPage + MarketingBanner) in both light and dark modes, without changing existing Style A or Style B behavior.",
-      "target": "frontend",
+      "id": "REQ-1",
+      "text": "Create backend methods in main.mo for initiating payment transactions with the new gateway provider, including methods to create payment sessions and retrieve payment status",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-last"
         ],
         "quotes": [
-          "SIM"
+          "implementar o novo gateway de pagamento"
         ]
       },
       "acceptanceCriteria": [
-        "A new variant option exists in the homepage style variant system (currently 'A' | 'B') to support a third variant (e.g., 'C').",
-        "The new variant persists via the existing localStorage key (homepage-style-variant) and loads correctly on refresh.",
-        "PublicOverviewPage applies a new CSS scope class for Style C (similar to home-style-b) when the variant is set to C.",
-        "MarketingBanner accepts and handles the new variant value and applies appropriate styling so text, badges, and controls remain readable in both light and dark mode."
+        "Backend exposes a method to create a new payment session with plan details",
+        "Backend exposes a method to query payment status by transaction ID",
+        "Payment session includes amount, currency, plan reference, and customer principal",
+        "Methods return appropriate error types for validation and gateway failures"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Add backend webhook handler method in main.mo to receive and process payment confirmation callbacks from the gateway provider",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-last"
+        ],
+        "quotes": [
+          "implementar o novo gateway de pagamento"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Webhook method validates incoming requests from the gateway",
+        "Successful payment confirmations update subscription status in backend state",
+        "Failed payment notifications are logged appropriately",
+        "Method returns appropriate HTTP-style status codes for webhook responses"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Define Style C theme overrides using CSS variables in `frontend/src/index.css` (light + dark) under a new scope class (e.g., `.home-style-c` and `.dark .home-style-c`) to achieve a clearly different but consistent palette across background/card/accent/border/ring/muted/secondary.",
+      "text": "Update the checkout page (CheckoutPage.tsx) to integrate with the new gateway, displaying payment options and handling the payment flow initiation",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-last"
         ],
         "quotes": [
-          "SIM"
+          "implementar o novo gateway de pagamento"
         ]
       },
       "acceptanceCriteria": [
-        "`frontend/src/index.css` includes Style C variable overrides for light mode.",
-        "`frontend/src/index.css` includes Style C variable overrides for dark mode.",
-        "Style C updates only CSS variables (no global breakage): other pages and variants render as before.",
-        "In Style C, key surfaces (background, cards, banner gradient) have sufficient contrast for headings/body text and UI controls in both light and dark mode."
+        "Checkout page displays available payment methods from the gateway",
+        "User can initiate a payment by clicking a payment button",
+        "Payment initiation calls the new backend payment session creation method",
+        "Loading states are shown during payment initiation",
+        "Error messages are displayed if payment initiation fails"
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Update the style toggle control on `frontend/src/pages/PublicOverviewPage.tsx` so users can cycle through A → B → C (and back), and ensure the UI reflects the currently selected variant.",
+      "text": "Create a custom React hook (useGatewayPayment.ts) to manage payment flow state, including initiating payments, polling payment status, and handling completion",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3"
+          "msg-last"
         ],
         "quotes": [
-          "SIM"
+          "implementar o novo gateway de pagamento"
         ]
       },
       "acceptanceCriteria": [
-        "The toggle control on the public overview page can select all three variants without requiring manual localStorage edits.",
-        "When Style C is selected, the page container uses the Style C scope class and the MarketingBanner receives the variant prop value 'C'.",
-        "No TypeScript errors occur due to the expanded variant union type across components using the variant prop/state."
+        "Hook provides methods to start a payment session",
+        "Hook provides methods to check payment status",
+        "Hook manages payment flow state (idle, initiating, pending, completed, failed)",
+        "Hook uses React Query for data fetching and caching",
+        "Hook invalidates subscription queries on successful payment"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Add payment status tracking component that displays the current payment state with appropriate UI feedback (pending, processing, success, error)",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-last"
+        ],
+        "quotes": [
+          "implementar o novo gateway de pagamento"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Component shows pending state while payment is being processed",
+        "Component displays success message with confirmation details when payment completes",
+        "Component shows error message with retry option if payment fails",
+        "Component provides navigation back to plans page or forward to dashboard after completion"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Update admin dashboard payment configuration section to include gateway-specific settings (API credentials, webhook URL, enabled status)",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-last"
+        ],
+        "quotes": [
+          "implementar o novo gateway de pagamento"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Admin can view current gateway configuration status",
+        "Admin can update gateway API credentials through a secure form",
+        "Admin can enable/disable the gateway provider",
+        "Form validation prevents saving incomplete credentials",
+        "Success/error messages are shown after configuration updates"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Add gateway payment error handling utilities in frontend/src/lib/payments/ that map gateway error codes to user-friendly Portuguese messages",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-last"
+        ],
+        "quotes": [
+          "implementar o novo gateway de pagamento"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Error mapping function handles common gateway error scenarios",
+        "Messages are in Portuguese and user-friendly",
+        "Error messages distinguish between user errors and system errors",
+        "Function follows the same pattern as existing paymentErrorMessages.ts"
       ]
     }
   ],
   "constraints": [
-    "Do not edit any files under `frontend/src/components/ui` (read-only UI components).",
-    "Do not modify immutable frontend hook files listed in SYSTEM_CONTEXT; compose around them where necessary.",
-    "Keep all changes within the existing React + TypeScript + Tailwind + React Query stack (no new frameworks or backend services)."
+    "Do not modify files in frontend/src/hooks/useInternetIdentity.ts or frontend/src/hooks/useActor.ts",
+    "Do not edit UI component sources in frontend/src/components/ui",
+    "All Motoko backend logic must remain in the single main actor file (backend/main.mo)",
+    "Use React Query for all data fetching and mutations",
+    "Follow the existing OKLCH-based color system defined in index.css"
   ],
   "nonGoals": [
-    "Do not redesign non-homepage pages or change the app’s content/copy as part of this request.",
-    "Do not change backend canister logic; this is a frontend-only style variation."
+    "Integration with specific third-party payment gateways like Stripe or PayPal",
+    "Real-time WebSocket connections for payment status updates",
+    "Mobile app payment integrations",
+    "Cryptocurrency payment options",
+    "Multi-currency support beyond BRL"
   ],
   "imageRequirements": {
     "required": [],

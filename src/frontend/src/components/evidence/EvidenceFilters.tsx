@@ -1,51 +1,46 @@
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { EvidenceType, Platform } from '../../backend';
+import { Label } from '@/components/ui/label';
+import { EvidenceType, Platform } from '../../types/backend-extended';
 
 interface EvidenceFiltersProps {
-  typeFilter: EvidenceType | null;
-  setTypeFilter: (type: EvidenceType | null) => void;
-  platformFilter: Platform | null;
-  setPlatformFilter: (platform: Platform | null) => void;
+  typeFilter: EvidenceType | 'all';
+  platformFilter: Platform | 'all';
+  onTypeFilterChange: (value: EvidenceType | 'all') => void;
+  onPlatformFilterChange: (value: Platform | 'all') => void;
 }
 
 export default function EvidenceFilters({
   typeFilter,
-  setTypeFilter,
   platformFilter,
-  setPlatformFilter,
+  onTypeFilterChange,
+  onPlatformFilterChange,
 }: EvidenceFiltersProps) {
   return (
-    <div className="grid gap-4 md:grid-cols-2">
-      <div className="space-y-2">
-        <Label htmlFor="type-filter" className="text-base">
-          Filtrar por Tipo
-        </Label>
-        <Select value={typeFilter || 'all'} onValueChange={(v) => setTypeFilter(v === 'all' ? null : (v as EvidenceType))}>
-          <SelectTrigger id="type-filter" className="h-12 text-base">
-            <SelectValue />
+    <div className="flex gap-4 flex-wrap">
+      <div className="flex-1 min-w-[200px]">
+        <Label htmlFor="type-filter">Tipo</Label>
+        <Select value={typeFilter} onValueChange={onTypeFilterChange}>
+          <SelectTrigger id="type-filter">
+            <SelectValue placeholder="Todos os tipos" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos os Tipos</SelectItem>
+            <SelectItem value="all">Todos os tipos</SelectItem>
             <SelectItem value={EvidenceType.selfie}>Selfie</SelectItem>
-            <SelectItem value={EvidenceType.screenshot}>Print</SelectItem>
+            <SelectItem value={EvidenceType.screenshot}>Screenshot</SelectItem>
+            <SelectItem value={EvidenceType.audio}>Áudio</SelectItem>
+            <SelectItem value={EvidenceType.video}>Vídeo</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="platform-filter" className="text-base">
-          Filtrar por Plataforma
-        </Label>
-        <Select
-          value={platformFilter || 'all'}
-          onValueChange={(v) => setPlatformFilter(v === 'all' ? null : (v as Platform))}
-        >
-          <SelectTrigger id="platform-filter" className="h-12 text-base">
-            <SelectValue />
+      <div className="flex-1 min-w-[200px]">
+        <Label htmlFor="platform-filter">Plataforma</Label>
+        <Select value={platformFilter} onValueChange={onPlatformFilterChange}>
+          <SelectTrigger id="platform-filter">
+            <SelectValue placeholder="Todas as plataformas" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todas as Plataformas</SelectItem>
+            <SelectItem value="all">Todas as plataformas</SelectItem>
             <SelectItem value={Platform.ifood}>iFood</SelectItem>
             <SelectItem value={Platform.uber}>Uber</SelectItem>
             <SelectItem value={Platform.rappi}>Rappi</SelectItem>

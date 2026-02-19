@@ -2,33 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-add-an-additional-homepage-style-variant-style-c-that-provides-a-distinct-cohesive-color-palette-for-the-unauthenticated-homepage-publicoverviewpage-marketingbanner-in-both-light-and-dark-modes-without-changing-existing-style-a-or-style-b-behavior",
-      "featureTitle": "Add an additional homepage style variant (Style C) that provides a distinct, cohesive color palette for the unauthenticated homepage (PublicOverviewPage + MarketingBanner) in both light and dark modes, without changing existing Style A or Style B behavior.",
+      "featureId": "feature-update-the-checkout-page-checkoutpage-tsx-to-integrate-with-the-new-gateway-displaying-payment-options-and-handling-the-payment-flow-initiation",
+      "featureTitle": "Update the checkout page (CheckoutPage.tsx) to integrate with the new gateway, displaying payment options and handling the payment flow initiation",
       "files": [
-        "frontend/src/components/marketing/MarketingBanner.tsx",
-        "frontend/src/hooks/useHomepageStyleVariant.ts",
-        "frontend/src/pages/PublicOverviewPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "camera@1.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-define-style-c-theme-overrides-using-css-variables-in-frontend-src-index-css-light-dark-under-a-new-scope-class-e-g-home-style-c-and-dark-home-style-c-to-achieve-a-clearly-different-but-consistent-palette-across-background-card-accent-border-ring-muted-secondary",
-      "featureTitle": "Define Style C theme overrides using CSS variables in `frontend/src/index.css` (light + dark) under a new scope class (e.g., `.home-style-c` and `.dark .home-style-c`) to achieve a clearly different but consistent palette across background/card/accent/border/ring/muted/secondary.",
-      "files": [
-        "frontend/src/index.css"
+        "frontend/src/pages/CheckoutPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -46,11 +23,10 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-style-toggle-control-on-frontend-src-pages-publicoverviewpage-tsx-so-users-can-cycle-through-a-b-c-and-back-and-ensure-the-ui-reflects-the-currently-selected-variant",
-      "featureTitle": "Update the style toggle control on `frontend/src/pages/PublicOverviewPage.tsx` so users can cycle through A → B → C (and back), and ensure the UI reflects the currently selected variant.",
+      "featureId": "feature-create-a-custom-react-hook-usegatewaypayment-ts-to-manage-payment-flow-state-including-initiating-payments-polling-payment-status-and-handling-completion",
+      "featureTitle": "Create a custom React hook (useGatewayPayment.ts) to manage payment flow state, including initiating payments, polling payment status, and handling completion",
       "files": [
-        "frontend/src/hooks/useHomepageStyleVariant.ts",
-        "frontend/src/pages/PublicOverviewPage.tsx"
+        "frontend/src/hooks/useGatewayPayment.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -64,6 +40,69 @@
       ],
       "testIds": [
         "REQ-4"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-payment-status-tracking-component-that-displays-the-current-payment-state-with-appropriate-ui-feedback-pending-processing-success-error",
+      "featureTitle": "Add payment status tracking component that displays the current payment state with appropriate UI feedback (pending, processing, success, error)",
+      "files": [
+        "frontend/src/components/payments/PaymentStatusPanel.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-admin-dashboard-payment-configuration-section-to-include-gateway-specific-settings-api-credentials-webhook-url-enabled-status",
+      "featureTitle": "Update admin dashboard payment configuration section to include gateway-specific settings (API credentials, webhook URL, enabled status)",
+      "files": [
+        "frontend/src/pages/AdminDashboardPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-gateway-payment-error-handling-utilities-in-frontend-src-lib-payments-that-map-gateway-error-codes-to-user-friendly-portuguese-messages",
+      "featureTitle": "Add gateway payment error handling utilities in frontend/src/lib/payments/ that map gateway error codes to user-friendly Portuguese messages",
+      "files": [
+        "frontend/src/lib/payments/gatewayErrorMessages.ts"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
       ],
       "confidence": "high"
     }

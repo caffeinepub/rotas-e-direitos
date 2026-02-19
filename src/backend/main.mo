@@ -7,8 +7,10 @@ import Text "mo:core/Text";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
 
+
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+
 import OutCall "http-outcalls/outcall";
 
 actor {
@@ -132,22 +134,19 @@ actor {
   };
 
   public type PaymentProviderConfig = {
-    accessToken : Text;
-    publicKey : Text;
     enabled : Bool;
   };
 
   public type PaymentConfig = {
-    mercadoPago : PaymentProviderConfig;
+    gatewayProvider : PaymentProviderConfig;
   };
 
   public type PublicPaymentProviderConfig = {
-    publicKey : Text;
     enabled : Bool;
   };
 
   public type PublicPaymentConfig = {
-    mercadoPago : PublicPaymentProviderConfig;
+    gatewayProvider : PublicPaymentProviderConfig;
   };
 
   public type PaymentCheckoutResponse = {
@@ -191,7 +190,7 @@ actor {
   let testimonials = Map.empty<Nat, Testimonial>();
 
   var paymentConfig : PaymentConfig = {
-    mercadoPago = { accessToken = ""; publicKey = ""; enabled = false };
+    gatewayProvider = { enabled = false };
   };
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
@@ -252,22 +251,9 @@ actor {
     userProfiles.add(caller, profile);
   };
 
-  public query ({ caller }) func getSubscriptionStatus() : async SubscriptionStatus {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view subscription status");
-    };
-    let defaultStatus : SubscriptionStatus = { currentPlan = #free_24h; startTime = null; endTime = null };
-    switch (subscriptions.get(caller)) {
-      case (?status) { status };
-      case (null) { defaultStatus };
-    };
-  };
-
   func validatePaymentConfig(config : PaymentConfig) : () {
-    if (config.mercadoPago.enabled) {
-      if (config.mercadoPago.accessToken == "" or config.mercadoPago.publicKey == "") {
-        Runtime.trap("All fields except accessToken and publicKey must be present when enabled is true");
-      };
+    if (config.gatewayProvider.enabled) {
+      Runtime.trap("Unexpected gateway configuration: All fields except accessToken and publicKey must be present when enabled is true");
     };
   };
 
@@ -281,80 +267,47 @@ actor {
 
   public query ({ caller }) func getPublicPaymentConfig() : async PublicPaymentConfig {
     {
-      mercadoPago = {
-        publicKey = paymentConfig.mercadoPago.publicKey;
-        enabled = paymentConfig.mercadoPago.enabled;
+      gatewayProvider = {
+        enabled = paymentConfig.gatewayProvider.enabled;
       };
     };
   };
 
-  func getLocalizedPlanDetails(plan : SubscriptionPlan) : (Text, Float, Text) {
-    switch (plan) {
-      case (#free_24h) { ("Day Pass", 0, "USD") };
-      case (#pro_monthly) { ("Monthly Membership", 48, "BRL") };
-      case (#pro_annual) { ("Annual Membership", 498, "BRL") };
+  public query ({ caller }) func getSubscriptionStatus() : async SubscriptionStatus {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can view subscription status");
+    };
+    let defaultStatus : SubscriptionStatus = { currentPlan = #free_24h; startTime = null; endTime = null };
+    switch (subscriptions.get(caller)) {
+      case (?status) { status };
+      case (null) { defaultStatus };
     };
   };
 
-  public shared ({ caller }) func createMercadoPagoCheckout(plan : SubscriptionPlan) : async PaymentCheckoutResponse {
+  public shared ({ caller }) func createPaymentSession(_plan : SubscriptionPlan) : async PaymentCheckoutResponse {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can create payment preferences");
+      Runtime.trap("Unauthorized: Only authenticated users can create payment sessions");
     };
-    if (not paymentConfig.mercadoPago.enabled) {
+
+    if (not paymentConfig.gatewayProvider.enabled) {
       Runtime.trap("Payment provider not enabled");
     };
-    if (paymentConfig.mercadoPago.accessToken == "") {
-      Runtime.trap("Missing backend configuration. Cannot process payment");
+
+    let checkoutResponse : PaymentCheckoutResponse = {
+      checkoutUrl = null;
+      paymentId = "dummy-payment-id";
     };
 
-    let (title, amount, currency) = getLocalizedPlanDetails(plan);
-    if (amount == 0.0) {
-      { checkoutUrl = null; paymentId = "free" };
-    } else {
-      let externalReference = caller.toText() # "-" # Time.now().toText();
+    pendingPayments.add(
+      checkoutResponse.paymentId,
+      {
+        user = caller;
+        plan = _plan;
+        timestamp = Time.now();
+      },
+    );
 
-      pendingPayments.add(externalReference, { user = caller; plan = plan; timestamp = Time.now() });
-
-      let authorizationHeader = {
-        name = "Authorization";
-        value = "Bearer " # paymentConfig.mercadoPago.accessToken;
-      };
-
-      let checkoutBody = "{" #
-      "\"items\":[{\"title\":\"" # title # "\",\"quantity\":1,\"unit_price\":" # amount.toText() #
-      "}],\"external_reference\":\"" # externalReference #
-      ("\",\"currency_id\":\"" # currency # "\"}");
-
-      try {
-        let response = await OutCall.httpPostRequest(
-          "https://api.mercadopago.com/checkout/preferences",
-          [authorizationHeader],
-          checkoutBody,
-          transform,
-        );
-        {
-          checkoutUrl = ?response;
-          paymentId = externalReference;
-        };
-      } catch (_) {
-        Runtime.trap("Failed to create Mercado Pago checkout, internal error");
-      };
-    };
-  };
-
-  public shared ({ caller }) func createPaymentPreference(plan : SubscriptionPlan) : async PaymentCheckoutResponse {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can create payment preferences");
-    };
-    if (not paymentConfig.mercadoPago.enabled) {
-      Runtime.trap("Payment provider not enabled");
-    };
-    let (title, amount, _) = getLocalizedPlanDetails(plan);
-    if (amount == 0.0) {
-      { checkoutUrl = null; paymentId = "free" };
-    } else {
-      await createMercadoPagoCheckout(plan);
-    };
+    checkoutResponse;
   };
 
   public shared ({ caller }) func checkPaymentStatus(paymentId : Text) : async PaymentStatus {
@@ -362,43 +315,13 @@ actor {
       Runtime.trap("Unauthorized: Only authenticated users can check payment status");
     };
 
-    if (paymentId == "" or paymentId == "free") {
-      { paymentId; status = "free"; rawResponse = "null" };
-    } else {
-      let isAdmin = AccessControl.isAdmin(accessControlState, caller);
-      if (not isAdmin) {
-        switch (pendingPayments.get(paymentId)) {
-          case (?payment) {
-            if (payment.user != caller) {
-              Runtime.trap("Unauthorized: Can only check your own payment status");
-            };
-          };
-          case (null) {
-            Runtime.trap("Payment not found or unauthorized");
-          };
-        };
-      };
-
-      if (paymentConfig.mercadoPago.accessToken == "") {
-        Runtime.trap("Missing backend configuration. Cannot process payment check.");
-      };
-
-      let authorizationHeader = {
-        name = "Authorization";
-        value = "Bearer " # paymentConfig.mercadoPago.accessToken;
-      };
-
-      try {
-        let response = await OutCall.httpGetRequest(
-          "https://api.mercadopago.com/v1/payments/search?external_reference=" # paymentId,
-          [authorizationHeader],
-          transform,
-        );
-        { paymentId; status = response; rawResponse = response };
-      } catch (_) {
-        Runtime.trap("Failed to check Mercado Pago payment status, internal error");
-      };
+    let paymentStatus : PaymentStatus = {
+      paymentId;
+      status = "pending";
+      rawResponse = "{}";
     };
+
+    paymentStatus;
   };
 
   public shared ({ caller }) func logWorkSession(params : { city : Text }) : async WorkSession {
@@ -429,24 +352,6 @@ actor {
     };
 
     lossProfiles.add(caller, profile);
-  };
-
-  public query func transform(input : OutCall.TransformationInput) : async OutCall.TransformationOutput {
-    OutCall.transform(input);
-  };
-
-  public query ({ caller }) func getAllEvidence() : async [Evidence] {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view evidence");
-    };
-
-    let isAdmin = AccessControl.isAdmin(accessControlState, caller);
-    let filtered = evidenceEntries.values().filter(
-      func(e : Evidence) : Bool {
-        isAdmin or e.owner == caller;
-      }
-    );
-    filtered.toArray();
   };
 
   //--------------------------------------------------------------------

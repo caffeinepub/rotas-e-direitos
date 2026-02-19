@@ -1,70 +1,93 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Homepage Style Variant C (light/dark) for unauthenticated landing page",
+  "title": "Frontend Payment Gateway Integration",
   "requirements": [
     {
-      "id": "REQ-2",
-      "summary": "Add Style C as a third homepage style variant for the unauthenticated landing page and ensure it propagates through PublicOverviewPage and MarketingBanner without changing A/B behavior.",
-      "acceptanceCriteria": [
-        "A new variant option exists in the homepage style variant system (currently 'A' | 'B') to support a third variant (e.g., 'C').",
-        "The new variant persists via the existing localStorage key (homepage-style-variant) and loads correctly on refresh.",
-        "PublicOverviewPage applies a new CSS scope class for Style C (similar to home-style-b) when the variant is set to C.",
-        "MarketingBanner accepts and handles the new variant value and applies appropriate styling so text, badges, and controls remain readable in both light and dark mode."
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useHomepageStyleVariant.ts",
-          "operation": "modify",
-          "description": "Expand the homepage style variant union to include 'C' and ensure localStorage load/restore logic accepts 'C' while preserving existing 'A'/'B' behavior and the same storage key (homepage-style-variant)."
-        },
-        {
-          "path": "frontend/src/pages/PublicOverviewPage.tsx",
-          "operation": "modify",
-          "description": "Update the public homepage container class logic to apply a new Style C scope class (home-style-c) when the stored variant is 'C', while keeping existing Style A/B rendering unchanged."
-        },
-        {
-          "path": "frontend/src/components/marketing/MarketingBanner.tsx",
-          "operation": "modify",
-          "description": "Expand the MarketingBanner variant prop type to accept 'C' and add Style C-specific class branching (banner/card/control surfaces) to keep text, badges, and controls readable in both light and dark mode."
-        }
-      ]
-    },
-    {
       "id": "REQ-3",
-      "summary": "Define Style C theme overrides via scoped CSS variables in frontend/src/index.css for both light and dark modes.",
+      "summary": "Update checkout page to integrate with new payment gateway and handle payment flow initiation",
       "acceptanceCriteria": [
-        "`frontend/src/index.css` includes Style C variable overrides for light mode.",
-        "`frontend/src/index.css` includes Style C variable overrides for dark mode.",
-        "Style C updates only CSS variables (no global breakage): other pages and variants render as before.",
-        "In Style C, key surfaces (background, cards, banner gradient) have sufficient contrast for headings/body text and UI controls in both light and dark mode."
+        "Checkout page displays available payment methods from the gateway",
+        "User can initiate a payment by clicking a payment button",
+        "Payment initiation calls the new backend payment session creation method",
+        "Loading states are shown during payment initiation",
+        "Error messages are displayed if payment initiation fails"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/index.css",
+          "path": "frontend/src/pages/CheckoutPage.tsx",
           "operation": "modify",
-          "description": "Add a new scoped variable override block for Style C (e.g., .home-style-c for light and .dark .home-style-c for dark) covering background/card/accent/border/ring/muted/secondary, ensuring changes are limited to variable overrides and do not affect other pages/variants."
+          "description": "Integrate the new payment gateway flow using the useGatewayPayment hook. Replace or extend the existing payment provider configuration display with interactive payment method buttons. Add the selected subscription plan display using checkoutState utilities. Include loading states during payment initiation and error message displays for failed payment attempts. Wire the payment button to call the createPaymentSession backend method through the custom hook. Display the trust badges component to reassure users during checkout."
         }
       ]
     },
     {
       "id": "REQ-4",
-      "summary": "Update the PublicOverviewPage style toggle control to cycle through A → B → C (and back) and reflect the active variant across the page and MarketingBanner.",
+      "summary": "Create custom React hook to manage payment flow state and interactions with backend payment capabilities",
       "acceptanceCriteria": [
-        "The toggle control on the public overview page can select all three variants without requiring manual localStorage edits.",
-        "When Style C is selected, the page container uses the Style C scope class and the MarketingBanner receives the variant prop value 'C'.",
-        "No TypeScript errors occur due to the expanded variant union type across components using the variant prop/state."
+        "Hook provides methods to start a payment session",
+        "Hook provides methods to check payment status",
+        "Hook manages payment flow state (idle, initiating, pending, completed, failed)",
+        "Hook uses React Query for data fetching and caching",
+        "Hook invalidates subscription queries on successful payment"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useHomepageStyleVariant.ts",
-          "operation": "modify",
-          "description": "Update the toggle function behavior to cycle variants A → B → C → A, keeping persistence behavior intact and ensuring TypeScript types align with the expanded union."
-        },
+          "path": "frontend/src/hooks/useGatewayPayment.ts",
+          "operation": "create",
+          "description": "Create a custom hook that manages the payment gateway flow state. Use React Query mutations for createPaymentSession (calls actor.createPaymentSession) and checkPaymentStatus (calls actor.checkPaymentStatus). Maintain local state for payment flow phases: idle, initiating, pending, completed, failed. Provide methods: startPayment(plan), checkStatus(paymentId), and reset(). On successful payment completion, invalidate the subscription status query using queryClient.invalidateQueries(['subscriptionStatus']). Handle errors from backend payment methods and expose them for UI display. Use the actor from useActor hook to access backend payment capabilities."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Add payment status tracking component with UI feedback for all payment states",
+      "acceptanceCriteria": [
+        "Component shows pending state while payment is being processed",
+        "Component displays success message with confirmation details when payment completes",
+        "Component shows error message with retry option if payment fails",
+        "Component provides navigation back to plans page or forward to dashboard after completion"
+      ],
+      "file_operations": [
         {
-          "path": "frontend/src/pages/PublicOverviewPage.tsx",
+          "path": "frontend/src/components/payments/PaymentStatusPanel.tsx",
           "operation": "modify",
-          "description": "Update the toggle button UI (label/aria-label and any visual indicator) to reflect the currently selected variant and to switch through all three variants; ensure the selected variant is passed to MarketingBanner as 'A' | 'B' | 'C'."
+          "description": "Implement the payment status tracking component that consumes payment state from useGatewayPayment hook. Display different UI states: pending (spinner with processing message), completed (success checkmark with confirmation details and navigation to dashboard), failed (error icon with retry button and navigation back to plans). Use shadcn/ui Alert, Button, and Card components. Include Portuguese user-facing messages. Add navigation using TanStack Router's useNavigate hook. Provide a retry mechanism that calls the payment initiation method again."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Update admin dashboard payment configuration section for gateway-specific settings",
+      "acceptanceCriteria": [
+        "Admin can view current gateway configuration status",
+        "Admin can update gateway API credentials through a secure form",
+        "Admin can enable/disable the gateway provider",
+        "Form validation prevents saving incomplete credentials",
+        "Success/error messages are shown after configuration updates"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/AdminDashboardPage.tsx",
+          "operation": "modify",
+          "description": "Extend the existing payment gateway configuration tab. Add form fields for gateway-specific settings including enabled toggle and secure credential inputs (use password input type for API keys). Fetch current configuration using usePublicPaymentConfig hook. Use the useAdminPaymentConfig mutation hook to save updated configuration. Add form validation to ensure credentials are complete before allowing save. Display success toast on successful update and error alerts on failure. Use shadcn/ui Form, Input, Switch, and Label components. Include Portuguese labels and help text."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Add gateway payment error handling utilities that map error codes to Portuguese user messages",
+      "acceptanceCriteria": [
+        "Error mapping function handles common gateway error scenarios",
+        "Messages are in Portuguese and user-friendly",
+        "Error messages distinguish between user errors and system errors",
+        "Function follows the same pattern as existing paymentErrorMessages.ts"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/payments/gatewayErrorMessages.ts",
+          "operation": "create",
+          "description": "Create error sanitization utilities following the same pattern as frontend/src/lib/payments/paymentErrorMessages.ts. Export a sanitizeGatewayError function that accepts raw backend error strings and returns user-friendly Portuguese messages. Map common gateway error scenarios: invalid credentials, insufficient funds, payment declined, timeout, network errors, validation failures. Distinguish between user-actionable errors (e.g., 'Cartão recusado - tente outro método') and system errors (e.g., 'Erro no gateway - contate o suporte'). Include a fallback for unknown errors. Return an object with { message: string, isUserError: boolean, requiresAdminAction: boolean }."
         }
       ]
     }

@@ -8,7 +8,7 @@ import { useCamera } from '../../camera/useCamera';
 import { useMediaRecorder } from '../../hooks/useMediaRecorder';
 
 interface RealTimeCapturePanelProps {
-  onCapture: (file: File, type: 'photo' | 'audio' | 'video') => void;
+  onCapture: (file: File) => void;
   onCancel?: () => void;
 }
 
@@ -22,21 +22,21 @@ export default function RealTimeCapturePanel({ onCapture, onCancel }: RealTimeCa
   const handlePhotoCapture = async () => {
     const file = await camera.capturePhoto();
     if (file) {
-      onCapture(file, 'photo');
+      onCapture(file);
     }
   };
 
   const handleAudioStop = async () => {
     const file = await audioRecorder.stopRecording();
     if (file) {
-      onCapture(file, 'audio');
+      onCapture(file);
     }
   };
 
   const handleVideoStop = async () => {
     const file = await videoRecorder.stopRecording();
     if (file) {
-      onCapture(file, 'video');
+      onCapture(file);
     }
   };
 
@@ -51,24 +51,24 @@ export default function RealTimeCapturePanel({ onCapture, onCancel }: RealTimeCa
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Camera className="h-5 w-5" />
-          Real-Time Capture
+          Captura em Tempo Real
         </CardTitle>
-        <CardDescription>Capture photo, audio, or video evidence</CardDescription>
+        <CardDescription>Capture foto, áudio ou vídeo como evidência</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as any)}>
           <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="photo">
               <Camera className="h-4 w-4 mr-2" />
-              Photo
+              Foto
             </TabsTrigger>
             <TabsTrigger value="audio">
               <Mic className="h-4 w-4 mr-2" />
-              Audio
+              Áudio
             </TabsTrigger>
             <TabsTrigger value="video">
               <Video className="h-4 w-4 mr-2" />
-              Video
+              Vídeo
             </TabsTrigger>
           </TabsList>
 
@@ -76,7 +76,7 @@ export default function RealTimeCapturePanel({ onCapture, onCancel }: RealTimeCa
             {camera.isSupported === false && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>Camera not supported in this browser</AlertDescription>
+                <AlertDescription>Câmera não suportada neste navegador</AlertDescription>
               </Alert>
             )}
 
@@ -101,22 +101,22 @@ export default function RealTimeCapturePanel({ onCapture, onCancel }: RealTimeCa
             <div className="flex gap-2">
               {!camera.isActive ? (
                 <Button onClick={camera.startCamera} disabled={camera.isLoading} className="flex-1">
-                  {camera.isLoading ? 'Starting...' : 'Start Camera'}
+                  {camera.isLoading ? 'Iniciando...' : 'Iniciar Câmera'}
                 </Button>
               ) : (
                 <>
                   <Button onClick={handlePhotoCapture} className="flex-1">
                     <Camera className="mr-2 h-4 w-4" />
-                    Capture Photo
+                    Capturar Foto
                   </Button>
                   <Button onClick={camera.stopCamera} variant="outline">
-                    Stop
+                    Parar
                   </Button>
                 </>
               )}
               {onCancel && (
                 <Button onClick={onCancel} variant="ghost">
-                  Cancel
+                  Cancelar
                 </Button>
               )}
             </div>
@@ -126,7 +126,7 @@ export default function RealTimeCapturePanel({ onCapture, onCancel }: RealTimeCa
             {!audioRecorder.isSupported && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>Audio recording not supported</AlertDescription>
+                <AlertDescription>Gravação de áudio não suportada</AlertDescription>
               </Alert>
             )}
 
@@ -155,25 +155,25 @@ export default function RealTimeCapturePanel({ onCapture, onCancel }: RealTimeCa
               {!audioRecorder.isRecording ? (
                 <Button onClick={audioRecorder.startRecording} className="flex-1">
                   <Mic className="mr-2 h-4 w-4" />
-                  Start Recording
+                  Iniciar Gravação
                 </Button>
               ) : (
                 <>
                   {!audioRecorder.isPaused ? (
                     <Button onClick={audioRecorder.pauseRecording} variant="outline" className="flex-1">
-                      Pause
+                      Pausar
                     </Button>
                   ) : (
                     <Button onClick={audioRecorder.resumeRecording} variant="outline" className="flex-1">
-                      Resume
+                      Retomar
                     </Button>
                   )}
                   <Button onClick={handleAudioStop} className="flex-1">
                     <Check className="mr-2 h-4 w-4" />
-                    Save
+                    Salvar
                   </Button>
                   <Button onClick={audioRecorder.cancelRecording} variant="ghost">
-                    Cancel
+                    Cancelar
                   </Button>
                 </>
               )}
@@ -184,7 +184,7 @@ export default function RealTimeCapturePanel({ onCapture, onCancel }: RealTimeCa
             {!videoRecorder.isSupported && (
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
-                <AlertDescription>Video recording not supported</AlertDescription>
+                <AlertDescription>Gravação de vídeo não suportada</AlertDescription>
               </Alert>
             )}
 
@@ -207,25 +207,25 @@ export default function RealTimeCapturePanel({ onCapture, onCancel }: RealTimeCa
               {!videoRecorder.isRecording ? (
                 <Button onClick={videoRecorder.startRecording} className="flex-1">
                   <Video className="mr-2 h-4 w-4" />
-                  Start Recording
+                  Iniciar Gravação
                 </Button>
               ) : (
                 <>
                   {!videoRecorder.isPaused ? (
                     <Button onClick={videoRecorder.pauseRecording} variant="outline" className="flex-1">
-                      Pause
+                      Pausar
                     </Button>
                   ) : (
                     <Button onClick={videoRecorder.resumeRecording} variant="outline" className="flex-1">
-                      Resume
+                      Retomar
                     </Button>
                   )}
                   <Button onClick={handleVideoStop} className="flex-1">
                     <Check className="mr-2 h-4 w-4" />
-                    Save
+                    Salvar
                   </Button>
                   <Button onClick={videoRecorder.cancelRecording} variant="ghost">
-                    Cancel
+                    Cancelar
                   </Button>
                 </>
               )}

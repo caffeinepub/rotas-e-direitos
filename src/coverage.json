@@ -1,65 +1,122 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-14T22:00:05.282Z",
+  "generatedAt": "2026-02-19T02:16:17.700Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 3,
+    "total": 7,
+    "implemented": 5,
     "items": [
       {
+        "id": "REQ-1",
+        "summary": "Create backend methods in main.mo for initiating payment transactions with the new gateway provider, including methods to create payment sessions and retrieve payment status",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
+      },
+      {
         "id": "REQ-2",
-        "summary": "Add an additional homepage style variant (Style C) that provides a distinct, cohesive color palette for the unauthenticated homepage (PublicOverviewPage + MarketingBanner) in both light and dark modes, without changing existing Style A or Style B behavior.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/hooks/useHomepageStyleVariant.ts",
-          "frontend/src/pages/PublicOverviewPage.tsx",
-          "frontend/src/components/marketing/MarketingBanner.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/hooks/useHomepageStyleVariant.ts",
-          "frontend/src/pages/PublicOverviewPage.tsx",
-          "frontend/src/components/marketing/MarketingBanner.tsx"
-        ]
+        "summary": "Add backend webhook handler method in main.mo to receive and process payment confirmation callbacks from the gateway provider",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-3",
-        "summary": "Define Style C theme overrides using CSS variables in `frontend/src/index.css` (light + dark) under a new scope class (e.g., `.home-style-c` and `.dark .home-style-c`) to achieve a clearly different but consistent palette across background/card/accent/border/ring/muted/secondary.",
+        "summary": "Update the checkout page (CheckoutPage.tsx) to integrate with the new gateway, displaying payment options and handling the payment flow initiation",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/index.css"
+          "frontend/src/pages/CheckoutPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/index.css"
+          "frontend/src/pages/CheckoutPage.tsx"
         ]
       },
       {
         "id": "REQ-4",
-        "summary": "Update the style toggle control on `frontend/src/pages/PublicOverviewPage.tsx` so users can cycle through A → B → C (and back), and ensure the UI reflects the currently selected variant.",
+        "summary": "Create a custom React hook (useGatewayPayment.ts) to manage payment flow state, including initiating payments, polling payment status, and handling completion",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/hooks/useHomepageStyleVariant.ts",
-          "frontend/src/pages/PublicOverviewPage.tsx"
+          "frontend/src/hooks/useGatewayPayment.ts"
         ],
         "matchedFiles": [
-          "frontend/src/hooks/useHomepageStyleVariant.ts",
-          "frontend/src/pages/PublicOverviewPage.tsx"
+          "frontend/src/hooks/useGatewayPayment.ts"
+        ]
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Add payment status tracking component that displays the current payment state with appropriate UI feedback (pending, processing, success, error)",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/payments/PaymentStatusPanel.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/payments/PaymentStatusPanel.tsx"
+        ]
+      },
+      {
+        "id": "REQ-6",
+        "summary": "Update admin dashboard payment configuration section to include gateway-specific settings (API credentials, webhook URL, enabled status)",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/pages/AdminDashboardPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/pages/AdminDashboardPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-7",
+        "summary": "Add gateway payment error handling utilities in frontend/src/lib/payments/ that map gateway error codes to user-friendly Portuguese messages",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/lib/payments/gatewayErrorMessages.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/lib/payments/gatewayErrorMessages.ts"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/marketing/MarketingBanner.tsx",
-    "frontend/src/hooks/useHomepageStyleVariant.ts",
-    "frontend/src/index.css",
-    "frontend/src/pages/PublicOverviewPage.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/appeal/EvidencePicker.tsx",
+    "frontend/src/components/collective/CollectiveFilters.tsx",
+    "frontend/src/components/collective/CollectiveSharePrompt.tsx",
+    "frontend/src/components/collective/PlatformDistribution.tsx",
+    "frontend/src/components/collective/ReasonDistribution.tsx",
+    "frontend/src/components/collective/TrendChart.tsx",
+    "frontend/src/components/evidence/EvidenceFilters.tsx",
+    "frontend/src/components/evidence/EvidenceSelectionToolbar.tsx",
+    "frontend/src/components/evidence/EvidenceTimeline.tsx",
+    "frontend/src/components/evidence/EvidenceUploadForm.tsx",
+    "frontend/src/components/evidence/RealTimeCapturePanel.tsx",
+    "frontend/src/components/payments/PaymentStatusPanel.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useCollectiveReports.ts",
+    "frontend/src/hooks/useEvidence.ts",
+    "frontend/src/hooks/useGatewayPayment.ts",
+    "frontend/src/lib/collectiveOptions.ts",
+    "frontend/src/lib/evidenceIndexedDb.ts",
+    "frontend/src/lib/payments/gatewayErrorMessages.ts",
+    "frontend/src/lib/supportSummary.ts",
+    "frontend/src/lib/zipExport.ts",
+    "frontend/src/pages/AdminDashboardPage.tsx",
+    "frontend/src/pages/AppealGeneratorPage.tsx",
+    "frontend/src/pages/CheckoutPage.tsx",
+    "frontend/src/pages/CollectiveInsightsPage.tsx",
+    "frontend/src/pages/EvidenceDetailPage.tsx",
+    "frontend/src/types/backend-extended.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

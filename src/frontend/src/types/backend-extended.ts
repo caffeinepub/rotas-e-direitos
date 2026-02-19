@@ -1,10 +1,41 @@
 // Extended types that should be in the backend but are missing from the interface
 // These match the internal backend types but need to be defined here for frontend use
 
-import type { Platform, Region, Principal } from '../backend';
+import type { Platform as BackendPlatform, Principal as BackendPrincipal } from '../backend';
 
-// Re-export types from backend for convenience
-export type { Platform, Region, Principal };
+// Re-export Platform and Principal as values (enums can be used as both types and values)
+export { Platform } from '../backend';
+export type { Principal } from '../backend';
+
+// Region enum - not exported from backend
+export enum Region {
+  fortaleza = 'fortaleza',
+  caucaia = 'caucaia',
+  maracanau = 'maracanau',
+}
+
+// EvidenceType enum - not exported from backend
+export enum EvidenceType {
+  selfie = 'selfie',
+  screenshot = 'screenshot',
+  audio = 'audio',
+  video = 'video',
+}
+
+// Evidence interface - not exported from backend
+export interface Evidence {
+  id: bigint;
+  owner: BackendPrincipal;
+  uploadTime: bigint;
+  evidenceType: EvidenceType;
+  notes: string;
+  platform?: BackendPlatform;
+  regiao?: Region;
+  bairro?: string;
+  duration?: bigint;
+  audioQuality?: string;
+  videoQuality?: string;
+}
 
 export enum ReasonCategory {
   documentsExpired = 'documentsExpired',
@@ -18,8 +49,8 @@ export enum ReasonCategory {
 
 export interface Appeal {
   id: bigint;
-  owner: Principal;
-  platform: Platform;
+  owner: BackendPrincipal;
+  platform: BackendPlatform;
   reasonCategory: ReasonCategory;
   userExplanation: string;
   evidenceIds: bigint[];
@@ -28,7 +59,7 @@ export interface Appeal {
 }
 
 export interface CollectiveReport {
-  platform: Platform;
+  platform: BackendPlatform;
   region: Region;
   neighborhood: string;
   reason: ReasonCategory;
@@ -39,5 +70,5 @@ export interface PublicLossProfile {
   dailyEarnings: number;
   daysPerWeek: bigint;
   deactivationDate: bigint;
-  platform: Platform;
+  platform: BackendPlatform;
 }

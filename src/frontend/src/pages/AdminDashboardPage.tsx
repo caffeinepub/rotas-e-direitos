@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -16,7 +14,6 @@ import { usePublicPaymentConfig } from '../hooks/usePublicPaymentConfig';
 import { PaymentConfig } from '../backend';
 import { toast } from 'sonner';
 import { Principal } from '@dfinity/principal';
-import MercadoPagoSetupGuide from '../components/admin/MercadoPagoSetupGuide';
 import AdminTestimonialsModerationPanel from '../components/admin/AdminTestimonialsModerationPanel';
 import AdminGate from '../components/AdminGate';
 
@@ -29,57 +26,27 @@ export default function AdminDashboardPage() {
 
   // Initialize with default empty config
   const [localConfig, setLocalConfig] = useState<PaymentConfig>({
-    mercadoPago: {
-      accessToken: '',
-      publicKey: '',
+    gatewayProvider: {
       enabled: false,
     },
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
 
-  // Update local config when public config loads (only non-sensitive fields)
+  // Update local config when public config loads
   useEffect(() => {
-    if (publicConfig?.mercadoPago) {
+    if (publicConfig?.gatewayProvider) {
       setLocalConfig(prev => ({
         ...prev,
-        mercadoPago: {
-          ...prev.mercadoPago,
-          publicKey: publicConfig.mercadoPago.publicKey,
-          enabled: publicConfig.mercadoPago.enabled,
-          // Keep accessToken from local state (not available from backend)
+        gatewayProvider: {
+          enabled: publicConfig.gatewayProvider.enabled,
         },
       }));
     }
   }, [publicConfig]);
 
-  const validatePublicKey = (key: string): boolean => {
-    if (!key.trim()) return false;
-    // Accept keys starting with TEST- or APP_USR- (case insensitive)
-    const upperKey = key.toUpperCase();
-    return upperKey.startsWith('TEST-') || upperKey.startsWith('APP_USR-');
-  };
-
   const handleSaveConfig = async () => {
     if (!localConfig) return;
-
-    // Validation: Check if Mercado Pago is being enabled
-    if (localConfig.mercadoPago.enabled) {
-      if (!localConfig.mercadoPago.publicKey.trim()) {
-        toast.error('Public Key is required when Mercado Pago is enabled');
-        return;
-      }
-
-      if (!validatePublicKey(localConfig.mercadoPago.publicKey)) {
-        toast.error('Public Key must start with TEST- or APP_USR-');
-        return;
-      }
-
-      if (!localConfig.mercadoPago.accessToken.trim()) {
-        toast.error('Access Token is required when Mercado Pago is enabled');
-        return;
-      }
-    }
 
     setIsSaving(true);
     setSaveSuccess(false);
@@ -91,22 +58,13 @@ export default function AdminDashboardPage() {
       await refetchPublicConfig();
       
       setSaveSuccess(true);
-      toast.success('Payment configuration saved successfully');
-      
-      // Clear Access Token field for security (don't keep it in local state)
-      setLocalConfig(prev => ({
-        ...prev,
-        mercadoPago: {
-          ...prev.mercadoPago,
-          accessToken: '',
-        },
-      }));
+      toast.success('Configuração de pagamento salva com sucesso');
 
       // Clear success message after 3 seconds
       setTimeout(() => setSaveSuccess(false), 3000);
     } catch (error: any) {
       console.error('Save config error:', error);
-      toast.error(error.message || 'Failed to save payment configuration');
+      toast.error(error.message || 'Falha ao salvar configuração de pagamento');
     } finally {
       setIsSaving(false);
     }
@@ -115,18 +73,18 @@ export default function AdminDashboardPage() {
   const handleBlockUser = async (principal: Principal) => {
     try {
       await blockUser.mutateAsync(principal);
-      toast.success('User blocked successfully');
+      toast.success('Usuário bloqueado com sucesso');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to block user');
+      toast.error(error.message || 'Falha ao bloquear usuário');
     }
   };
 
   const handleUnblockUser = async (principal: Principal) => {
     try {
       await unblockUser.mutateAsync(principal);
-      toast.success('User unblocked successfully');
+      toast.success('Usuário desbloqueado com sucesso');
     } catch (error: any) {
-      toast.error(error.message || 'Failed to unblock user');
+      toast.error(error.message || 'Falha ao desbloquear usuário');
     }
   };
 
@@ -138,15 +96,15 @@ export default function AdminDashboardPage() {
     <AdminGate>
       <div className="space-y-6">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage users and system configuration</p>
+          <h1 className="text-3xl font-bold tracking-tight">Painel Administrativo</h1>
+          <p className="text-muted-foreground">Gerencie usuários e configurações do sistema</p>
         </div>
 
         {/* Statistics Cards */}
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Users</CardTitle>
+              <CardTitle className="text-sm font-medium">Total de Usuários</CardTitle>
               <Users className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -156,7 +114,7 @@ export default function AdminDashboardPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pro Subscribers</CardTitle>
+              <CardTitle className="text-sm font-medium">Assinantes Pro</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -166,7 +124,7 @@ export default function AdminDashboardPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Blocked Users</CardTitle>
+              <CardTitle className="text-sm font-medium">Usuários Bloqueados</CardTitle>
               <ShieldAlert className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -179,23 +137,23 @@ export default function AdminDashboardPage() {
           <TabsList>
             <TabsTrigger value="users">
               <Users className="h-4 w-4 mr-2" />
-              Users
+              Usuários
             </TabsTrigger>
             <TabsTrigger value="testimonials">
               <MessageSquare className="h-4 w-4 mr-2" />
-              Testimonials
+              Depoimentos
             </TabsTrigger>
             <TabsTrigger value="payments">
               <Settings className="h-4 w-4 mr-2" />
-              Payment Settings
+              Configurações de Pagamento
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="users" className="space-y-4">
             <Card>
               <CardHeader>
-                <CardTitle>User Management</CardTitle>
-                <CardDescription>View and manage all registered users</CardDescription>
+                <CardTitle>Gerenciamento de Usuários</CardTitle>
+                <CardDescription>Visualize e gerencie todos os usuários registrados</CardDescription>
               </CardHeader>
               <CardContent>
                 {usersLoading ? (
@@ -206,30 +164,30 @@ export default function AdminDashboardPage() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Name</TableHead>
+                        <TableHead>Nome</TableHead>
                         <TableHead>Email</TableHead>
-                        <TableHead>Plan</TableHead>
+                        <TableHead>Plano</TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead>Actions</TableHead>
+                        <TableHead>Ações</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {users.map((user) => (
                         <TableRow key={user.principal.toString()}>
                           <TableCell className="font-medium">
-                            {user.profile?.name || 'No name'}
+                            {user.profile?.name || 'Sem nome'}
                           </TableCell>
-                          <TableCell>{user.profile?.email || 'No email'}</TableCell>
+                          <TableCell>{user.profile?.email || 'Sem email'}</TableCell>
                           <TableCell>
                             <Badge variant={user.subscriptionStatus.currentPlan === 'free_24h' ? 'outline' : 'default'}>
-                              {user.subscriptionStatus.currentPlan.replace('_', ' ')}
+                              {user.subscriptionStatus.currentPlan}
                             </Badge>
                           </TableCell>
                           <TableCell>
                             {user.isBlockedByAdmin ? (
-                              <Badge variant="destructive">Blocked</Badge>
+                              <Badge variant="destructive">Bloqueado</Badge>
                             ) : (
-                              <Badge variant="outline" className="border-green-600 text-green-600">Active</Badge>
+                              <Badge variant="outline" className="border-green-600 text-green-600">Ativo</Badge>
                             )}
                           </TableCell>
                           <TableCell>
@@ -241,7 +199,7 @@ export default function AdminDashboardPage() {
                                 disabled={unblockUser.isPending}
                               >
                                 <Unlock className="h-4 w-4 mr-1" />
-                                Unblock
+                                Desbloquear
                               </Button>
                             ) : (
                               <Button
@@ -251,7 +209,7 @@ export default function AdminDashboardPage() {
                                 disabled={blockUser.isPending}
                               >
                                 <Ban className="h-4 w-4 mr-1" />
-                                Block
+                                Bloquear
                               </Button>
                             )}
                           </TableCell>
@@ -261,7 +219,7 @@ export default function AdminDashboardPage() {
                   </Table>
                 ) : (
                   <div className="text-center py-8 text-muted-foreground">
-                    No users found
+                    Nenhum usuário encontrado
                   </div>
                 )}
               </CardContent>
@@ -273,14 +231,10 @@ export default function AdminDashboardPage() {
           </TabsContent>
 
           <TabsContent value="payments" className="space-y-4">
-            <MercadoPagoSetupGuide />
-
             <Card>
               <CardHeader>
-                <CardTitle>Mercado Pago Configuration</CardTitle>
-                <CardDescription>
-                  Configure your Mercado Pago payment integration
-                </CardDescription>
+                <CardTitle>Configuração do Gateway de Pagamento</CardTitle>
+                <CardDescription>Configure as definições do provedor de pagamento</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {configLoading ? (
@@ -289,21 +243,27 @@ export default function AdminDashboardPage() {
                   </div>
                 ) : (
                   <>
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertDescription>
+                        A integração do gateway de pagamento está sendo preparada. Habilite o gateway quando as credenciais do provedor de pagamento estiverem configuradas.
+                      </AlertDescription>
+                    </Alert>
+
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
                         <div className="space-y-0.5">
-                          <Label htmlFor="mp-enabled">Enable Mercado Pago</Label>
-                          <p className="text-sm text-muted-foreground">
-                            Allow users to pay via Mercado Pago
-                          </p>
+                          <div className="text-sm font-medium">Habilitar Gateway de Pagamento</div>
+                          <div className="text-sm text-muted-foreground">
+                            Ative ou desative o processamento de pagamentos
+                          </div>
                         </div>
                         <Switch
-                          id="mp-enabled"
-                          checked={localConfig.mercadoPago.enabled}
+                          checked={localConfig.gatewayProvider.enabled}
                           onCheckedChange={(checked) =>
                             setLocalConfig({
                               ...localConfig,
-                              mercadoPago: { ...localConfig.mercadoPago, enabled: checked },
+                              gatewayProvider: { enabled: checked },
                             })
                           }
                         />
@@ -311,74 +271,42 @@ export default function AdminDashboardPage() {
 
                       <Separator />
 
-                      <div className="space-y-2">
-                        <Label htmlFor="mp-public-key">Public Key</Label>
-                        <Input
-                          id="mp-public-key"
-                          type="text"
-                          placeholder="TEST-... or APP_USR-..."
-                          value={localConfig.mercadoPago.publicKey}
-                          onChange={(e) =>
-                            setLocalConfig({
-                              ...localConfig,
-                              mercadoPago: { ...localConfig.mercadoPago, publicKey: e.target.value },
-                            })
-                          }
-                        />
-                        <p className="text-xs text-muted-foreground">
-                          Your Mercado Pago Public Key (starts with TEST- or APP_USR-)
-                        </p>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label htmlFor="mp-access-token">Access Token</Label>
-                        <Input
-                          id="mp-access-token"
-                          type="password"
-                          placeholder="Enter your Access Token"
-                          value={localConfig.mercadoPago.accessToken}
-                          onChange={(e) =>
-                            setLocalConfig({
-                              ...localConfig,
-                              mercadoPago: { ...localConfig.mercadoPago, accessToken: e.target.value },
-                            })
-                          }
-                        />
+                      {saveSuccess && (
                         <Alert>
-                          <Info className="h-4 w-4" />
-                          <AlertDescription className="text-xs">
-                            For security, the Access Token is never displayed after saving. Enter it again only when updating.
+                          <CheckCircle2 className="h-4 w-4" />
+                          <AlertDescription>
+                            Configuração salva com sucesso
                           </AlertDescription>
                         </Alert>
-                      </div>
-                    </div>
-
-                    {saveSuccess && (
-                      <Alert className="border-green-600 bg-green-50 dark:bg-green-950">
-                        <CheckCircle2 className="h-4 w-4 text-green-600" />
-                        <AlertDescription className="text-green-800 dark:text-green-200">
-                          Configuration saved successfully
-                        </AlertDescription>
-                      </Alert>
-                    )}
-
-                    <Button
-                      onClick={handleSaveConfig}
-                      disabled={isSaving}
-                      className="w-full"
-                    >
-                      {isSaving ? (
-                        <>
-                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                          Saving...
-                        </>
-                      ) : (
-                        <>
-                          <Save className="h-4 w-4 mr-2" />
-                          Save Configuration
-                        </>
                       )}
-                    </Button>
+
+                      {updateConfig.isError && (
+                        <Alert variant="destructive">
+                          <AlertCircle className="h-4 w-4" />
+                          <AlertDescription>
+                            Falha ao salvar configuração. Por favor, tente novamente.
+                          </AlertDescription>
+                        </Alert>
+                      )}
+
+                      <Button
+                        onClick={handleSaveConfig}
+                        disabled={isSaving}
+                        className="w-full"
+                      >
+                        {isSaving ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                            Salvando...
+                          </>
+                        ) : (
+                          <>
+                            <Save className="h-4 w-4 mr-2" />
+                            Salvar Configuração
+                          </>
+                        )}
+                      </Button>
+                    </div>
                   </>
                 )}
               </CardContent>

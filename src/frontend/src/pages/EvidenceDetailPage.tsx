@@ -1,24 +1,21 @@
 import { useParams, useNavigate } from '@tanstack/react-router';
-import { useGetEvidenceById } from '../hooks/useEvidence';
-import { useEvidenceMedia } from '../lib/evidenceIndexedDb';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Calendar, FileText, Loader2, Mic, Video } from 'lucide-react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
-import { EvidenceType, Platform } from '../backend';
+import { ArrowLeft, Camera, FileText, Mic, Video } from 'lucide-react';
+import { useEvidenceFromIndexedDB, useMediaFromIndexedDB } from '../lib/evidenceIndexedDb';
+import { EvidenceType, Platform } from '../types/backend-extended';
 
-const platformLabels: Record<Platform, string> = {
-  [Platform.ifood]: 'iFood',
-  [Platform.uber]: 'Uber',
-  [Platform.rappi]: 'Rappi',
-  [Platform.ninetyNine]: '99',
+const evidenceTypeIcons = {
+  [EvidenceType.selfie]: Camera,
+  [EvidenceType.screenshot]: FileText,
+  [EvidenceType.audio]: Mic,
+  [EvidenceType.video]: Video,
 };
 
-const typeLabels: Record<EvidenceType, string> = {
+const evidenceTypeLabels = {
   [EvidenceType.selfie]: 'Selfie',
-  [EvidenceType.screenshot]: 'Print',
+  [EvidenceType.screenshot]: 'Screenshot',
   [EvidenceType.audio]: 'Áudio',
   [EvidenceType.video]: 'Vídeo',
 };
@@ -26,99 +23,110 @@ const typeLabels: Record<EvidenceType, string> = {
 export default function EvidenceDetailPage() {
   const { evidenceId } = useParams({ from: '/evidencias/$evidenceId' });
   const navigate = useNavigate();
-  const { data: evidence, isLoading } = useGetEvidenceById(Number(evidenceId));
-  const { url: mediaUrl, mediaType } = useEvidenceMedia(Number(evidenceId));
+  const { evidence, isLoading } = useEvidenceFromIndexedDB();
+  const item = evidence.find((e) => e.id.toString() === evidenceId);
+  const { mediaUrl, isLoading: mediaLoading } = useMediaFromIndexedDB(item?.id);
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
-  }
-
-  if (!evidence) {
-    return (
       <div className="space-y-6">
         <Button variant="ghost" onClick={() => navigate({ to: '/evidencias' })}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
+          <ArrowLeft className="h-4 w-4 mr-2" />
           Voltar
         </Button>
         <Card>
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">Evidência não encontrada</p>
-          </CardContent>
+          <CardHeader>
+            <CardTitle>Carregando...</CardTitle>
+          </CardHeader>
         </Card>
       </div>
     );
   }
 
+  if (!item) {
+    return (
+      <div className="space-y-6">
+        <Button variant="ghost" onClick={() => navigate({ to: '/evidencias' })}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Voltar
+        </Button>
+        <Card>
+          <CardHeader>
+            <CardTitle>Evidência não encontrada</CardTitle>
+            <CardDescription>A evidência solicitada não existe</CardDescription>
+          </CardHeader>
+        </Card>
+      </div>
+    );
+  }
+
+  const Icon = evidenceTypeIcons[item.evidenceType];
+
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      <Button variant="ghost" onClick={() => navigate({ to: '/evidencias' })} size="lg">
-        <ArrowLeft className="mr-2 h-4 w-4" />
-        Voltar para Evidências
+    <div className="space-y-6">
+      <Button variant="ghost" onClick={() => navigate({ to: '/evidencias' })}>
+        <ArrowLeft className="h-4 w-4 mr-2" />
+        Voltar
       </Button>
 
       <Card>
         <CardHeader>
-          <div className="flex items-start justify-between gap-4">
-            <CardTitle className="text-3xl">Detalhes da Evidência</CardTitle>
-            <Badge variant="outline" className="text-base px-3 py-1">
-              {typeLabels[evidence.evidenceType]}
-            </Badge>
+          <div className="flex items-center gap-3">
+            <Icon className="h-6 w-6 text-muted-foreground" />
+            <div>
+              <CardTitle>Detalhes da Evidência</CardTitle>
+              <CardDescription>
+                {new Date(Number(item.uploadTime)).toLocaleString('pt-BR')}
+              </CardDescription>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-6">
-          {mediaUrl && (
-            <div className="rounded-lg overflow-hidden border border-border">
-              {(mediaType === 'image' || evidence.evidenceType === EvidenceType.selfie || evidence.evidenceType === EvidenceType.screenshot) && (
-                <img src={mediaUrl} alt="Evidência" className="w-full h-auto" />
+          <div className="flex gap-2">
+            <Badge variant="outline">{evidenceTypeLabels[item.evidenceType]}</Badge>
+            {item.platform && <Badge variant="secondary">{item.platform}</Badge>}
+            {item.regiao && <Badge variant="secondary">{item.regiao}</Badge>}
+          </div>
+
+          {mediaUrl && !mediaLoading && (
+            <div className="rounded-lg overflow-hidden border">
+              {(item.evidenceType === EvidenceType.selfie ||
+                item.evidenceType === EvidenceType.screenshot) && (
+                <img src={mediaUrl} alt="Evidence" className="w-full h-auto" />
               )}
-              {(mediaType === 'audio' || evidence.evidenceType === EvidenceType.audio) && (
-                <div className="p-8 bg-muted flex flex-col items-center gap-4">
-                  <Mic className="h-16 w-16 text-muted-foreground" />
-                  <audio controls src={mediaUrl} className="w-full max-w-md" />
-                </div>
+              {item.evidenceType === EvidenceType.audio && (
+                <audio controls className="w-full">
+                  <source src={mediaUrl} type="audio/webm" />
+                  Seu navegador não suporta o elemento de áudio.
+                </audio>
               )}
-              {(mediaType === 'video' || evidence.evidenceType === EvidenceType.video) && (
-                <div className="bg-black">
-                  <video controls src={mediaUrl} className="w-full h-auto" />
-                </div>
+              {item.evidenceType === EvidenceType.video && (
+                <video controls className="w-full h-auto">
+                  <source src={mediaUrl} type="video/webm" />
+                  Seu navegador não suporta o elemento de vídeo.
+                </video>
               )}
             </div>
           )}
 
-          <div className="grid gap-4">
-            <div className="flex items-start gap-3">
-              <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div>
-                <p className="text-sm text-muted-foreground">Data de Upload</p>
-                <p className="text-lg">
-                  {format(new Date(Number(evidence.uploadTime) / 1000000), "dd 'de' MMMM 'de' yyyy 'às' HH:mm", {
-                    locale: ptBR,
-                  })}
-                </p>
-              </div>
-            </div>
-
-            {evidence.platform && (
-              <div className="flex items-start gap-3">
-                <FileText className="h-5 w-5 text-muted-foreground mt-0.5" />
-                <div>
-                  <p className="text-sm text-muted-foreground">Plataforma</p>
-                  <p className="text-lg">{platformLabels[evidence.platform]}</p>
-                </div>
-              </div>
-            )}
-
-            {evidence.notes && (
-              <div className="space-y-2">
-                <p className="text-sm text-muted-foreground">Observações</p>
-                <p className="text-base leading-relaxed">{evidence.notes}</p>
-              </div>
-            )}
+          <div>
+            <h3 className="font-semibold mb-2">Notas</h3>
+            <p className="text-muted-foreground">{item.notes || 'Sem notas'}</p>
           </div>
+
+          {item.bairro && (
+            <div>
+              <h3 className="font-semibold mb-2">Bairro</h3>
+              <p className="text-muted-foreground">{item.bairro}</p>
+            </div>
+          )}
+
+          {item.duration && (
+            <div>
+              <h3 className="font-semibold mb-2">Duração</h3>
+              <p className="text-muted-foreground">{Number(item.duration)} segundos</p>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
