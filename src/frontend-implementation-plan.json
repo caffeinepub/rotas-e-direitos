@@ -1,93 +1,102 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Frontend Payment Gateway Integration",
+  "title": "PagBank Payment Gateway Integration",
   "requirements": [
     {
-      "id": "REQ-3",
-      "summary": "Update checkout page to integrate with new payment gateway and handle payment flow initiation",
-      "acceptanceCriteria": [
-        "Checkout page displays available payment methods from the gateway",
-        "User can initiate a payment by clicking a payment button",
-        "Payment initiation calls the new backend payment session creation method",
-        "Loading states are shown during payment initiation",
-        "Error messages are displayed if payment initiation fails"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/CheckoutPage.tsx",
-          "operation": "modify",
-          "description": "Integrate the new payment gateway flow using the useGatewayPayment hook. Replace or extend the existing payment provider configuration display with interactive payment method buttons. Add the selected subscription plan display using checkoutState utilities. Include loading states during payment initiation and error message displays for failed payment attempts. Wire the payment button to call the createPaymentSession backend method through the custom hook. Display the trust badges component to reassure users during checkout."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Create custom React hook to manage payment flow state and interactions with backend payment capabilities",
-      "acceptanceCriteria": [
-        "Hook provides methods to start a payment session",
-        "Hook provides methods to check payment status",
-        "Hook manages payment flow state (idle, initiating, pending, completed, failed)",
-        "Hook uses React Query for data fetching and caching",
-        "Hook invalidates subscription queries on successful payment"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/hooks/useGatewayPayment.ts",
-          "operation": "create",
-          "description": "Create a custom hook that manages the payment gateway flow state. Use React Query mutations for createPaymentSession (calls actor.createPaymentSession) and checkPaymentStatus (calls actor.checkPaymentStatus). Maintain local state for payment flow phases: idle, initiating, pending, completed, failed. Provide methods: startPayment(plan), checkStatus(paymentId), and reset(). On successful payment completion, invalidate the subscription status query using queryClient.invalidateQueries(['subscriptionStatus']). Handle errors from backend payment methods and expose them for UI display. Use the actor from useActor hook to access backend payment capabilities."
-        }
-      ]
-    },
-    {
       "id": "REQ-5",
-      "summary": "Add payment status tracking component with UI feedback for all payment states",
+      "summary": "Add PagBank payment provider configuration UI in admin dashboard alongside existing gateway provider settings",
       "acceptanceCriteria": [
-        "Component shows pending state while payment is being processed",
-        "Component displays success message with confirmation details when payment completes",
-        "Component shows error message with retry option if payment fails",
-        "Component provides navigation back to plans page or forward to dashboard after completion"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/components/payments/PaymentStatusPanel.tsx",
-          "operation": "modify",
-          "description": "Implement the payment status tracking component that consumes payment state from useGatewayPayment hook. Display different UI states: pending (spinner with processing message), completed (success checkmark with confirmation details and navigation to dashboard), failed (error icon with retry button and navigation back to plans). Use shadcn/ui Alert, Button, and Card components. Include Portuguese user-facing messages. Add navigation using TanStack Router's useNavigate hook. Provide a retry mechanism that calls the payment initiation method again."
-        }
-      ]
-    },
-    {
-      "id": "REQ-6",
-      "summary": "Update admin dashboard payment configuration section for gateway-specific settings",
-      "acceptanceCriteria": [
-        "Admin can view current gateway configuration status",
-        "Admin can update gateway API credentials through a secure form",
-        "Admin can enable/disable the gateway provider",
-        "Form validation prevents saving incomplete credentials",
-        "Success/error messages are shown after configuration updates"
+        "Admin can select PagBank as a payment provider in the payment configuration panel",
+        "PagBank configuration includes fields for API credentials (token, email) and sandbox/production mode toggle",
+        "Configuration is persisted in backend state and retrievable via public payment config query"
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/AdminDashboardPage.tsx",
           "operation": "modify",
-          "description": "Extend the existing payment gateway configuration tab. Add form fields for gateway-specific settings including enabled toggle and secure credential inputs (use password input type for API keys). Fetch current configuration using usePublicPaymentConfig hook. Use the useAdminPaymentConfig mutation hook to save updated configuration. Add form validation to ensure credentials are complete before allowing save. Display success toast on successful update and error alerts on failure. Use shadcn/ui Form, Input, Switch, and Label components. Include Portuguese labels and help text."
+          "description": "Add PagBank configuration section with form fields for merchantId, clientId, clientSecret, webhookSecret, and enabled toggle. Include sandbox/production mode indicator. Wire the PagBank fields into the existing payment configuration mutation alongside the gateway provider section. Display current PagBank config state from usePublicPaymentConfig hook. Verify the authorization component's usage instructions before implementing admin-only access."
+        },
+        {
+          "path": "frontend/src/hooks/useAdminPaymentConfig.ts",
+          "operation": "modify",
+          "description": "Update the PaymentConfig type to match the backend interface structure with both gatewayProvider and pagbankProvider fields. Ensure the mutation properly serializes PagBank configuration fields when calling setPaymentConfig backend method."
+        },
+        {
+          "path": "frontend/src/hooks/usePublicPaymentConfig.ts",
+          "operation": "modify",
+          "description": "Update return type to match backend's PublicPaymentConfig structure including pagbankProvider field with enabled flag. Ensure the query properly handles both gateway and PagBank provider configurations."
         }
       ]
     },
     {
       "id": "REQ-7",
-      "summary": "Add gateway payment error handling utilities that map error codes to Portuguese user messages",
+      "summary": "Create PagBank payment flow hook that initiates payment sessions and handles checkout redirects",
       "acceptanceCriteria": [
-        "Error mapping function handles common gateway error scenarios",
-        "Messages are in Portuguese and user-friendly",
-        "Error messages distinguish between user errors and system errors",
-        "Function follows the same pattern as existing paymentErrorMessages.ts"
+        "Hook provides mutation to create PagBank payment with selected plan",
+        "On successful session creation, user is redirected to PagBank checkout URL",
+        "After returning from PagBank, hook polls payment status and updates UI accordingly",
+        "Hook invalidates subscription queries on successful payment completion"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/lib/payments/gatewayErrorMessages.ts",
+          "path": "frontend/src/hooks/usePagBankPayment.ts",
           "operation": "create",
-          "description": "Create error sanitization utilities following the same pattern as frontend/src/lib/payments/paymentErrorMessages.ts. Export a sanitizeGatewayError function that accepts raw backend error strings and returns user-friendly Portuguese messages. Map common gateway error scenarios: invalid credentials, insufficient funds, payment declined, timeout, network errors, validation failures. Distinguish between user-actionable errors (e.g., 'Cartão recusado - tente outro método') and system errors (e.g., 'Erro no gateway - contate o suporte'). Include a fallback for unknown errors. Return an object with { message: string, isUserError: boolean, requiresAdminAction: boolean }."
+          "description": "Create a custom hook that mirrors the structure of useGatewayPayment.ts. Provide mutations for creating PagBank payment sessions via createPagBankPaymentSession backend method and checking payment status via checkPaymentStatus. Include state management for paymentId, checkoutUrl, and polling status. Implement redirect logic to navigate to PagBank checkout URL on successful session creation. Add polling mechanism that checks payment status every 5 seconds after user returns from checkout. Invalidate subscription queries on payment completion. Return interface matching useGatewayPayment for consistency."
+        },
+        {
+          "path": "frontend/src/lib/payments/pagbankErrorMessages.ts",
+          "operation": "create",
+          "description": "Create error sanitization utility following the pattern of gatewayErrorMessages.ts. Map backend PagBank error responses to user-friendly Portuguese messages. Categorize errors by type (configuration, authentication, network, validation) and indicate whether admin action is required. Export sanitizePagBankError function."
+        }
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "summary": "Update CheckoutPage to conditionally render PagBank payment flow based on active provider configuration",
+      "acceptanceCriteria": [
+        "CheckoutPage reads active payment provider from public payment config",
+        "When PagBank is active, page uses usePagBankPayment hook instead of useGatewayPayment",
+        "Payment status panel displays PagBank-specific status messages and actions",
+        "Existing gateway payment flow continues to work when gateway provider is selected"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/CheckoutPage.tsx",
+          "operation": "modify",
+          "description": "Add logic to read public payment config via usePublicPaymentConfig hook. Conditionally import and use either useGatewayPayment or usePagBankPayment based on which provider is enabled in the config. If both are enabled, prioritize PagBank. Pass the appropriate payment hook state to PaymentStatusPanel. Ensure backward compatibility with existing gateway flow."
+        },
+        {
+          "path": "frontend/src/components/payments/PaymentStatusPanel.tsx",
+          "operation": "modify",
+          "description": "Add provider parameter to distinguish between gateway and PagBank payment flows. Update status messages to be provider-aware (e.g., 'Redirecting to PagBank...' vs 'Redirecting to gateway...'). Handle PagBank-specific status codes and error messages using the pagbankErrorMessages utility. Maintain existing gateway flow UI."
+        },
+        {
+          "path": "frontend/src/lib/payments/providerConfig.ts",
+          "operation": "modify",
+          "description": "Extend provider selection storage to support 'pagbank' as a valid provider option alongside 'gateway'. Update type definitions and validation logic. Add helper functions to determine active provider from PublicPaymentConfig."
+        }
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "summary": "Create PagBank setup guide component with step-by-step integration instructions for administrators",
+      "acceptanceCriteria": [
+        "Component displays numbered steps with clear instructions for PagBank account creation",
+        "Includes guidance on obtaining API token and email credentials from PagBank dashboard",
+        "Provides webhook URL format and instructions for configuring it in PagBank settings",
+        "Includes testing checklist for sandbox mode validation before production use"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/payments/PagBankSetupGuide.tsx",
+          "operation": "create",
+          "description": "Create an instructional component following the pattern intended for MercadoPagoSetupGuide.tsx. Structure content with numbered steps covering: (1) Creating a PagBank business account, (2) Accessing the PagBank developer dashboard, (3) Generating API credentials (merchant ID, client ID, client secret), (4) Configuring webhook URL (provide format: https://<canister-id>.icp0.io/pagbank-webhook), (5) Testing in sandbox mode, (6) Switching to production. Include code snippets, links to PagBank documentation, and a pre-production testing checklist. Use Card and Alert components from shadcn/ui for layout."
+        },
+        {
+          "path": "frontend/src/pages/AdminDashboardPage.tsx",
+          "operation": "modify",
+          "description": "Add a collapsible section or dialog trigger that renders the PagBankSetupGuide component within the payment configuration area. Position it near the PagBank configuration form to provide contextual help to administrators."
         }
       ]
     }

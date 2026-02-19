@@ -16,11 +16,27 @@ export interface LossProfile {
   'platform' : Platform,
   'daysPerWeek' : bigint,
 }
+export interface PagBankConfig {
+  'webhookSecret' : [] | [string],
+  'clientId' : [] | [string],
+  'merchantId' : [] | [string],
+  'enabled' : boolean,
+  'clientSecret' : [] | [string],
+}
+export interface PagBankWebhookPayload {
+  'status' : string,
+  'signature' : string,
+  'paymentId' : string,
+  'rawData' : string,
+}
 export interface PaymentCheckoutResponse {
   'paymentId' : string,
   'checkoutUrl' : [] | [string],
 }
-export interface PaymentConfig { 'gatewayProvider' : PaymentProviderConfig }
+export interface PaymentConfig {
+  'gatewayProvider' : PaymentProviderConfig,
+  'pagbankProvider' : PagBankConfig,
+}
 export interface PaymentProviderConfig { 'enabled' : boolean }
 export interface PaymentStatus {
   'status' : string,
@@ -32,8 +48,10 @@ export type Platform = { 'uber' : null } |
   { 'ifood' : null } |
   { 'rappi' : null };
 export type Principal = Principal;
+export interface PublicPagBankConfig { 'enabled' : boolean }
 export interface PublicPaymentConfig {
   'gatewayProvider' : PublicPaymentProviderConfig,
+  'pagbankProvider' : PublicPagBankConfig,
 }
 export interface PublicPaymentProviderConfig { 'enabled' : boolean }
 export type SubscriptionPlan = { 'free_24h' : null } |
@@ -90,6 +108,10 @@ export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'checkPaymentStatus' : ActorMethod<[string], PaymentStatus>,
+  'createPagBankPaymentSession' : ActorMethod<
+    [SubscriptionPlan],
+    PaymentCheckoutResponse
+  >,
   'createPaymentSession' : ActorMethod<
     [SubscriptionPlan],
     PaymentCheckoutResponse
@@ -102,6 +124,7 @@ export interface _SERVICE {
   'getPublicPaymentConfig' : ActorMethod<[], PublicPaymentConfig>,
   'getSubscriptionStatus' : ActorMethod<[], SubscriptionStatus>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
+  'handlePagBankWebhook' : ActorMethod<[PagBankWebhookPayload], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'logWorkSession' : ActorMethod<[{ 'city' : string }], WorkSession>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,

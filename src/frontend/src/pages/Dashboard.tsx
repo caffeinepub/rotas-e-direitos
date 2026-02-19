@@ -11,6 +11,7 @@ export default function Dashboard() {
       description: 'Organize selfies diárias, prints de avaliações e registre condições de trabalho',
       icon: FileText,
       color: 'text-chart-1',
+      bgColor: 'bg-chart-1/10',
     },
     {
       to: '/calculadora',
@@ -18,6 +19,7 @@ export default function Dashboard() {
       description: 'Calcule o prejuízo financeiro causado pela desativação injusta',
       icon: Calculator,
       color: 'text-chart-2',
+      bgColor: 'bg-chart-2/10',
     },
     {
       to: '/recursos',
@@ -25,6 +27,7 @@ export default function Dashboard() {
       description: 'Crie recursos profissionais para contestar desativações',
       icon: MessageSquare,
       color: 'text-chart-3',
+      bgColor: 'bg-chart-3/10',
     },
     {
       to: '/dados-coletivos',
@@ -32,6 +35,7 @@ export default function Dashboard() {
       description: 'Veja estatísticas anônimas de desativações na sua região',
       icon: BarChart3,
       color: 'text-chart-4',
+      bgColor: 'bg-chart-4/10',
     },
   ];
 
@@ -56,13 +60,15 @@ export default function Dashboard() {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-4xl font-bold tracking-tight">Painel Principal</h1>
+        <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+          Painel Principal
+        </h1>
         <p className="text-xl text-muted-foreground">
           Ferramenta para defender seus direitos como entregador
         </p>
       </div>
 
-      <Card className="bg-primary/5 border-primary/20">
+      <Card className="bg-gradient-to-br from-primary/8 to-accent/8 border-primary/20 shadow-md">
         <CardHeader>
           <CardTitle className="text-xl">Acesso Rápido</CardTitle>
           <CardDescription>Atalhos para funcionalidades importantes</CardDescription>
@@ -75,7 +81,7 @@ export default function Dashboard() {
                 <Button
                   key={item.to}
                   variant="outline"
-                  className="h-24 flex-col gap-2"
+                  className="h-24 flex-col gap-2 hover:bg-primary/5 hover:border-primary/30 transition-all"
                   asChild
                 >
                   <Link to={item.to}>
@@ -94,10 +100,10 @@ export default function Dashboard() {
           const Icon = module.icon;
           return (
             <Link key={module.to} to={module.to}>
-              <Card className="h-full transition-all hover:shadow-lg hover:scale-[1.02] cursor-pointer">
+              <Card className="h-full transition-all hover:shadow-xl hover:scale-[1.02] cursor-pointer border-border/60">
                 <CardHeader>
                   <div className="flex items-start gap-4">
-                    <div className={`p-3 rounded-lg bg-accent ${module.color}`}>
+                    <div className={`p-3 rounded-xl ${module.bgColor} ${module.color} shadow-sm`}>
                       <Icon className="h-8 w-8" />
                     </div>
                     <div className="flex-1">
@@ -112,10 +118,10 @@ export default function Dashboard() {
         })}
       </div>
 
-      <Card className="bg-accent/50">
+      <Card className="bg-accent/5 border-accent/20 shadow-sm">
         <CardContent className="pt-6">
           <p className="text-base leading-relaxed">
-            <strong>Importante:</strong> Este aplicativo é uma iniciativa colaborativa criada para
+            <strong className="text-accent">Importante:</strong> Este aplicativo é uma iniciativa colaborativa criada para
             ajudar entregadores de Fortaleza-CE e região metropolitana. Todos os seus dados são privados e
             protegidos. Compartilhe apenas informações anônimas quando solicitado.
           </p>

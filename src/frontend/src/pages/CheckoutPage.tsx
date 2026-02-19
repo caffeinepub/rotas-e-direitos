@@ -6,9 +6,12 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Info, CreditCard } from 'lucide-react';
 import { usePublicPaymentConfig } from '../hooks/usePublicPaymentConfig';
 import { useGatewayPayment } from '../hooks/useGatewayPayment';
+import { usePagBankPayment } from '../hooks/usePagBankPayment';
 import { getSelectedPlan, clearSelectedPlan } from '../lib/payments/checkoutState';
+import { getActiveProvider } from '../lib/payments/providerConfig';
 import { PLANS } from '../lib/subscriptions/plans';
 import { sanitizeGatewayError } from '../lib/payments/gatewayErrorMessages';
+import { sanitizePagBankError } from '../lib/payments/pagbankErrorMessages';
 import TrustBadges from '../components/trust/TrustBadges';
 import PaymentStatusPanel from '../components/payments/PaymentStatusPanel';
 
@@ -18,7 +21,15 @@ export default function CheckoutPage() {
   const plan = selectedPlan ? PLANS.find((p) => p.id === selectedPlan) : null;
 
   const { data: publicConfig, isLoading: configLoading } = usePublicPaymentConfig();
-  const { flowStatus, startPayment, checkStatus, reset, isInitiating, isCheckingStatus } = useGatewayPayment();
+  const activeProvider = getActiveProvider(publicConfig);
+  
+  // Initialize both payment hooks
+  const gatewayPayment = useGatewayPayment();
+  const pagbankPayment = usePagBankPayment();
+  
+  // Select the appropriate payment hook based on active provider
+  const paymentHook = activeProvider === 'pagbank' ? pagbankPayment : gatewayPayment;
+  const { flowStatus, startPayment, checkStatus, reset, isInitiating, isCheckingStatus } = paymentHook;
   
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
@@ -43,7 +54,9 @@ export default function CheckoutPage() {
     try {
       await startPayment(plan.id);
     } catch (error: any) {
-      const sanitized = sanitizeGatewayError(error);
+      const sanitized = activeProvider === 'pagbank' 
+        ? sanitizePagBankError(error)
+        : sanitizeGatewayError(error);
       setErrorMessage(sanitized.message);
     }
   };
@@ -54,7 +67,9 @@ export default function CheckoutPage() {
     try {
       await checkStatus(flowStatus.paymentId);
     } catch (error: any) {
-      const sanitized = sanitizeGatewayError(error);
+      const sanitized = activeProvider === 'pagbank'
+        ? sanitizePagBankError(error)
+        : sanitizeGatewayError(error);
       setErrorMessage(sanitized.message);
     }
   };
@@ -80,129 +95,113 @@ export default function CheckoutPage() {
     );
   }
 
-  const gatewayEnabled = publicConfig?.gatewayProvider?.enabled || false;
+  if (!activeProvider) {
+    return (
+      <div className="max-w-2xl mx-auto space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Checkout</h1>
+          <p className="text-muted-foreground">Finalize sua assinatura</p>
+        </div>
+
+        <Alert variant="destructive">
+          <AlertDescription>
+            Nenhum provedor de pagamento está habilitado no momento. Entre em contato com o suporte.
+          </AlertDescription>
+        </Alert>
+
+        <Button onClick={() => navigate({ to: '/planos' })} variant="outline">
+          Voltar aos Planos
+        </Button>
+      </div>
+    );
+  }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-2xl mx-auto space-y-6">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Checkout</h1>
-        <p className="text-muted-foreground">Complete sua assinatura</p>
+        <p className="text-muted-foreground">Finalize sua assinatura {plan.name}</p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="lg:col-span-2 space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Plano Selecionado</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-lg font-semibold">{plan.name}</h3>
-                  <p className="text-sm text-muted-foreground">{plan.description}</p>
-                </div>
-                <div className="text-right">
-                  <p className="text-2xl font-bold">{plan.price}</p>
-                  <p className="text-sm text-muted-foreground">{plan.billingPeriod}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      {/* Order Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Resumo do Pedido</CardTitle>
+          <CardDescription>Revise os detalhes da sua assinatura</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="font-semibold">{plan.name}</div>
+              <div className="text-sm text-muted-foreground">{plan.description}</div>
+            </div>
+            <div className="text-right">
+              <div className="font-bold text-lg">{plan.price}</div>
+              <div className="text-xs text-muted-foreground">{plan.billingPeriod}</div>
+            </div>
+          </div>
 
-          {/* Payment Status Panel */}
-          {flowStatus.state !== 'idle' && (
-            <PaymentStatusPanel 
-              flowStatus={flowStatus}
-              onRetry={handleRetry}
-              onCheckStatus={handleCheckStatus}
-              isCheckingStatus={isCheckingStatus}
-            />
-          )}
+          <Alert>
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              Provedor de pagamento: <strong>{activeProvider === 'pagbank' ? 'PagBank' : 'Gateway'}</strong>
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
 
-          {/* Payment Method Card - only show when idle */}
-          {flowStatus.state === 'idle' && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Método de Pagamento</CardTitle>
-                <CardDescription>Escolha como deseja pagar</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {!gatewayEnabled ? (
-                  <Alert>
-                    <Info className="h-4 w-4" />
-                    <AlertDescription>
-                      <p className="font-medium mb-2">Gateway de Pagamento em Configuração</p>
-                      <p className="text-sm text-muted-foreground">
-                        Nosso gateway de pagamento está sendo configurado. Por favor, volte em breve para completar sua compra.
-                      </p>
-                    </AlertDescription>
-                  </Alert>
-                ) : (
-                  <>
-                    <div className="space-y-3">
-                      <Button 
-                        onClick={handleInitiatePayment}
-                        disabled={isInitiating}
-                        className="w-full h-auto py-4"
-                        size="lg"
-                      >
-                        {isInitiating ? (
-                          <>
-                            <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                            Processando...
-                          </>
-                        ) : (
-                          <>
-                            <CreditCard className="h-5 w-5 mr-2" />
-                            Pagar com Gateway
-                          </>
-                        )}
-                      </Button>
-                    </div>
+      {/* Payment Status or Initiate Button */}
+      {flowStatus.state === 'idle' ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Método de Pagamento
+            </CardTitle>
+            <CardDescription>
+              {activeProvider === 'pagbank' 
+                ? 'Você será redirecionado para o PagBank para concluir o pagamento'
+                : 'Você será redirecionado para o gateway de pagamento para concluir o pagamento'}
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {errorMessage && (
+              <Alert variant="destructive">
+                <AlertDescription>{errorMessage}</AlertDescription>
+              </Alert>
+            )}
 
-                    {errorMessage && (
-                      <Alert variant="destructive">
-                        <AlertDescription>{errorMessage}</AlertDescription>
-                      </Alert>
-                    )}
+            <Button
+              onClick={handleInitiatePayment}
+              disabled={isInitiating}
+              className="w-full"
+              size="lg"
+            >
+              {isInitiating ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Iniciando...
+                </>
+              ) : (
+                <>
+                  <CreditCard className="h-4 w-4 mr-2" />
+                  Prosseguir para Pagamento
+                </>
+              )}
+            </Button>
 
-                    <Alert>
-                      <Info className="h-4 w-4" />
-                      <AlertDescription className="text-sm">
-                        Você será redirecionado para completar o pagamento de forma segura.
-                      </AlertDescription>
-                    </Alert>
-                  </>
-                )}
-              </CardContent>
-            </Card>
-          )}
-        </div>
-
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Resumo do Pedido</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Plano</span>
-                <span className="font-medium">{plan.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Cobrança</span>
-                <span className="font-medium">{plan.billingPeriod}</span>
-              </div>
-              <div className="border-t pt-4 flex justify-between">
-                <span className="font-semibold">Total</span>
-                <span className="text-2xl font-bold">{plan.price}</span>
-              </div>
-            </CardContent>
-          </Card>
-
-          <TrustBadges />
-        </div>
-      </div>
+            <TrustBadges />
+          </CardContent>
+        </Card>
+      ) : (
+        <PaymentStatusPanel
+          flowStatus={flowStatus}
+          onRetry={handleRetry}
+          onCheckStatus={handleCheckStatus}
+          isCheckingStatus={isCheckingStatus}
+          provider={activeProvider}
+        />
+      )}
     </div>
   );
 }

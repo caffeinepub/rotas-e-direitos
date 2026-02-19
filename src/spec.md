@@ -1,15 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Implement a new payment gateway integration for subscription payments.
+**Goal:** Integrate PagBank payment gateway as an alternative payment provider alongside the existing gateway, allowing administrators to configure and use PagBank for subscription payments.
 
 **Planned changes:**
-- Add backend methods for creating payment sessions and querying payment status
-- Implement webhook handler to process payment confirmations from the gateway
-- Update checkout page to display payment options and initiate payment flow
-- Create custom React hook to manage payment state and flow
-- Add payment status tracking component with pending/success/error states
-- Update admin dashboard to configure gateway settings (API credentials, webhook URL)
-- Add payment error handling utilities with Portuguese error messages
+- Add PagBank as a selectable payment provider option in admin payment settings with API credential configuration fields
+- Implement backend payment session creation endpoint for PagBank that generates checkout URLs and tracks payment sessions
+- Create frontend payment flow hook (usePagBankPayment) for initiating payments, redirecting to PagBank checkout, and polling payment status
+- Add backend webhook handler to receive PagBank payment notifications and activate subscriptions on approved payments
+- Update CheckoutPage to detect active payment provider and render PagBank-specific flow when selected
+- Create PagBankSetupGuide component with step-by-step instructions for administrators to configure PagBank integration
 
-**User-visible outcome:** Users can complete subscription payments through the new gateway on the checkout page, see real-time payment status, and admins can configure gateway settings from the dashboard.
+**User-visible outcome:** Administrators can configure PagBank as the payment provider and users can complete subscription payments through PagBank checkout, with automatic subscription activation upon successful payment.

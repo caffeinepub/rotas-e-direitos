@@ -2,52 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-checkout-page-checkoutpage-tsx-to-integrate-with-the-new-gateway-displaying-payment-options-and-handling-the-payment-flow-initiation",
-      "featureTitle": "Update the checkout page (CheckoutPage.tsx) to integrate with the new gateway, displaying payment options and handling the payment flow initiation",
+      "featureId": "feature-integrate-pagbank-payment-gateway-as-a-payment-provider-option-alongside-the-existing-gateway-provider-add-pagbank-specific-configuration-fields-in-the-admin-payment-settings-panel",
+      "featureTitle": "Integrate PagBank payment gateway as a payment provider option alongside the existing gateway provider. Add PagBank-specific configuration fields in the admin payment settings panel.",
       "files": [
-        "frontend/src/pages/CheckoutPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "camera@1.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-create-a-custom-react-hook-usegatewaypayment-ts-to-manage-payment-flow-state-including-initiating-payments-polling-payment-status-and-handling-completion",
-      "featureTitle": "Create a custom React hook (useGatewayPayment.ts) to manage payment flow state, including initiating payments, polling payment status, and handling completion",
-      "files": [
-        "frontend/src/hooks/useGatewayPayment.ts"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "camera@1.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-payment-status-tracking-component-that-displays-the-current-payment-state-with-appropriate-ui-feedback-pending-processing-success-error",
-      "featureTitle": "Add payment status tracking component that displays the current payment state with appropriate UI feedback (pending, processing, success, error)",
-      "files": [
-        "frontend/src/components/payments/PaymentStatusPanel.tsx"
+        "frontend/src/hooks/useAdminPaymentConfig.ts",
+        "frontend/src/pages/AdminDashboardPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -65,31 +24,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-admin-dashboard-payment-configuration-section-to-include-gateway-specific-settings-api-credentials-webhook-url-enabled-status",
-      "featureTitle": "Update admin dashboard payment configuration section to include gateway-specific settings (API credentials, webhook URL, enabled status)",
+      "featureId": "feature-create-frontend-pagbank-payment-flow-hook-usepagbankpayment-that-handles-payment-initiation-redirects-users-to-pagbank-checkout-and-polls-for-payment-status-updates-after-return",
+      "featureTitle": "Create frontend PagBank payment flow hook (usePagBankPayment) that handles payment initiation, redirects users to PagBank checkout, and polls for payment status updates after return.",
       "files": [
-        "frontend/src/pages/AdminDashboardPage.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "camera@1.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-6"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-add-gateway-payment-error-handling-utilities-in-frontend-src-lib-payments-that-map-gateway-error-codes-to-user-friendly-portuguese-messages",
-      "featureTitle": "Add gateway payment error handling utilities in frontend/src/lib/payments/ that map gateway error codes to user-friendly Portuguese messages",
-      "files": [
-        "frontend/src/lib/payments/gatewayErrorMessages.ts"
+        "frontend/src/hooks/usePagBankPayment.ts",
+        "frontend/src/lib/payments/pagbankErrorMessages.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -103,6 +42,51 @@
       ],
       "testIds": [
         "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-update-checkoutpage-to-detect-selected-payment-provider-and-render-pagbank-specific-payment-flow-when-pagbank-is-configured-as-the-active-provider-while-maintaining-existing-gateway-provider-flow",
+      "featureTitle": "Update CheckoutPage to detect selected payment provider and render PagBank-specific payment flow when PagBank is configured as the active provider, while maintaining existing gateway provider flow.",
+      "files": [
+        "frontend/src/components/payments/PaymentStatusPanel.tsx",
+        "frontend/src/lib/payments/providerConfig.ts",
+        "frontend/src/pages/CheckoutPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0"
+      ],
+      "testIds": [
+        "REQ-9"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-create-pagbanksetupguide-component-in-frontend-src-components-payments-that-provides-step-by-step-instructions-for-administrators-to-obtain-pagbank-api-credentials-configure-webhook-urls-and-test-the-integration-in-sandbox-mode",
+      "featureTitle": "Create PagBankSetupGuide component in frontend/src/components/payments/ that provides step-by-step instructions for administrators to obtain PagBank API credentials, configure webhook URLs, and test the integration in sandbox mode.",
+      "files": [
+        "frontend/src/components/payments/PagBankSetupGuide.tsx",
+        "frontend/src/pages/AdminDashboardPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0"
+      ],
+      "testIds": [
+        "REQ-10"
       ],
       "confidence": "high"
     }

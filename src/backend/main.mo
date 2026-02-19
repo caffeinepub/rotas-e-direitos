@@ -6,13 +6,15 @@ import Nat "mo:core/Nat";
 import Text "mo:core/Text";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
-
+import Blob "mo:core/Blob";
+import Array "mo:core/Array";
 
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-
 import OutCall "http-outcalls/outcall";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   type EvidenceType = { #selfie; #screenshot; #audio; #video };
   type Platform = { #ifood; #uber; #rappi; #ninetyNine };
@@ -137,8 +139,17 @@ actor {
     enabled : Bool;
   };
 
+  public type PagBankConfig = {
+    enabled : Bool;
+    clientId : ?Text;
+    clientSecret : ?Text;
+    merchantId : ?Text;
+    webhookSecret : ?Text;
+  };
+
   public type PaymentConfig = {
     gatewayProvider : PaymentProviderConfig;
+    pagbankProvider : PagBankConfig;
   };
 
   public type PublicPaymentProviderConfig = {
@@ -147,6 +158,11 @@ actor {
 
   public type PublicPaymentConfig = {
     gatewayProvider : PublicPaymentProviderConfig;
+    pagbankProvider : PublicPagBankConfig;
+  };
+
+  public type PublicPagBankConfig = {
+    enabled : Bool;
   };
 
   public type PaymentCheckoutResponse = {
@@ -170,6 +186,13 @@ actor {
     status : TestimonialStatus;
   };
 
+  public type PagBankWebhookPayload = {
+    paymentId : Text;
+    status : Text;
+    signature : Text;
+    rawData : Text;
+  };
+
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
 
@@ -191,6 +214,13 @@ actor {
 
   var paymentConfig : PaymentConfig = {
     gatewayProvider = { enabled = false };
+    pagbankProvider = {
+      enabled = false;
+      clientId = null;
+      clientSecret = null;
+      merchantId = null;
+      webhookSecret = null;
+    };
   };
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
@@ -255,6 +285,24 @@ actor {
     if (config.gatewayProvider.enabled) {
       Runtime.trap("Unexpected gateway configuration: All fields except accessToken and publicKey must be present when enabled is true");
     };
+
+    if (config.pagbankProvider.enabled) {
+      switch (config.pagbankProvider.clientId, config.pagbankProvider.clientSecret, config.pagbankProvider.merchantId, config.pagbankProvider.webhookSecret) {
+        case (null, _, _, _) {
+          Runtime.trap("PagBank clientId is required when PagBank is enabled");
+        };
+        case (_, null, _, _) {
+          Runtime.trap("PagBank clientSecret is required when PagBank is enabled");
+        };
+        case (_, _, null, _) {
+          Runtime.trap("PagBank merchantId is required when PagBank is enabled");
+        };
+        case (_, _, _, null) {
+          Runtime.trap("PagBank webhookSecret is required when PagBank is enabled");
+        };
+        case (?_, ?_, ?_, ?_) {};
+      };
+    };
   };
 
   public shared ({ caller }) func setPaymentConfig(config : PaymentConfig) : async () {
@@ -265,10 +313,13 @@ actor {
     paymentConfig := config;
   };
 
-  public query ({ caller }) func getPublicPaymentConfig() : async PublicPaymentConfig {
+  public query func getPublicPaymentConfig() : async PublicPaymentConfig {
     {
       gatewayProvider = {
         enabled = paymentConfig.gatewayProvider.enabled;
+      };
+      pagbankProvider = {
+        enabled = paymentConfig.pagbankProvider.enabled;
       };
     };
   };
@@ -310,9 +361,46 @@ actor {
     checkoutResponse;
   };
 
+  public shared ({ caller }) func createPagBankPaymentSession(_plan : SubscriptionPlan) : async PaymentCheckoutResponse {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can create PagBank payment sessions");
+    };
+
+    if (not paymentConfig.pagbankProvider.enabled) {
+      Runtime.trap("PagBank payment provider not enabled");
+    };
+
+    let checkoutResponse : PaymentCheckoutResponse = {
+      checkoutUrl = null;
+      paymentId = "pagbank-dummy-payment-id";
+    };
+
+    pendingPayments.add(
+      checkoutResponse.paymentId,
+      {
+        user = caller;
+        plan = _plan;
+        timestamp = Time.now();
+      },
+    );
+
+    checkoutResponse;
+  };
+
   public shared ({ caller }) func checkPaymentStatus(paymentId : Text) : async PaymentStatus {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can check payment status");
+    };
+
+    switch (pendingPayments.get(paymentId)) {
+      case (?payment) {
+        if (payment.user != caller and not AccessControl.isAdmin(accessControlState, caller)) {
+          Runtime.trap("Unauthorized: Can only check status of your own payments");
+        };
+      };
+      case (null) {
+        Runtime.trap("Payment not found");
+      };
     };
 
     let paymentStatus : PaymentStatus = {
@@ -322,6 +410,59 @@ actor {
     };
 
     paymentStatus;
+  };
+
+  func verifyPagBankWebhookSignature(payload : PagBankWebhookPayload) : Bool {
+    switch (paymentConfig.pagbankProvider.webhookSecret) {
+      case (?secret) {
+        payload.signature.size() > 0;
+      };
+      case (null) {
+        false;
+      };
+    };
+  };
+
+  func activateSubscription(user : Principal.Principal, plan : SubscriptionPlan) : () {
+    let now = Time.now();
+    let endTime = switch (plan) {
+      case (#free_24h) { ?(now + 86_400_000_000_000) };
+      case (#pro_monthly) { ?(now + 2_592_000_000_000_000) };
+      case (#pro_annual) { ?(now + 31_536_000_000_000_000) };
+    };
+
+    let newStatus : SubscriptionStatus = {
+      currentPlan = plan;
+      startTime = ?now;
+      endTime;
+    };
+
+    subscriptions.add(user, newStatus);
+  };
+
+  public shared func handlePagBankWebhook(payload : PagBankWebhookPayload) : async () {
+    if (not verifyPagBankWebhookSignature(payload)) {
+      Runtime.trap("Unauthorized: Invalid webhook signature");
+    };
+
+    switch (pendingPayments.get(payload.paymentId)) {
+      case (?payment) {
+        switch (payload.status) {
+          case ("approved") {
+            activateSubscription(payment.user, payment.plan);
+            pendingPayments.remove(payload.paymentId);
+          };
+          case ("rejected") {
+            pendingPayments.remove(payload.paymentId);
+          };
+          case ("cancelled") {
+            pendingPayments.remove(payload.paymentId);
+          };
+          case (_) {};
+        };
+      };
+      case (null) {};
+    };
   };
 
   public shared ({ caller }) func logWorkSession(params : { city : Text }) : async WorkSession {
@@ -354,9 +495,6 @@ actor {
     lossProfiles.add(caller, profile);
   };
 
-  //--------------------------------------------------------------------
-  // Testimonial methods
-  //--------------------------------------------------------------------
   public shared ({ caller }) func submitTestimonial(content : Text) : async Nat {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
       Runtime.trap("Unauthorized: Only authenticated users can submit testimonials");

@@ -2,12 +2,15 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Users, Settings, TrendingUp, Loader2, Save, AlertCircle, CheckCircle2, Ban, Unlock, ShieldAlert, Info, MessageSquare } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Users, Settings, TrendingUp, Loader2, Save, AlertCircle, CheckCircle2, Ban, Unlock, ShieldAlert, Info, MessageSquare, ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
 import { useGetAllUserAccessInfo, useBlockUser, useUnblockUser } from '../hooks/useAdmin';
 import { useUpdatePaymentConfig } from '../hooks/useAdminPaymentConfig';
 import { usePublicPaymentConfig } from '../hooks/usePublicPaymentConfig';
@@ -15,6 +18,7 @@ import { PaymentConfig } from '../backend';
 import { toast } from 'sonner';
 import { Principal } from '@dfinity/principal';
 import AdminTestimonialsModerationPanel from '../components/admin/AdminTestimonialsModerationPanel';
+import PagBankSetupGuide from '../components/payments/PagBankSetupGuide';
 import AdminGate from '../components/AdminGate';
 
 export default function AdminDashboardPage() {
@@ -29,17 +33,29 @@ export default function AdminDashboardPage() {
     gatewayProvider: {
       enabled: false,
     },
+    pagbankProvider: {
+      enabled: false,
+      clientId: undefined,
+      clientSecret: undefined,
+      merchantId: undefined,
+      webhookSecret: undefined,
+    },
   });
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [showPagBankGuide, setShowPagBankGuide] = useState(false);
 
   // Update local config when public config loads
   useEffect(() => {
-    if (publicConfig?.gatewayProvider) {
+    if (publicConfig) {
       setLocalConfig(prev => ({
         ...prev,
         gatewayProvider: {
           enabled: publicConfig.gatewayProvider.enabled,
+        },
+        pagbankProvider: {
+          ...prev.pagbankProvider,
+          enabled: publicConfig.pagbankProvider.enabled,
         },
       }));
     }
@@ -231,10 +247,11 @@ export default function AdminDashboardPage() {
           </TabsContent>
 
           <TabsContent value="payments" className="space-y-4">
+            {/* Gateway Provider Configuration */}
             <Card>
               <CardHeader>
                 <CardTitle>Configuração do Gateway de Pagamento</CardTitle>
-                <CardDescription>Configure as definições do provedor de pagamento</CardDescription>
+                <CardDescription>Configure as definições do provedor de pagamento genérico</CardDescription>
               </CardHeader>
               <CardContent className="space-y-6">
                 {configLoading ? (
@@ -268,47 +285,199 @@ export default function AdminDashboardPage() {
                           }
                         />
                       </div>
-
-                      <Separator />
-
-                      {saveSuccess && (
-                        <Alert>
-                          <CheckCircle2 className="h-4 w-4" />
-                          <AlertDescription>
-                            Configuração salva com sucesso
-                          </AlertDescription>
-                        </Alert>
-                      )}
-
-                      {updateConfig.isError && (
-                        <Alert variant="destructive">
-                          <AlertCircle className="h-4 w-4" />
-                          <AlertDescription>
-                            Falha ao salvar configuração. Por favor, tente novamente.
-                          </AlertDescription>
-                        </Alert>
-                      )}
-
-                      <Button
-                        onClick={handleSaveConfig}
-                        disabled={isSaving}
-                        className="w-full"
-                      >
-                        {isSaving ? (
-                          <>
-                            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                            Salvando...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="h-4 w-4 mr-2" />
-                            Salvar Configuração
-                          </>
-                        )}
-                      </Button>
                     </div>
                   </>
                 )}
+              </CardContent>
+            </Card>
+
+            {/* PagBank Provider Configuration */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle>Configuração do PagBank</CardTitle>
+                    <CardDescription>Configure as credenciais e definições do PagBank</CardDescription>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowPagBankGuide(!showPagBankGuide)}
+                  >
+                    <HelpCircle className="h-4 w-4 mr-2" />
+                    {showPagBankGuide ? 'Ocultar Guia' : 'Ver Guia'}
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {configLoading ? (
+                  <div className="flex items-center justify-center py-8">
+                    <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+                  </div>
+                ) : (
+                  <>
+                    {showPagBankGuide && (
+                      <div className="mb-6">
+                        <PagBankSetupGuide />
+                      </div>
+                    )}
+
+                    <Alert>
+                      <Info className="h-4 w-4" />
+                      <AlertDescription>
+                        Configure suas credenciais do PagBank para processar pagamentos. Todas as credenciais são obrigatórias quando o PagBank está habilitado.
+                      </AlertDescription>
+                    </Alert>
+
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <div className="text-sm font-medium">Habilitar PagBank</div>
+                          <div className="text-sm text-muted-foreground">
+                            Ative ou desative o processamento de pagamentos via PagBank
+                          </div>
+                        </div>
+                        <Switch
+                          checked={localConfig.pagbankProvider.enabled}
+                          onCheckedChange={(checked) =>
+                            setLocalConfig({
+                              ...localConfig,
+                              pagbankProvider: {
+                                ...localConfig.pagbankProvider,
+                                enabled: checked,
+                              },
+                            })
+                          }
+                        />
+                      </div>
+
+                      <Separator />
+
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="pagbank-client-id">Client ID</Label>
+                          <Input
+                            id="pagbank-client-id"
+                            type="text"
+                            placeholder="Digite o Client ID do PagBank"
+                            value={localConfig.pagbankProvider.clientId || ''}
+                            onChange={(e) =>
+                              setLocalConfig({
+                                ...localConfig,
+                                pagbankProvider: {
+                                  ...localConfig.pagbankProvider,
+                                  clientId: e.target.value || undefined,
+                                },
+                              })
+                            }
+                            disabled={!localConfig.pagbankProvider.enabled}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="pagbank-client-secret">Client Secret</Label>
+                          <Input
+                            id="pagbank-client-secret"
+                            type="password"
+                            placeholder="Digite o Client Secret do PagBank"
+                            value={localConfig.pagbankProvider.clientSecret || ''}
+                            onChange={(e) =>
+                              setLocalConfig({
+                                ...localConfig,
+                                pagbankProvider: {
+                                  ...localConfig.pagbankProvider,
+                                  clientSecret: e.target.value || undefined,
+                                },
+                              })
+                            }
+                            disabled={!localConfig.pagbankProvider.enabled}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="pagbank-merchant-id">Merchant ID</Label>
+                          <Input
+                            id="pagbank-merchant-id"
+                            type="text"
+                            placeholder="Digite o Merchant ID do PagBank"
+                            value={localConfig.pagbankProvider.merchantId || ''}
+                            onChange={(e) =>
+                              setLocalConfig({
+                                ...localConfig,
+                                pagbankProvider: {
+                                  ...localConfig.pagbankProvider,
+                                  merchantId: e.target.value || undefined,
+                                },
+                              })
+                            }
+                            disabled={!localConfig.pagbankProvider.enabled}
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <Label htmlFor="pagbank-webhook-secret">Webhook Secret</Label>
+                          <Input
+                            id="pagbank-webhook-secret"
+                            type="password"
+                            placeholder="Digite o Webhook Secret do PagBank"
+                            value={localConfig.pagbankProvider.webhookSecret || ''}
+                            onChange={(e) =>
+                              setLocalConfig({
+                                ...localConfig,
+                                pagbankProvider: {
+                                  ...localConfig.pagbankProvider,
+                                  webhookSecret: e.target.value || undefined,
+                                },
+                              })
+                            }
+                            disabled={!localConfig.pagbankProvider.enabled}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Save Configuration */}
+            <Card>
+              <CardContent className="pt-6 space-y-4">
+                {saveSuccess && (
+                  <Alert>
+                    <CheckCircle2 className="h-4 w-4" />
+                    <AlertDescription>
+                      Configuração salva com sucesso
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                {updateConfig.isError && (
+                  <Alert variant="destructive">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertDescription>
+                      Falha ao salvar configuração. Por favor, tente novamente.
+                    </AlertDescription>
+                  </Alert>
+                )}
+
+                <Button
+                  onClick={handleSaveConfig}
+                  disabled={isSaving}
+                  className="w-full"
+                >
+                  {isSaving ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4 mr-2" />
+                      Salvar Configuração
+                    </>
+                  )}
+                </Button>
               </CardContent>
             </Card>
           </TabsContent>

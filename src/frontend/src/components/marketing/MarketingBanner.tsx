@@ -1,263 +1,160 @@
-import { Badge } from '@/components/ui/badge';
-import { Card } from '@/components/ui/card';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Camera, Calculator, FileText, TrendingUp, Lock, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
-import { bannerSlides } from './marketingBannerSlides';
 import { useMarketingBannerCarousel } from './useMarketingBannerCarousel';
 
 interface MarketingBannerProps {
   variant?: 'A' | 'B' | 'C';
 }
 
+interface BannerSlide {
+  headline: string;
+  subheadline: string;
+  platforms: string[];
+}
+
+const slides: BannerSlide[] = [
+  {
+    headline: 'Rastreamento de Evidências',
+    subheadline: 'Capture e organize fotos, áudios e vídeos com timestamps automáticos para provar sua situação',
+    platforms: ['iFood', 'Uber', 'Rappi', '99'],
+  },
+  {
+    headline: 'Calculadora de Perdas',
+    subheadline: 'Calcule automaticamente seus prejuízos financeiros com base em ganhos diários e tempo de bloqueio',
+    platforms: ['iFood', 'Uber', 'Rappi', '99'],
+  },
+  {
+    headline: 'Gerador de Recursos',
+    subheadline: 'Crie recursos profissionais personalizados para contestar bloqueios e desativações injustas',
+    platforms: ['iFood', 'Uber', 'Rappi', '99'],
+  },
+  {
+    headline: 'Insights Coletivos',
+    subheadline: 'Acesse dados agregados da sua região para fortalecer sua defesa com estatísticas reais',
+    platforms: ['iFood', 'Uber', 'Rappi', '99'],
+  },
+  {
+    headline: 'Segurança e Privacidade',
+    subheadline: 'Seus dados protegidos com tecnologia blockchain e armazenamento descentralizado',
+    platforms: ['iFood', 'Uber', 'Rappi', '99'],
+  },
+];
+
 export default function MarketingBanner({ variant = 'A' }: MarketingBannerProps) {
   const navigate = useNavigate();
   const { currentSlide, goToSlide, nextSlide, prevSlide, pause, resume } = useMarketingBannerCarousel({
-    slideCount: bannerSlides.length,
-    autoAdvanceInterval: 5000,
+    slideCount: slides.length,
   });
-
-  const platforms = [
-    { name: 'Uber', color: 'bg-foreground/90 text-background' },
-    { name: '99', color: 'bg-primary/90 text-primary-foreground' },
-    { name: 'iFood', color: 'bg-destructive/90 text-destructive-foreground' },
-    { name: 'InDriver', color: 'bg-accent-foreground/90 text-accent' },
-  ];
-
-  const services = [
-    {
-      icon: Camera,
-      title: 'Rastreamento de Evidências',
-      description: 'Capture fotos, áudios e vídeos com timestamps automáticos',
-    },
-    {
-      icon: Calculator,
-      title: 'Calculadora de Perdas',
-      description: 'Calcule prejuízos financeiros causados por bloqueios',
-    },
-    {
-      icon: FileText,
-      title: 'Gerador de Recursos',
-      description: 'Crie recursos profissionais para contestar desativações',
-    },
-    {
-      icon: TrendingUp,
-      title: 'Insights Coletivos',
-      description: 'Acesse estatísticas da sua região para fortalecer defesas',
-    },
-    {
-      icon: Lock,
-      title: 'Segurança e Privacidade',
-      description: 'Dados protegidos com tecnologia blockchain',
-    },
-  ];
-
-  const currentSlideData = bannerSlides[currentSlide];
 
   const handleBannerClick = () => {
     navigate({ to: '/planos' });
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      handleBannerClick();
-    }
-  };
-
-  const handleControlClick = (e: React.MouseEvent) => {
+  const handleNavClick = (e: React.MouseEvent, index: number) => {
     e.stopPropagation();
+    pause();
+    goToSlide(index);
+    setTimeout(resume, 3000);
   };
 
-  const handleControlKeyDown = (e: React.KeyboardEvent) => {
+  const handlePrevClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+    pause();
+    prevSlide();
+    setTimeout(resume, 3000);
   };
 
-  const getBannerClasses = () => {
-    if (variant === 'B') {
-      return 'relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary/25 via-accent/15 to-card/95 border-4 border-primary/35 cursor-pointer transition-all hover:border-primary/55 hover:shadow-2xl focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary focus-visible:ring-offset-4';
-    }
-    if (variant === 'C') {
-      return 'relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/30 via-accent/20 to-card/90 border-2 border-primary/40 cursor-pointer transition-all hover:border-primary/60 hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2';
-    }
-    return 'relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/20 via-accent/10 to-background border-2 border-primary/30 cursor-pointer transition-all hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2';
+  const handleNextClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    pause();
+    nextSlide();
+    setTimeout(resume, 3000);
   };
 
-  const getCardClasses = () => {
-    if (variant === 'B') {
-      return 'p-4 bg-card/95 backdrop-blur-md border-2 border-primary/25 hover:border-primary/45 hover:shadow-lg transition-all';
-    }
-    if (variant === 'C') {
-      return 'p-4 bg-card/90 backdrop-blur-sm border-2 border-primary/30 hover:border-primary/50 hover:shadow-md transition-all';
-    }
-    return 'p-4 bg-card/80 backdrop-blur-sm border-primary/20 hover:border-primary/40 transition-colors';
-  };
+  const slide = slides[currentSlide];
 
-  const getImageOpacity = () => {
-    if (variant === 'B') return 0.12;
-    if (variant === 'C') return 0.15;
-    return 0.1;
+  const getVariantStyles = () => {
+    switch (variant) {
+      case 'B':
+        return 'bg-gradient-to-br from-primary/12 to-accent/12 border-primary/25';
+      case 'C':
+        return 'bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20';
+      default:
+        return 'bg-gradient-to-br from-primary/10 to-accent/10 border-primary/20';
+    }
   };
 
   return (
     <div
-      className={getBannerClasses()}
+      className={`relative overflow-hidden rounded-2xl ${getVariantStyles()} border shadow-lg cursor-pointer transition-all hover:shadow-xl group`}
       onClick={handleBannerClick}
-      onKeyDown={handleKeyDown}
-      onMouseEnter={pause}
-      onMouseLeave={resume}
-      onFocus={pause}
-      onBlur={resume}
-      role="link"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleBannerClick();
+        }
+      }}
+      role="button"
       tabIndex={0}
-      aria-label="Ver planos e começar a usar o ROTAS E DIREITOS"
+      aria-label="Ver planos e recursos"
     >
-      {/* Background Images - Responsive with Crossfade */}
-      <div className="absolute inset-0">
-        {bannerSlides.map((slide, index) => (
-          <div
-            key={slide.id}
-            className="absolute inset-0 opacity-10 transition-opacity duration-700"
-            style={{
-              opacity: index === currentSlide ? getImageOpacity() : 0,
-              pointerEvents: 'none',
-            }}
-          >
-            <picture>
-              <source media="(min-width: 768px)" srcSet={slide.desktopImage} />
-              <img
-                src={slide.mobileImage}
-                alt=""
-                className="w-full h-full object-cover"
-              />
-            </picture>
-          </div>
-        ))}
-      </div>
-
-      <div className={`relative z-10 pb-16 md:pb-20 ${variant === 'B' ? 'p-8 md:p-12 lg:p-16' : 'p-6 md:p-10 lg:p-12'}`}>
-        {/* Header Section with Slide Content */}
-        <div className={`text-center space-y-4 ${variant === 'B' ? 'mb-10' : 'mb-8'}`}>
-          <div className="min-h-[120px] md:min-h-[100px] flex flex-col justify-center">
-            <h2 className={`font-bold tracking-tight transition-opacity duration-500 ${variant === 'B' ? 'text-4xl md:text-5xl lg:text-6xl' : 'text-3xl md:text-4xl lg:text-5xl'}`}>
-              {currentSlideData.headline}
-            </h2>
-            <p className={`text-muted-foreground max-w-3xl mx-auto mt-4 transition-opacity duration-500 ${variant === 'B' ? 'text-xl md:text-2xl' : 'text-lg md:text-xl'}`}>
-              {currentSlideData.subheadline}
-            </p>
-          </div>
-
-          {/* Platform Badges */}
-          <div className={`flex flex-wrap justify-center gap-2 ${variant === 'B' ? 'pt-4' : 'pt-2'}`}>
-            <span className="text-sm text-muted-foreground self-center">Para motoristas e entregadores:</span>
-            {platforms.map((platform) => (
-              <Badge key={platform.name} className={`${platform.color} text-sm px-3 py-1 ${variant === 'B' ? 'text-base px-4 py-1.5' : ''}`}>
-                {platform.name}
-              </Badge>
-            ))}
-            <Badge variant="outline" className={`text-sm px-3 py-1 ${variant === 'B' ? 'text-base px-4 py-1.5 border-2' : ''}`}>
-              e outros
-            </Badge>
-          </div>
-        </div>
-
-        {/* Services Grid - Responsive with proper spacing */}
-        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6 mb-6 ${variant === 'B' ? 'gap-6 md:gap-8' : ''}`}>
-          {services.map((service) => {
-            const Icon = service.icon;
-            return (
-              <Card
-                key={service.title}
-                className={getCardClasses()}
-              >
-                <div className="flex flex-col items-center text-center space-y-3">
-                  <div className={`p-3 rounded-full bg-primary/10 ${variant === 'B' ? 'ring-2 ring-primary/25' : variant === 'C' ? 'ring-2 ring-primary/20' : ''}`}>
-                    <Icon className="h-6 w-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-sm mb-1">{service.title}</h3>
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {service.description}
-                    </p>
-                  </div>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Call to Action */}
-        <div className="text-center mt-6">
-          <p className={`text-muted-foreground ${variant === 'B' ? 'text-base' : 'text-sm'}`}>
-            Junte-se a centenas de profissionais que já protegem seus direitos
+      <div className="relative px-6 py-12 md:px-12 md:py-16">
+        <div className="max-w-3xl">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3 text-foreground">
+            {slide.headline}
+          </h2>
+          <p className="text-lg md:text-xl text-muted-foreground mb-6">
+            {slide.subheadline}
           </p>
+          <div className="flex flex-wrap gap-2">
+            {slide.platforms.map((platform) => (
+              <span
+                key={platform}
+                className="px-4 py-2 bg-background/60 backdrop-blur-sm rounded-full text-sm font-medium border border-border/50 shadow-sm"
+              >
+                {platform}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="absolute right-4 top-1/2 -translate-y-1/2 hidden md:flex gap-2">
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full bg-background/80 backdrop-blur-sm hover:bg-background shadow-md"
+            onClick={handlePrevClick}
+            aria-label="Slide anterior"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full bg-background/80 backdrop-blur-sm hover:bg-background shadow-md"
+            onClick={handleNextClick}
+            aria-label="Próximo slide"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
         </div>
       </div>
 
-      {/* Carousel Controls */}
-      <div
-        className="absolute bottom-4 left-0 right-0 z-20 flex items-center justify-center gap-4"
-        onClick={handleControlClick}
-        onKeyDown={handleControlKeyDown}
-      >
-        {/* Previous Button */}
-        <Button
-          variant="outline"
-          size="icon"
-          className={`rounded-full bg-background/80 backdrop-blur-sm hover:bg-background/90 ${variant === 'B' ? 'h-10 w-10 border-2' : 'h-8 w-8'}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            prevSlide();
-          }}
-          aria-label="Slide anterior"
-        >
-          <ChevronLeft className={variant === 'B' ? 'h-5 w-5' : 'h-4 w-4'} />
-        </Button>
-
-        {/* Slide Indicators */}
-        <div className="flex gap-2">
-          {bannerSlides.map((slide, index) => (
-            <button
-              key={slide.id}
-              onClick={(e) => {
-                e.stopPropagation();
-                goToSlide(index);
-              }}
-              onKeyDown={(e) => {
-                e.stopPropagation();
-                if (e.key === 'Enter' || e.key === ' ') {
-                  e.preventDefault();
-                  goToSlide(index);
-                }
-              }}
-              className={`rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
-                variant === 'B'
-                  ? index === currentSlide
-                    ? 'h-3 w-10 bg-primary'
-                    : 'h-3 w-3 bg-primary/30 hover:bg-primary/50'
-                  : index === currentSlide
-                  ? 'h-2 w-8 bg-primary'
-                  : 'h-2 w-2 bg-primary/30 hover:bg-primary/50'
-              }`}
-              aria-label={`Ir para slide ${index + 1}`}
-              aria-current={index === currentSlide ? 'true' : 'false'}
-            />
-          ))}
-        </div>
-
-        {/* Next Button */}
-        <Button
-          variant="outline"
-          size="icon"
-          className={`rounded-full bg-background/80 backdrop-blur-sm hover:bg-background/90 ${variant === 'B' ? 'h-10 w-10 border-2' : 'h-8 w-8'}`}
-          onClick={(e) => {
-            e.stopPropagation();
-            nextSlide();
-          }}
-          aria-label="Próximo slide"
-        >
-          <ChevronRight className={variant === 'B' ? 'h-5 w-5' : 'h-4 w-4'} />
-        </Button>
+      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+        {slides.map((_, index) => (
+          <button
+            key={index}
+            className={`h-2 rounded-full transition-all ${
+              index === currentSlide
+                ? 'w-8 bg-primary shadow-sm'
+                : 'w-2 bg-muted-foreground/40 hover:bg-muted-foreground/60'
+            }`}
+            onClick={(e) => handleNavClick(e, index)}
+            aria-label={`Ir para slide ${index + 1}`}
+            aria-current={index === currentSlide ? 'true' : 'false'}
+          />
+        ))}
       </div>
     </div>
   );

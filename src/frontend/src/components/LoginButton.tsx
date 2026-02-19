@@ -33,7 +33,7 @@ export default function LoginButton() {
       disabled={disabled}
       variant={isAuthenticated ? 'outline' : 'default'}
       size="lg"
-      className="min-w-[120px]"
+      className="min-w-[120px] shadow-sm hover:shadow-md transition-all"
     >
       {disabled ? (
         <>

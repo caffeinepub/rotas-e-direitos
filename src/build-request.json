@@ -1,159 +1,118 @@
 {
   "kind": "build_request",
-  "title": "Implement new payment gateway integration",
-  "projectName": "Rotas e Direitos",
+  "title": "PagBank Payment Gateway Integration",
+  "projectName": "ROTAS E DIREITOS",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Create backend methods in main.mo for initiating payment transactions with the new gateway provider, including methods to create payment sessions and retrieve payment status",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "implementar o novo gateway de pagamento"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend exposes a method to create a new payment session with plan details",
-        "Backend exposes a method to query payment status by transaction ID",
-        "Payment session includes amount, currency, plan reference, and customer principal",
-        "Methods return appropriate error types for validation and gateway failures"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Add backend webhook handler method in main.mo to receive and process payment confirmation callbacks from the gateway provider",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "implementar o novo gateway de pagamento"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Webhook method validates incoming requests from the gateway",
-        "Successful payment confirmations update subscription status in backend state",
-        "Failed payment notifications are logged appropriately",
-        "Method returns appropriate HTTP-style status codes for webhook responses"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Update the checkout page (CheckoutPage.tsx) to integrate with the new gateway, displaying payment options and handling the payment flow initiation",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "implementar o novo gateway de pagamento"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Checkout page displays available payment methods from the gateway",
-        "User can initiate a payment by clicking a payment button",
-        "Payment initiation calls the new backend payment session creation method",
-        "Loading states are shown during payment initiation",
-        "Error messages are displayed if payment initiation fails"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Create a custom React hook (useGatewayPayment.ts) to manage payment flow state, including initiating payments, polling payment status, and handling completion",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "implementar o novo gateway de pagamento"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Hook provides methods to start a payment session",
-        "Hook provides methods to check payment status",
-        "Hook manages payment flow state (idle, initiating, pending, completed, failed)",
-        "Hook uses React Query for data fetching and caching",
-        "Hook invalidates subscription queries on successful payment"
-      ]
-    },
-    {
       "id": "REQ-5",
-      "text": "Add payment status tracking component that displays the current payment state with appropriate UI feedback (pending, processing, success, error)",
-      "target": "frontend",
+      "text": "Integrate PagBank payment gateway as a payment provider option alongside the existing gateway provider. Add PagBank-specific configuration fields in the admin payment settings panel.",
+      "target": "both",
       "source": {
         "messageIds": [
           "msg-last"
         ],
         "quotes": [
-          "implementar o novo gateway de pagamento"
+          "gostaria de fazer a integracao do gateway de pagamento com o pagbank como procedre passo a passo"
         ]
       },
       "acceptanceCriteria": [
-        "Component shows pending state while payment is being processed",
-        "Component displays success message with confirmation details when payment completes",
-        "Component shows error message with retry option if payment fails",
-        "Component provides navigation back to plans page or forward to dashboard after completion"
+        "Admin can select PagBank as a payment provider in the payment configuration panel",
+        "PagBank configuration includes fields for API credentials (token, email) and sandbox/production mode toggle",
+        "Configuration is persisted in backend state and retrievable via public payment config query"
       ]
     },
     {
       "id": "REQ-6",
-      "text": "Update admin dashboard payment configuration section to include gateway-specific settings (API credentials, webhook URL, enabled status)",
-      "target": "frontend",
+      "text": "Implement backend PagBank payment session creation endpoint that generates payment links or checkout URLs using PagBank's API. Store payment sessions with reference IDs, amounts, and status tracking.",
+      "target": "backend",
       "source": {
         "messageIds": [
           "msg-last"
-        ],
-        "quotes": [
-          "implementar o novo gateway de pagamento"
         ]
       },
       "acceptanceCriteria": [
-        "Admin can view current gateway configuration status",
-        "Admin can update gateway API credentials through a secure form",
-        "Admin can enable/disable the gateway provider",
-        "Form validation prevents saving incomplete credentials",
-        "Success/error messages are shown after configuration updates"
+        "Backend method createPagBankPayment accepts subscription plan ID and returns payment session data with checkout URL",
+        "Payment sessions are stored with unique reference IDs, timestamps, and initial 'pending' status",
+        "Method returns structured payment data including PagBank checkout URL and session reference"
       ]
     },
     {
       "id": "REQ-7",
-      "text": "Add gateway payment error handling utilities in frontend/src/lib/payments/ that map gateway error codes to user-friendly Portuguese messages",
+      "text": "Create frontend PagBank payment flow hook (usePagBankPayment) that handles payment initiation, redirects users to PagBank checkout, and polls for payment status updates after return.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-last"
-        ],
-        "quotes": [
-          "implementar o novo gateway de pagamento"
         ]
       },
       "acceptanceCriteria": [
-        "Error mapping function handles common gateway error scenarios",
-        "Messages are in Portuguese and user-friendly",
-        "Error messages distinguish between user errors and system errors",
-        "Function follows the same pattern as existing paymentErrorMessages.ts"
+        "Hook provides mutation to create PagBank payment with selected plan",
+        "On successful session creation, user is redirected to PagBank checkout URL",
+        "After returning from PagBank, hook polls payment status and updates UI accordingly",
+        "Hook invalidates subscription queries on successful payment completion"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Add PagBank webhook handler endpoint in backend to receive payment notifications from PagBank and update payment session status (approved, rejected, cancelled). Activate user subscription upon approved payment.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-last"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Backend method processPagBankWebhook validates and processes payment notifications",
+        "Payment session status is updated based on notification type (approved, rejected, cancelled)",
+        "On approved payment, user subscription is activated with appropriate plan and expiry date",
+        "Webhook signature validation ensures notifications are authentic"
+      ]
+    },
+    {
+      "id": "REQ-9",
+      "text": "Update CheckoutPage to detect selected payment provider and render PagBank-specific payment flow when PagBank is configured as the active provider, while maintaining existing gateway provider flow.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-last"
+        ]
+      },
+      "acceptanceCriteria": [
+        "CheckoutPage reads active payment provider from public payment config",
+        "When PagBank is active, page uses usePagBankPayment hook instead of useGatewayPayment",
+        "Payment status panel displays PagBank-specific status messages and actions",
+        "Existing gateway payment flow continues to work when gateway provider is selected"
+      ]
+    },
+    {
+      "id": "REQ-10",
+      "text": "Create PagBankSetupGuide component in frontend/src/components/payments/ that provides step-by-step instructions for administrators to obtain PagBank API credentials, configure webhook URLs, and test the integration in sandbox mode.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-last"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Component displays numbered steps with clear instructions for PagBank account creation",
+        "Includes guidance on obtaining API token and email credentials from PagBank dashboard",
+        "Provides webhook URL format and instructions for configuring it in PagBank settings",
+        "Includes testing checklist for sandbox mode validation before production use"
       ]
     }
   ],
   "constraints": [
-    "Do not modify files in frontend/src/hooks/useInternetIdentity.ts or frontend/src/hooks/useActor.ts",
-    "Do not edit UI component sources in frontend/src/components/ui",
-    "All Motoko backend logic must remain in the single main actor file (backend/main.mo)",
-    "Use React Query for all data fetching and mutations",
-    "Follow the existing OKLCH-based color system defined in index.css"
+    "PagBank integration must coexist with existing gateway provider without breaking current payment flows",
+    "Payment provider selection must be configurable by admin and stored in backend state",
+    "PagBank API credentials must be stored securely in backend configuration",
+    "Webhook endpoint must validate PagBank notification signatures to prevent fraud"
   ],
   "nonGoals": [
-    "Integration with specific third-party payment gateways like Stripe or PayPal",
-    "Real-time WebSocket connections for payment status updates",
-    "Mobile app payment integrations",
-    "Cryptocurrency payment options",
-    "Multi-currency support beyond BRL"
+    "Removing or replacing the existing gateway payment provider",
+    "Supporting multiple simultaneous payment providers for a single transaction",
+    "Implementing PIX payment method (unless specifically required by PagBank integration)",
+    "Automatic migration of existing payment data to PagBank format"
   ],
   "imageRequirements": {
     "required": [],

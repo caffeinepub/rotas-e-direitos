@@ -4,9 +4,11 @@
  * Does not store secrets - only provider selection preferences
  */
 
-export type PaymentProvider = 'gateway';
+import { PublicPaymentConfig } from '../../backend';
 
-export const availableProviders: PaymentProvider[] = ['gateway'];
+export type PaymentProvider = 'gateway' | 'pagbank';
+
+export const availableProviders: PaymentProvider[] = ['gateway', 'pagbank'];
 
 const STORAGE_KEY = 'selected_payment_provider';
 
@@ -49,4 +51,24 @@ export function clearSelectedProvider(): void {
   } catch (error) {
     console.error('Failed to clear selected provider from localStorage:', error);
   }
+}
+
+/**
+ * Determine the active payment provider from public config
+ * Priority: PagBank > Gateway
+ */
+export function getActiveProvider(config: PublicPaymentConfig | undefined): PaymentProvider | null {
+  if (!config) return null;
+  
+  // If PagBank is enabled, prioritize it
+  if (config.pagbankProvider.enabled) {
+    return 'pagbank';
+  }
+  
+  // Otherwise use gateway if enabled
+  if (config.gatewayProvider.enabled) {
+    return 'gateway';
+  }
+  
+  return null;
 }

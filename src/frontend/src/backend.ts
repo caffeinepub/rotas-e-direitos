@@ -102,8 +102,12 @@ export interface Testimonial {
 }
 export interface PaymentConfig {
     gatewayProvider: PaymentProviderConfig;
+    pagbankProvider: PagBankConfig;
 }
 export type Time = bigint;
+export interface PublicPagBankConfig {
+    enabled: boolean;
+}
 export interface LossProfile {
     dailyEarnings: number;
     deactivationDate: bigint;
@@ -128,6 +132,14 @@ export interface WeatherSample {
 }
 export interface PublicPaymentConfig {
     gatewayProvider: PublicPaymentProviderConfig;
+    pagbankProvider: PublicPagBankConfig;
+}
+export interface PagBankConfig {
+    webhookSecret?: string;
+    clientId?: string;
+    merchantId?: string;
+    enabled: boolean;
+    clientSecret?: string;
 }
 export interface PaymentCheckoutResponse {
     paymentId: string;
@@ -137,6 +149,12 @@ export interface PaymentStatus {
     status: string;
     paymentId: string;
     rawResponse: string;
+}
+export interface PagBankWebhookPayload {
+    status: string;
+    signature: string;
+    paymentId: string;
+    rawData: string;
 }
 export interface SubscriptionStatus {
     startTime?: bigint;
@@ -188,6 +206,7 @@ export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkPaymentStatus(paymentId: string): Promise<PaymentStatus>;
+    createPagBankPaymentSession(_plan: SubscriptionPlan): Promise<PaymentCheckoutResponse>;
     createPaymentSession(_plan: SubscriptionPlan): Promise<PaymentCheckoutResponse>;
     getAllUserAccessInfo(): Promise<Array<UserAccessInfo>>;
     getApprovedTestimonials(): Promise<Array<Testimonial>>;
@@ -197,6 +216,7 @@ export interface backendInterface {
     getPublicPaymentConfig(): Promise<PublicPaymentConfig>;
     getSubscriptionStatus(): Promise<SubscriptionStatus>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    handlePagBankWebhook(payload: PagBankWebhookPayload): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
     logWorkSession(params: {
         city: string;
@@ -207,7 +227,7 @@ export interface backendInterface {
     submitTestimonial(content: string): Promise<bigint>;
     updateTestimonialStatus(testimonialId: bigint, newStatus: TestimonialStatus): Promise<void>;
 }
-import type { LossProfile as _LossProfile, PaymentCheckoutResponse as _PaymentCheckoutResponse, Platform as _Platform, Principal as _Principal, SubscriptionPlan as _SubscriptionPlan, SubscriptionStatus as _SubscriptionStatus, Testimonial as _Testimonial, TestimonialStatus as _TestimonialStatus, Time as _Time, UserAccessInfo as _UserAccessInfo, UserProfile as _UserProfile, UserRole as _UserRole, WeatherCondition as _WeatherCondition, WeatherSample as _WeatherSample, WorkSession as _WorkSession } from "./declarations/backend.did.d.ts";
+import type { LossProfile as _LossProfile, PagBankConfig as _PagBankConfig, PaymentCheckoutResponse as _PaymentCheckoutResponse, PaymentConfig as _PaymentConfig, PaymentProviderConfig as _PaymentProviderConfig, Platform as _Platform, Principal as _Principal, SubscriptionPlan as _SubscriptionPlan, SubscriptionStatus as _SubscriptionStatus, Testimonial as _Testimonial, TestimonialStatus as _TestimonialStatus, Time as _Time, UserAccessInfo as _UserAccessInfo, UserProfile as _UserProfile, UserRole as _UserRole, WeatherCondition as _WeatherCondition, WeatherSample as _WeatherSample, WorkSession as _WorkSession } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
     constructor(private actor: ActorSubclass<_SERVICE>, private _uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, private _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, private processError?: (error: unknown) => never){}
     async _initializeAccessControlWithSecret(arg0: string): Promise<void> {
@@ -250,6 +270,20 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.checkPaymentStatus(arg0);
             return result;
+        }
+    }
+    async createPagBankPaymentSession(arg0: SubscriptionPlan): Promise<PaymentCheckoutResponse> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.createPagBankPaymentSession(to_candid_SubscriptionPlan_n3(this._uploadFile, this._downloadFile, arg0));
+                return from_candid_PaymentCheckoutResponse_n5(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.createPagBankPaymentSession(to_candid_SubscriptionPlan_n3(this._uploadFile, this._downloadFile, arg0));
+            return from_candid_PaymentCheckoutResponse_n5(this._uploadFile, this._downloadFile, result);
         }
     }
     async createPaymentSession(arg0: SubscriptionPlan): Promise<PaymentCheckoutResponse> {
@@ -378,6 +412,20 @@ export class Backend implements backendInterface {
             return from_candid_opt_n16(this._uploadFile, this._downloadFile, result);
         }
     }
+    async handlePagBankWebhook(arg0: PagBankWebhookPayload): Promise<void> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.handlePagBankWebhook(arg0);
+                return result;
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.handlePagBankWebhook(arg0);
+            return result;
+        }
+    }
     async isCallerAdmin(): Promise<boolean> {
         if (this.processError) {
             try {
@@ -439,14 +487,14 @@ export class Backend implements backendInterface {
     async setPaymentConfig(arg0: PaymentConfig): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.setPaymentConfig(arg0);
+                const result = await this.actor.setPaymentConfig(to_candid_PaymentConfig_n40(this._uploadFile, this._downloadFile, arg0));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.setPaymentConfig(arg0);
+            const result = await this.actor.setPaymentConfig(to_candid_PaymentConfig_n40(this._uploadFile, this._downloadFile, arg0));
             return result;
         }
     }
@@ -467,14 +515,14 @@ export class Backend implements backendInterface {
     async updateTestimonialStatus(arg0: bigint, arg1: TestimonialStatus): Promise<void> {
         if (this.processError) {
             try {
-                const result = await this.actor.updateTestimonialStatus(arg0, to_candid_TestimonialStatus_n40(this._uploadFile, this._downloadFile, arg1));
+                const result = await this.actor.updateTestimonialStatus(arg0, to_candid_TestimonialStatus_n44(this._uploadFile, this._downloadFile, arg1));
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.updateTestimonialStatus(arg0, to_candid_TestimonialStatus_n40(this._uploadFile, this._downloadFile, arg1));
+            const result = await this.actor.updateTestimonialStatus(arg0, to_candid_TestimonialStatus_n44(this._uploadFile, this._downloadFile, arg1));
             return result;
         }
     }
@@ -700,14 +748,20 @@ function from_candid_vec_n8(_uploadFile: (file: ExternalBlob) => Promise<Uint8Ar
 function to_candid_LossProfile_n36(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: LossProfile): _LossProfile {
     return to_candid_record_n37(_uploadFile, _downloadFile, value);
 }
+function to_candid_PagBankConfig_n42(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PagBankConfig): _PagBankConfig {
+    return to_candid_record_n43(_uploadFile, _downloadFile, value);
+}
+function to_candid_PaymentConfig_n40(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: PaymentConfig): _PaymentConfig {
+    return to_candid_record_n41(_uploadFile, _downloadFile, value);
+}
 function to_candid_Platform_n38(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: Platform): _Platform {
     return to_candid_variant_n39(_uploadFile, _downloadFile, value);
 }
 function to_candid_SubscriptionPlan_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: SubscriptionPlan): _SubscriptionPlan {
     return to_candid_variant_n4(_uploadFile, _downloadFile, value);
 }
-function to_candid_TestimonialStatus_n40(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TestimonialStatus): _TestimonialStatus {
-    return to_candid_variant_n41(_uploadFile, _downloadFile, value);
+function to_candid_TestimonialStatus_n44(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TestimonialStatus): _TestimonialStatus {
+    return to_candid_variant_n45(_uploadFile, _downloadFile, value);
 }
 function to_candid_UserProfile_n34(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserProfile): _UserProfile {
     return to_candid_record_n35(_uploadFile, _downloadFile, value);
@@ -743,6 +797,39 @@ function to_candid_record_n37(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         deactivationDate: value.deactivationDate,
         platform: to_candid_Platform_n38(_uploadFile, _downloadFile, value.platform),
         daysPerWeek: value.daysPerWeek
+    };
+}
+function to_candid_record_n41(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    gatewayProvider: PaymentProviderConfig;
+    pagbankProvider: PagBankConfig;
+}): {
+    gatewayProvider: _PaymentProviderConfig;
+    pagbankProvider: _PagBankConfig;
+} {
+    return {
+        gatewayProvider: value.gatewayProvider,
+        pagbankProvider: to_candid_PagBankConfig_n42(_uploadFile, _downloadFile, value.pagbankProvider)
+    };
+}
+function to_candid_record_n43(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
+    webhookSecret?: string;
+    clientId?: string;
+    merchantId?: string;
+    enabled: boolean;
+    clientSecret?: string;
+}): {
+    webhookSecret: [] | [string];
+    clientId: [] | [string];
+    merchantId: [] | [string];
+    enabled: boolean;
+    clientSecret: [] | [string];
+} {
+    return {
+        webhookSecret: value.webhookSecret ? candid_some(value.webhookSecret) : candid_none(),
+        clientId: value.clientId ? candid_some(value.clientId) : candid_none(),
+        merchantId: value.merchantId ? candid_some(value.merchantId) : candid_none(),
+        enabled: value.enabled,
+        clientSecret: value.clientSecret ? candid_some(value.clientSecret) : candid_none()
     };
 }
 function to_candid_variant_n2(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: UserRole): {
@@ -794,7 +881,7 @@ function to_candid_variant_n4(_uploadFile: (file: ExternalBlob) => Promise<Uint8
         pro_annual: null
     } : value;
 }
-function to_candid_variant_n41(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TestimonialStatus): {
+function to_candid_variant_n45(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: TestimonialStatus): {
     pending: null;
 } | {
     approved: null;

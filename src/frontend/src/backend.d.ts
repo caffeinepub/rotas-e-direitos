@@ -20,8 +20,12 @@ export interface Testimonial {
 }
 export interface PaymentConfig {
     gatewayProvider: PaymentProviderConfig;
+    pagbankProvider: PagBankConfig;
 }
 export type Time = bigint;
+export interface PublicPagBankConfig {
+    enabled: boolean;
+}
 export interface LossProfile {
     dailyEarnings: number;
     deactivationDate: bigint;
@@ -46,6 +50,14 @@ export interface WeatherSample {
 }
 export interface PublicPaymentConfig {
     gatewayProvider: PublicPaymentProviderConfig;
+    pagbankProvider: PublicPagBankConfig;
+}
+export interface PagBankConfig {
+    webhookSecret?: string;
+    clientId?: string;
+    merchantId?: string;
+    enabled: boolean;
+    clientSecret?: string;
 }
 export interface PaymentCheckoutResponse {
     paymentId: string;
@@ -55,6 +67,12 @@ export interface PaymentStatus {
     status: string;
     paymentId: string;
     rawResponse: string;
+}
+export interface PagBankWebhookPayload {
+    status: string;
+    signature: string;
+    paymentId: string;
+    rawData: string;
 }
 export interface SubscriptionStatus {
     startTime?: bigint;
@@ -105,6 +123,7 @@ export enum WeatherCondition {
 export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkPaymentStatus(paymentId: string): Promise<PaymentStatus>;
+    createPagBankPaymentSession(_plan: SubscriptionPlan): Promise<PaymentCheckoutResponse>;
     createPaymentSession(_plan: SubscriptionPlan): Promise<PaymentCheckoutResponse>;
     getAllUserAccessInfo(): Promise<Array<UserAccessInfo>>;
     getApprovedTestimonials(): Promise<Array<Testimonial>>;
@@ -114,6 +133,7 @@ export interface backendInterface {
     getPublicPaymentConfig(): Promise<PublicPaymentConfig>;
     getSubscriptionStatus(): Promise<SubscriptionStatus>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
+    handlePagBankWebhook(payload: PagBankWebhookPayload): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
     logWorkSession(params: {
         city: string;

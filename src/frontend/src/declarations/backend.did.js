@@ -56,8 +56,16 @@ export const Testimonial = IDL.Record({
   'timestamp' : IDL.Int,
 });
 export const PublicPaymentProviderConfig = IDL.Record({ 'enabled' : IDL.Bool });
+export const PublicPagBankConfig = IDL.Record({ 'enabled' : IDL.Bool });
 export const PublicPaymentConfig = IDL.Record({
   'gatewayProvider' : PublicPaymentProviderConfig,
+  'pagbankProvider' : PublicPagBankConfig,
+});
+export const PagBankWebhookPayload = IDL.Record({
+  'status' : IDL.Text,
+  'signature' : IDL.Text,
+  'paymentId' : IDL.Text,
+  'rawData' : IDL.Text,
 });
 export const Time = IDL.Int;
 export const WeatherCondition = IDL.Variant({
@@ -96,14 +104,27 @@ export const LossProfile = IDL.Record({
   'daysPerWeek' : IDL.Nat,
 });
 export const PaymentProviderConfig = IDL.Record({ 'enabled' : IDL.Bool });
+export const PagBankConfig = IDL.Record({
+  'webhookSecret' : IDL.Opt(IDL.Text),
+  'clientId' : IDL.Opt(IDL.Text),
+  'merchantId' : IDL.Opt(IDL.Text),
+  'enabled' : IDL.Bool,
+  'clientSecret' : IDL.Opt(IDL.Text),
+});
 export const PaymentConfig = IDL.Record({
   'gatewayProvider' : PaymentProviderConfig,
+  'pagbankProvider' : PagBankConfig,
 });
 
 export const idlService = IDL.Service({
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'checkPaymentStatus' : IDL.Func([IDL.Text], [PaymentStatus], []),
+  'createPagBankPaymentSession' : IDL.Func(
+      [SubscriptionPlan],
+      [PaymentCheckoutResponse],
+      [],
+    ),
   'createPaymentSession' : IDL.Func(
       [SubscriptionPlan],
       [PaymentCheckoutResponse],
@@ -117,6 +138,7 @@ export const idlService = IDL.Service({
   'getPublicPaymentConfig' : IDL.Func([], [PublicPaymentConfig], ['query']),
   'getSubscriptionStatus' : IDL.Func([], [SubscriptionStatus], ['query']),
   'getUserProfile' : IDL.Func([Principal], [IDL.Opt(UserProfile)], ['query']),
+  'handlePagBankWebhook' : IDL.Func([PagBankWebhookPayload], [], []),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'logWorkSession' : IDL.Func(
       [IDL.Record({ 'city' : IDL.Text })],
@@ -181,8 +203,16 @@ export const idlFactory = ({ IDL }) => {
     'timestamp' : IDL.Int,
   });
   const PublicPaymentProviderConfig = IDL.Record({ 'enabled' : IDL.Bool });
+  const PublicPagBankConfig = IDL.Record({ 'enabled' : IDL.Bool });
   const PublicPaymentConfig = IDL.Record({
     'gatewayProvider' : PublicPaymentProviderConfig,
+    'pagbankProvider' : PublicPagBankConfig,
+  });
+  const PagBankWebhookPayload = IDL.Record({
+    'status' : IDL.Text,
+    'signature' : IDL.Text,
+    'paymentId' : IDL.Text,
+    'rawData' : IDL.Text,
   });
   const Time = IDL.Int;
   const WeatherCondition = IDL.Variant({
@@ -221,14 +251,27 @@ export const idlFactory = ({ IDL }) => {
     'daysPerWeek' : IDL.Nat,
   });
   const PaymentProviderConfig = IDL.Record({ 'enabled' : IDL.Bool });
+  const PagBankConfig = IDL.Record({
+    'webhookSecret' : IDL.Opt(IDL.Text),
+    'clientId' : IDL.Opt(IDL.Text),
+    'merchantId' : IDL.Opt(IDL.Text),
+    'enabled' : IDL.Bool,
+    'clientSecret' : IDL.Opt(IDL.Text),
+  });
   const PaymentConfig = IDL.Record({
     'gatewayProvider' : PaymentProviderConfig,
+    'pagbankProvider' : PagBankConfig,
   });
   
   return IDL.Service({
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'checkPaymentStatus' : IDL.Func([IDL.Text], [PaymentStatus], []),
+    'createPagBankPaymentSession' : IDL.Func(
+        [SubscriptionPlan],
+        [PaymentCheckoutResponse],
+        [],
+      ),
     'createPaymentSession' : IDL.Func(
         [SubscriptionPlan],
         [PaymentCheckoutResponse],
@@ -242,6 +285,7 @@ export const idlFactory = ({ IDL }) => {
     'getPublicPaymentConfig' : IDL.Func([], [PublicPaymentConfig], ['query']),
     'getSubscriptionStatus' : IDL.Func([], [SubscriptionStatus], ['query']),
     'getUserProfile' : IDL.Func([Principal], [IDL.Opt(UserProfile)], ['query']),
+    'handlePagBankWebhook' : IDL.Func([PagBankWebhookPayload], [], []),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'logWorkSession' : IDL.Func(
         [IDL.Record({ 'city' : IDL.Text })],

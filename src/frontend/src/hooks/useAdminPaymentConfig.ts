@@ -29,7 +29,7 @@ export function useUpdatePaymentConfig() {
         console.error('Payment config update error (sanitized):', error.message);
         
         // Re-throw with safe message
-        if (error.message?.includes('required') || error.message?.includes('fields')) {
+        if (error.message?.includes('required') || error.message?.includes('fields') || error.message?.includes('clientId') || error.message?.includes('clientSecret') || error.message?.includes('merchantId') || error.message?.includes('webhookSecret')) {
           throw new Error('Configuration validation failed. Please verify all required fields.');
         } else if (error.message?.includes('trap') || error.message?.includes('Unauthorized')) {
           throw new Error('Backend validation failed. Please check your permissions.');

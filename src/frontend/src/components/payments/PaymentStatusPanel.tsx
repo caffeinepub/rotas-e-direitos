@@ -5,19 +5,22 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, CheckCircle2, XCircle, AlertCircle, ArrowRight, ArrowLeft } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 import { PaymentFlowStatus } from '../../hooks/useGatewayPayment';
+import { PaymentProvider } from '../../lib/payments/providerConfig';
 
 interface PaymentStatusPanelProps {
   flowStatus: PaymentFlowStatus;
   onRetry?: () => void;
   onCheckStatus?: () => void;
   isCheckingStatus?: boolean;
+  provider?: PaymentProvider | null;
 }
 
 export default function PaymentStatusPanel({ 
   flowStatus, 
   onRetry, 
   onCheckStatus,
-  isCheckingStatus = false 
+  isCheckingStatus = false,
+  provider = 'gateway'
 }: PaymentStatusPanelProps) {
   const navigate = useNavigate();
 
@@ -29,6 +32,8 @@ export default function PaymentStatusPanel({
     navigate({ to: '/planos' });
   };
 
+  const providerName = provider === 'pagbank' ? 'PagBank' : 'Gateway';
+
   // Pending state
   if (flowStatus.state === 'pending') {
     return (
@@ -38,7 +43,7 @@ export default function PaymentStatusPanel({
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
             Processando Pagamento
           </CardTitle>
-          <CardDescription>Aguarde enquanto processamos seu pagamento</CardDescription>
+          <CardDescription>Aguarde enquanto processamos seu pagamento via {providerName}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert>
@@ -121,7 +126,7 @@ export default function PaymentStatusPanel({
             <XCircle className="h-5 w-5" />
             Falha no Pagamento
           </CardTitle>
-          <CardDescription>Não foi possível processar seu pagamento</CardDescription>
+          <CardDescription>Não foi possível processar seu pagamento via {providerName}</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <Alert variant="destructive">
@@ -162,13 +167,15 @@ export default function PaymentStatusPanel({
             <Loader2 className="h-5 w-5 animate-spin text-primary" />
             Iniciando Pagamento
           </CardTitle>
-          <CardDescription>Preparando sua sessão de pagamento</CardDescription>
+          <CardDescription>Preparando sua sessão de pagamento via {providerName}</CardDescription>
         </CardHeader>
         <CardContent>
           <Alert>
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
-              Aguarde enquanto preparamos seu pagamento...
+              {provider === 'pagbank' 
+                ? 'Aguarde enquanto preparamos seu redirecionamento para o PagBank...'
+                : 'Aguarde enquanto preparamos seu pagamento...'}
             </AlertDescription>
           </Alert>
         </CardContent>

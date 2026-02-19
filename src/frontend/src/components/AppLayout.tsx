@@ -36,7 +36,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70 shadow-sm">
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-4">
             <Sheet open={open} onOpenChange={setOpen}>
@@ -107,7 +107,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 alt="ROTAS E DIREITOS"
                 className="h-10 w-10"
               />
-              <span className="font-bold text-xl hidden sm:inline-block">ROTAS E DIREITOS</span>
+              <span className="font-bold text-xl hidden sm:inline-block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                ROTAS E DIREITOS
+              </span>
             </Link>
           </div>
 
@@ -139,14 +141,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
       <main className="flex-1 container px-4 py-8">{children}</main>
 
-      <footer className="border-t border-border/40 bg-card/50 mt-auto">
+      <footer className="border-t border-border/60 bg-card/30 backdrop-blur-sm mt-auto">
         <div className="container px-4 py-6">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
             <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-              <Link to="/privacidade" className="hover:text-foreground underline">
+              <Link to="/privacidade" className="hover:text-foreground underline transition-colors">
                 Política de Privacidade
               </Link>
-              <Link to="/politica-dados" className="hover:text-foreground underline">
+              <Link to="/politica-dados" className="hover:text-foreground underline transition-colors">
                 Política de Dados
               </Link>
             </div>
@@ -158,7 +160,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline hover:text-foreground"
+                className="underline hover:text-foreground transition-colors"
               >
                 caffeine.ai
               </a>

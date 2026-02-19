@@ -1,48 +1,46 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Payment gateway integration project",
-  "architectural_notes": [],
+  "summary": "Project with user dashboard, document verification system, and payment gateway integration",
+  "architectural_notes": [
+    "User data stored securely in Motoko backend canister",
+    "Document files stored as binary data in backend",
+    "Pop-up registration modal appears on first user access",
+    "Admin-only access control for user management and document viewing",
+    "PagBank payment gateway integration for transactions"
+  ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-update-the-checkout-page-checkoutpage-tsx-to-integrate-with-the-new-gateway-displaying-payment-options-and-handling-the-payment-flow-initiation",
-      "title": "Update the checkout page (CheckoutPage.tsx) to integrate with the new gateway, displaying payment options and handling the payment flow initiation",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-create-a-custom-react-hook-usegatewaypayment-ts-to-manage-payment-flow-state-including-initiating-payments-polling-payment-status-and-handling-completion",
-      "title": "Create a custom React hook (useGatewayPayment.ts) to manage payment flow state, including initiating payments, polling payment status, and handling completion",
-      "reqIds": [
-        "REQ-4"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-add-payment-status-tracking-component-that-displays-the-current-payment-state-with-appropriate-ui-feedback-pending-processing-success-error",
-      "title": "Add payment status tracking component that displays the current payment state with appropriate UI feedback (pending, processing, success, error)",
+      "id": "feature-integrate-pagbank-payment-gateway-as-a-payment-provider-option-alongside-the-existing-gateway-provider-add-pagbank-specific-configuration-fields-in-the-admin-payment-settings-panel",
+      "title": "Integrate PagBank payment gateway as a payment provider option alongside the existing gateway provider. Add PagBank-specific configuration fields in the admin payment settings panel.",
       "reqIds": [
         "REQ-5"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-admin-dashboard-payment-configuration-section-to-include-gateway-specific-settings-api-credentials-webhook-url-enabled-status",
-      "title": "Update admin dashboard payment configuration section to include gateway-specific settings (API credentials, webhook URL, enabled status)",
+      "id": "feature-create-frontend-pagbank-payment-flow-hook-usepagbankpayment-that-handles-payment-initiation-redirects-users-to-pagbank-checkout-and-polls-for-payment-status-updates-after-return",
+      "title": "Create frontend PagBank payment flow hook (usePagBankPayment) that handles payment initiation, redirects users to PagBank checkout, and polls for payment status updates after return.",
       "reqIds": [
-        "REQ-6"
+        "REQ-7"
       ],
       "version": 1
     },
     {
-      "id": "feature-add-gateway-payment-error-handling-utilities-in-frontend-src-lib-payments-that-map-gateway-error-codes-to-user-friendly-portuguese-messages",
-      "title": "Add gateway payment error handling utilities in frontend/src/lib/payments/ that map gateway error codes to user-friendly Portuguese messages",
+      "id": "feature-update-checkoutpage-to-detect-selected-payment-provider-and-render-pagbank-specific-payment-flow-when-pagbank-is-configured-as-the-active-provider-while-maintaining-existing-gateway-provider-flow",
+      "title": "Update CheckoutPage to detect selected payment provider and render PagBank-specific payment flow when PagBank is configured as the active provider, while maintaining existing gateway provider flow.",
       "reqIds": [
-        "REQ-7"
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-pagbanksetupguide-component-in-frontend-src-components-payments-that-provides-step-by-step-instructions-for-administrators-to-obtain-pagbank-api-credentials-configure-webhook-urls-and-test-the-integration-in-sandbox-mode",
+      "title": "Create PagBankSetupGuide component in frontend/src/components/payments/ that provides step-by-step instructions for administrators to obtain PagBank API credentials, configure webhook URLs, and test the integration in sandbox mode.",
+      "reqIds": [
+        "REQ-10"
       ],
       "version": 1
     }
@@ -50,28 +48,46 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Implement new payment gateway",
+      "summary": "User registration dashboard with personal data collection (name, RG, CPF, birth date, mother's name, marital status, address, CEP, reference point)",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Create backend methods in main.mo for initiating payment transactions with the new gateway provider, including methods to create payment sessions and retrieve payment status",
-      "reqIds": [
-        "REQ-1"
-      ],
+      "summary": "Document upload system for CNH (digital or front/back), RG (front/back), or passport",
+      "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Add backend webhook handler method in main.mo to receive and process payment confirmation callbacks from the gateway provider",
+      "summary": "Administrative panel to view users, search/filter data, and block/unblock access",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "PagBank payment gateway integration",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Implement backend PagBank payment session creation endpoint that generates payment links or checkout URLs using PagBank's API. Store payment sessions with reference IDs, amounts, and status tracking.",
       "reqIds": [
-        "REQ-2"
+        "REQ-6"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Add PagBank webhook handler endpoint in backend to receive payment notifications from PagBank and update payment session status (approved, rejected, cancelled). Activate user subscription upon approved payment.",
+      "reqIds": [
+        "REQ-8"
       ],
       "status": "pending"
     }
   ],
-  "projectName": "Rotas e Direitos",
+  "projectName": "ROTAS E DIREITOS",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }
