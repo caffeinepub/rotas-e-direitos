@@ -1,31 +1,30 @@
 {
   "kind": "build_request",
-  "title": "Fix PIX QR code display bug in checkout",
+  "title": "Fix PIX QR code not displaying in checkout",
   "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Debug and fix the PIX QR code generation and display logic in the checkout flow to ensure the QR code appears correctly when users select PIX payment method",
+      "text": "Debug and fix the PIX QR code display issue in the checkout flow. The QR code should be visible when users select PIX as the payment method.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-6"
         ],
         "quotes": [
-          "corrija bugs na criacao do qr code pix . ele nao esta aparecendo!"
+          "o qr code pix nao ta aparecendo"
         ]
       },
       "acceptanceCriteria": [
-        "PIX QR code image renders visibly in the checkout page when PIX payment is selected",
-        "QR code payload is generated correctly using the pixPayload utility",
-        "QR code image URL is generated successfully via qrCodeGenerator",
-        "Copy-to-clipboard functionality works for both QR payload and PIX key",
-        "No console errors related to QR code generation or display"
+        "PIX QR code image renders correctly on the checkout page",
+        "QR code is scannable and contains valid payment payload",
+        "Copy-to-clipboard functionality works for PIX key and payload",
+        "QR code displays properly on both desktop and mobile viewports"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Verify that the PixQrCodeDisplay component properly receives the PIX email key and displays it alongside the QR code",
+      "text": "Verify the PixQrCodeDisplay component is properly integrated in CheckoutPage and receives correct payment data from the PagBank payment flow.",
       "target": "frontend",
       "source": {
         "messageIds": [
@@ -33,14 +32,14 @@
         ]
       },
       "acceptanceCriteria": [
-        "PIX email key is passed correctly to PixQrCodeDisplay component",
-        "Email key displays below the QR code with copy button",
-        "Component handles loading and error states appropriately"
+        "PixQrCodeDisplay component receives valid PIX payload data",
+        "Payment status updates correctly after QR code is displayed",
+        "Error states are handled gracefully if payment data is missing"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Check CheckoutPage integration with payment providers to ensure PIX QR code display is triggered correctly for both Gateway and PagBank payment flows",
+      "text": "Ensure the PIX payload generation in pixPayload.ts creates valid BR Code format with correct CRC16 checksum for QR code scanning.",
       "target": "frontend",
       "source": {
         "messageIds": [
@@ -48,23 +47,21 @@
         ]
       },
       "acceptanceCriteria": [
-        "PIX QR code displays when using Gateway provider",
-        "PIX QR code displays when using PagBank provider",
-        "Proper conditional rendering based on selected payment provider",
-        "Payment amount is correctly passed to QR code generation"
+        "Generated PIX payload follows EMV QR Code specification",
+        "CRC16 checksum is calculated correctly",
+        "Payload can be successfully scanned by banking apps"
       ]
     }
   ],
   "constraints": [
-    "Do not modify the PIX payload generation algorithm in frontend/src/lib/payments/pixPayload.ts unless a format error is identified",
-    "Maintain existing QR code API integration with qrserver.com in frontend/src/lib/payments/qrCodeGenerator.ts",
-    "Preserve the PixQrCodeDisplay component's copy-to-clipboard functionality"
+    "Do not modify the backend payment configuration logic",
+    "Maintain compatibility with existing PagBank integration",
+    "Preserve the current checkout flow and payment status tracking"
   ],
   "nonGoals": [
-    "Adding new payment methods beyond PIX",
-    "Redesigning the checkout page layout",
-    "Implementing payment webhook handling",
-    "Adding payment confirmation notifications"
+    "Adding new payment methods",
+    "Changing the overall checkout page design",
+    "Modifying payment provider selection logic"
   ],
   "imageRequirements": {
     "required": [],

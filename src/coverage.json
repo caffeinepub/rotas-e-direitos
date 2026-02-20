@@ -1,24 +1,23 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-20T20:31:51.584Z",
+  "generatedAt": "2026-02-20T21:36:26.044Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
     "total": 3,
-    "implemented": 2,
+    "implemented": 1,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Debug and fix the PIX QR code generation and display logic in the checkout flow to ensure the QR code appears correctly when users select PIX payment method",
+        "summary": "Debug and fix the PIX QR code display issue in the checkout flow. The QR code should be visible when users select PIX as the payment method.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/components/payments/PixQrCodeDisplay.tsx",
-          "frontend/src/pages/CheckoutPage.tsx",
-          "frontend/src/lib/payments/pixPayload.ts",
-          "frontend/src/lib/payments/qrCodeGenerator.ts"
+          "frontend/src/lib/payments/qrCodeGenerator.ts",
+          "frontend/src/pages/CheckoutPage.tsx"
         ],
         "matchedFiles": [
           "frontend/src/components/payments/PixQrCodeDisplay.tsx",
@@ -27,24 +26,22 @@
       },
       {
         "id": "REQ-2",
-        "summary": "Verify that the PixQrCodeDisplay component properly receives the PIX email key and displays it alongside the QR code",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/payments/PixQrCodeDisplay.tsx",
-          "frontend/src/pages/CheckoutPage.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/payments/PixQrCodeDisplay.tsx"
-        ]
-      },
-      {
-        "id": "REQ-3",
-        "summary": "Check CheckoutPage integration with payment providers to ensure PIX QR code display is triggered correctly for both Gateway and PagBank payment flows",
+        "summary": "Verify the PixQrCodeDisplay component is properly integrated in CheckoutPage and receives correct payment data from the PagBank payment flow.",
         "status": "missing",
         "plannedFiles": [
           "frontend/src/pages/CheckoutPage.tsx",
-          "frontend/src/hooks/useGatewayPayment.ts",
-          "frontend/src/hooks/usePagBankPayment.ts"
+          "frontend/src/hooks/usePagBankPayment.ts",
+          "frontend/src/components/payments/PaymentStatusPanel.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Ensure the PIX payload generation in pixPayload.ts creates valid BR Code format with correct CRC16 checksum for QR code scanning.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/lib/payments/pixPayload.ts",
+          "frontend/src/pages/CheckoutPage.tsx"
         ],
         "matchedFiles": []
       }
@@ -52,13 +49,11 @@
   },
   "changedFiles": [
     "build-request.json",
-    "caffeine.lock.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
     "frontend/src/components/payments/PixQrCodeDisplay.tsx",
     "frontend/src/lib/payments/qrCodeGenerator.ts",
-    "frontend/src/qr-code/useQRScanner.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

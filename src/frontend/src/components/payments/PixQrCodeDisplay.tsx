@@ -28,14 +28,16 @@ export default function PixQrCodeDisplay({ amount, description }: PixQrCodeDispl
       try {
         // Generate PIX payload
         const payload = generateFixedPixPayload();
+        console.log('PIX Payload generated:', payload);
         setPixPayload(payload);
 
         // Generate QR code image from payload
         const dataUrl = await generateQRCodeDataURL(payload, 300);
+        console.log('QR Code generated successfully');
         setQrCodeDataUrl(dataUrl);
       } catch (err) {
         console.error('Error generating QR code:', err);
-        setError('Erro ao gerar QR Code. Por favor, tente novamente.');
+        setError('Erro ao gerar QR Code. Por favor, recarregue a página e tente novamente.');
       } finally {
         setIsLoading(false);
       }

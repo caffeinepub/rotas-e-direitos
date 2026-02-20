@@ -2,8 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-debug-and-fix-the-pix-qr-code-generation-and-display-logic-in-the-checkout-flow-to-ensure-the-qr-code-appears-correctly-when-users-select-pix-payment-method",
-      "featureTitle": "Debug and fix the PIX QR code generation and display logic in the checkout flow to ensure the QR code appears correctly when users select PIX payment method",
+      "featureId": "feature-debug-and-fix-the-pix-qr-code-display-issue-in-the-checkout-flow-the-qr-code-should-be-visible-when-users-select-pix-as-the-payment-method",
+      "featureTitle": "Debug and fix the PIX QR code display issue in the checkout flow. The QR code should be visible when users select PIX as the payment method.",
       "files": [
         "frontend/src/components/payments/PixQrCodeDisplay.tsx",
         "frontend/src/lib/payments/qrCodeGenerator.ts"
@@ -22,29 +22,6 @@
       ],
       "testIds": [
         "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-verify-that-the-pixqrcodedisplay-component-properly-receives-the-pix-email-key-and-displays-it-alongside-the-qr-code",
-      "featureTitle": "Verify that the PixQrCodeDisplay component properly receives the PIX email key and displays it alongside the QR code",
-      "files": [
-        "frontend/src/components/payments/PixQrCodeDisplay.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "camera@1.0.0",
-        "http-outcalls@3.0.0",
-        "blob-storage@4.0.0",
-        "qr-code@1.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
       ],
       "confidence": "high"
     }

@@ -1,11 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the PIX QR code display bug in the checkout flow so it appears correctly when users select PIX payment.
+**Goal:** Fix the PIX QR code display issue in the checkout flow so users can complete PIX payments.
 
 **Planned changes:**
-- Debug and fix PIX QR code generation and display logic in checkout
-- Verify PixQrCodeDisplay component receives and displays PIX email key correctly
-- Check CheckoutPage integration with Gateway and PagBank payment providers to ensure QR code triggers properly
+- Debug and fix the PIX QR code rendering in the checkout page
+- Verify PixQrCodeDisplay component integration and data flow from PagBank
+- Ensure PIX payload generation creates valid BR Code format with correct CRC16 checksum
+- Test QR code scannability and copy-to-clipboard functionality
+- Validate display on both desktop and mobile viewports
 
-**User-visible outcome:** Users can see the PIX QR code and copy the payment information when selecting PIX as their payment method during checkout.
+**User-visible outcome:** Users selecting PIX as payment method will see a scannable QR code and be able to copy the PIX key/payload to complete their purchase.
