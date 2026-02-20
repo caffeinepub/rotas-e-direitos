@@ -1,96 +1,42 @@
 {
   "kind": "build_request",
-  "title": "Update page layout with black background, orange/white text, and harmonious logo integration",
+  "title": "Increase logo size and visibility",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Change the page background color to black across all pages and components",
+      "text": "Increase the size of the logo image (nova logo-1.png) in the AppLayout header to make it more prominent and visible to users",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-last"
+          "msg-6"
         ],
         "quotes": [
-          "MUDE O LAYOUTE DA PAGINA PARA UM FUNDO PRETO"
+          "deixe a logo maior e mais visivel"
         ]
       },
       "acceptanceCriteria": [
-        "All page backgrounds are black (#000000 or equivalent)",
-        "Background color is consistent across all routes and components",
-        "Dark mode CSS variables are updated to use black background"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "text": "Update text colors throughout the application to use orange and white color scheme, with orange for headings/accents and white for body text",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "CORES DE LETRAS LARANJA E BRANCO"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Primary headings and accent text use orange color",
-        "Body text and general content use white color",
-        "Text maintains sufficient contrast against black background for accessibility",
-        "Color scheme is applied consistently across all components"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Integrate the user-provided logo into the page layout harmoniously without disrupting the existing layout or mobile responsiveness",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ],
-        "quotes": [
-          "COLOQUE ESTA LOGO NA PAGINA DE FORMA ARMONICA SEM PREJUDICAR O LAYOUT OU A ABERTURA DA PAGINA PARA DISPOSIVIVOS MOVEIS"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Logo is placed in a prominent but non-intrusive location (e.g., header)",
-        "Logo scales appropriately for mobile devices",
-        "Logo does not break or interfere with existing navigation or content layout",
-        "Logo maintains aspect ratio and quality across all screen sizes"
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "text": "Update Tailwind CSS configuration and global styles to support the new black background with orange and white color palette",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ]
-      },
-      "acceptanceCriteria": [
-        "CSS variables are updated with new color values",
-        "Tailwind theme configuration includes orange and white as primary colors",
-        "All components respect the new color system"
+        "Logo in AppLayout.tsx is visibly larger than current implementation",
+        "Logo maintains proper aspect ratio and quality",
+        "Logo fits well within the header layout on both desktop and mobile viewports",
+        "Logo does not cause layout shifts or overflow issues"
       ]
     }
   ],
   "constraints": [
-    "Do not modify the Internet Identity authentication components (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts)",
-    "Do not edit components in frontend/src/components/ui directory",
-    "Maintain mobile responsiveness for all layout changes",
-    "Preserve all existing functionality while applying visual updates"
+    "Do not modify frontend/src/hooks/useInternetIdentity.ts",
+    "Do not modify frontend/src/hooks/useInternetIdentity.tsx",
+    "Do not modify frontend/src/hooks/useActor.ts",
+    "Do not modify frontend/src/main.tsx",
+    "Do not modify files in frontend/src/components/ui"
   ],
   "nonGoals": [
-    "Changing the functionality of any existing features",
-    "Modifying backend logic or data structures",
-    "Adding new pages or navigation items",
-    "Redesigning the overall information architecture"
+    "Changing the logo image file itself",
+    "Modifying other header elements beyond the logo",
+    "Redesigning the entire header layout"
   ],
   "imageRequirements": {
-    "required": [
-      "Logo image suitable for header placement with transparent background, optimized for both light and dark backgrounds (logo.dim_200x80.png)"
-    ],
+    "required": [],
     "edits": []
   }
 }

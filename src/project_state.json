@@ -5,37 +5,12 @@
   "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
-  "imageRequirements": "## Required Images\n- Logo image suitable for header placement with transparent background, optimized for both light and dark backgrounds (logo.dim_200x80.png)",
   "existing_features": [
     {
-      "id": "feature-change-the-page-background-color-to-black-across-all-pages-and-components",
-      "title": "Change the page background color to black across all pages and components",
+      "id": "feature-increase-the-size-of-the-logo-image-nova-logo-1-png-in-the-applayout-header-to-make-it-more-prominent-and-visible-to-users",
+      "title": "Increase the size of the logo image (nova logo-1.png) in the AppLayout header to make it more prominent and visible to users",
       "reqIds": [
         "REQ-1"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-text-colors-throughout-the-application-to-use-orange-and-white-color-scheme-with-orange-for-headings-accents-and-white-for-body-text",
-      "title": "Update text colors throughout the application to use orange and white color scheme, with orange for headings/accents and white for body text",
-      "reqIds": [
-        "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-integrate-the-user-provided-logo-into-the-page-layout-harmoniously-without-disrupting-the-existing-layout-or-mobile-responsiveness",
-      "title": "Integrate the user-provided logo into the page layout harmoniously without disrupting the existing layout or mobile responsiveness",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-update-tailwind-css-configuration-and-global-styles-to-support-the-new-black-background-with-orange-and-white-color-palette",
-      "title": "Update Tailwind CSS configuration and global styles to support the new black background with orange and white color palette",
-      "reqIds": [
-        "REQ-4"
       ],
       "version": 1
     }
@@ -43,18 +18,12 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Change page layout to black background with orange and white text colors",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-2",
-      "summary": "Add logo to page harmoniously without affecting mobile responsiveness",
+      "summary": "Make logo larger and more visible",
       "reqIds": [],
       "status": "pending"
     }
   ],
-  "projectName": "Update page layout with black background, orange/white text, and harmonious logo integration",
+  "projectName": "Increase logo size and visibility",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

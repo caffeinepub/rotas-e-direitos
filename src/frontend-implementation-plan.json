@@ -1,86 +1,22 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Update page layout with black background, orange/white text, and harmonious logo integration",
+  "title": "Increase logo size and visibility",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Change the page background color to black across all pages and components",
+      "summary": "Increase the size of the logo image (nova logo-1.png) in the AppLayout header to make it more prominent and visible to users",
       "acceptanceCriteria": [
-        "All page backgrounds are black (#000000 or equivalent)",
-        "Background color is consistent across all routes and components",
-        "Dark mode CSS variables are updated to use black background"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Update CSS variables in the :root selector to use black (#000000) for background colors. Modify --background, --card, --popover, and related background color tokens to use pure black or OKLCH equivalent (oklch(0% 0 0)). Ensure the dark mode color scheme uses black as the base background across all color variants (default, variant-b, variant-c)."
-        },
-        {
-          "path": "frontend/tailwind.config.js",
-          "operation": "modify",
-          "description": "Update the Tailwind theme configuration to include black as the default background color in the color system. Ensure backgroundColor utilities reference the updated CSS variables that now use black. Verify that container and component backgrounds inherit the black color scheme."
-        }
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "summary": "Update text colors throughout the application to use orange and white color scheme, with orange for headings/accents and white for body text",
-      "acceptanceCriteria": [
-        "Primary headings and accent text use orange color",
-        "Body text and general content use white color",
-        "Text maintains sufficient contrast against black background for accessibility",
-        "Color scheme is applied consistently across all components"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Update CSS variables for text colors to use white for --foreground (body text) and orange for --primary (headings and accents). Set --foreground to white (oklch(100% 0 0) or #FFFFFF) and --primary to orange (oklch(0.65 0.15 45) or a suitable orange like #FF8C00). Update --muted-foreground, --accent-foreground, and other text-related tokens to maintain the orange/white palette. Ensure sufficient contrast ratios for accessibility (WCAG AA minimum 4.5:1 for body text, 3:1 for large text)."
-        },
-        {
-          "path": "frontend/src/components/AppLayout.tsx",
-          "operation": "modify",
-          "description": "Update text color classes in the AppLayout component to use the new orange/white scheme. Apply white text color classes (text-white or text-foreground) to navigation items, menu text, and general content. Use orange color classes (text-primary or text-orange-500) for headings, active navigation states, and accent elements. Ensure the header and sidebar text colors follow the new scheme."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Integrate the user-provided logo into the page layout harmoniously without disrupting the existing layout or mobile responsiveness",
-      "acceptanceCriteria": [
-        "Logo is placed in a prominent but non-intrusive location (e.g., header)",
-        "Logo scales appropriately for mobile devices",
-        "Logo does not break or interfere with existing navigation or content layout",
-        "Logo maintains aspect ratio and quality across all screen sizes"
+        "Logo in AppLayout.tsx is visibly larger than current implementation",
+        "Logo maintains proper aspect ratio and quality",
+        "Logo fits well within the header layout on both desktop and mobile viewports",
+        "Logo does not cause layout shifts or overflow issues"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/AppLayout.tsx",
           "operation": "modify",
-          "description": "Add the generated logo image (frontend/public/assets/generated/logo.dim_200x80.png) to the header section of AppLayout. Place the logo in the left side of the header before or alongside the application title. Use an <img> tag with responsive width classes (e.g., w-32 md:w-40) to ensure the logo scales appropriately on mobile and desktop. Set max-height constraints (e.g., h-12 md:h-16) to prevent the logo from disrupting header layout. Ensure the logo has object-fit: contain to maintain aspect ratio. Add appropriate alt text for accessibility. Verify the logo displays correctly in both the desktop header and mobile menu states without breaking navigation functionality."
-        }
-      ]
-    },
-    {
-      "id": "REQ-4",
-      "summary": "Update Tailwind CSS configuration and global styles to support the new black background with orange and white color palette",
-      "acceptanceCriteria": [
-        "CSS variables are updated with new color values",
-        "Tailwind theme configuration includes orange and white as primary colors",
-        "All components respect the new color system"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/tailwind.config.js",
-          "operation": "modify",
-          "description": "Extend the Tailwind theme to include orange as a custom color in the colors object (e.g., 'orange': '#FF8C00' or appropriate orange shade). Ensure the backgroundColor, textColor, and borderColor utilities can access the new orange color. Update the theme configuration to map 'primary' to orange and ensure background defaults to black. Verify that all color tokens (primary, secondary, accent, destructive, etc.) work harmoniously with the black background and orange/white text scheme."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add global CSS rules to enforce the black background and orange/white text scheme across all pages. Set body background to black and default text color to white. Add utility classes or global overrides for common UI elements (cards, modals, sidebars) to ensure they use the black background. Update any hardcoded color values in global styles to use the new CSS variables. Ensure all variant classes (variant-b, variant-c) also support the black background with orange/white text."
+          "description": "Increase the logo image dimensions in the header section. Modify the img element for 'nova logo-1.png' to use larger width and height values (e.g., increase from current size to approximately 150-200px width while maintaining aspect ratio). Ensure responsive behavior is preserved by using appropriate Tailwind classes (e.g., w-32 md:w-48 or similar) to scale appropriately on mobile and desktop viewports. Verify the logo does not cause overflow or alignment issues with adjacent navigation elements."
         }
       ]
     }

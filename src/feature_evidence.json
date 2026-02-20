@@ -2,52 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-change-the-page-background-color-to-black-across-all-pages-and-components",
-      "featureTitle": "Change the page background color to black across all pages and components",
-      "files": [
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "camera@1.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-text-colors-throughout-the-application-to-use-orange-and-white-color-scheme-with-orange-for-headings-accents-and-white-for-body-text",
-      "featureTitle": "Update text colors throughout the application to use orange and white color scheme, with orange for headings/accents and white for body text",
-      "files": [
-        "frontend/src/components/AppLayout.tsx",
-        "frontend/src/index.css"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "camera@1.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-integrate-the-user-provided-logo-into-the-page-layout-harmoniously-without-disrupting-the-existing-layout-or-mobile-responsiveness",
-      "featureTitle": "Integrate the user-provided logo into the page layout harmoniously without disrupting the existing layout or mobile responsiveness",
+      "featureId": "feature-increase-the-size-of-the-logo-image-nova-logo-1-png-in-the-applayout-header-to-make-it-more-prominent-and-visible-to-users",
+      "featureTitle": "Increase the size of the logo image (nova logo-1.png) in the AppLayout header to make it more prominent and visible to users",
       "files": [
         "frontend/src/components/AppLayout.tsx"
       ],
@@ -59,32 +15,11 @@
         "initial-app@1.0.0",
         "github-export-icp-cli@1.0.0",
         "camera@1.0.0",
-        "http-outcalls@3.0.0"
+        "http-outcalls@3.0.0",
+        "blob-storage@4.0.0"
       ],
       "testIds": [
-        "REQ-3"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-tailwind-css-configuration-and-global-styles-to-support-the-new-black-background-with-orange-and-white-color-palette",
-      "featureTitle": "Update Tailwind CSS configuration and global styles to support the new black background with orange and white color palette",
-      "files": [
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "camera@1.0.0",
-        "http-outcalls@3.0.0"
-      ],
-      "testIds": [
-        "REQ-4"
+        "REQ-1"
       ],
       "confidence": "high"
     }
