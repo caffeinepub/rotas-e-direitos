@@ -1,11 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Increase the size and visibility of the logo in the application header.
+**Goal:** Increase the logo size in the header to make it more prominent and visible.
 
 **Planned changes:**
-- Increase the logo image size in the AppLayout header component
-- Ensure logo maintains proper aspect ratio and fits well on both desktop and mobile viewports
-- Verify no layout shifts or overflow issues occur
+- Increase the logo dimensions in the AppLayout header component beyond the current size
+- Ensure the logo maintains proper aspect ratio and visual quality
+- Verify the larger logo works well on both desktop and mobile viewports
 
-**User-visible outcome:** Users will see a larger, more prominent logo in the application header that is easier to notice and recognize.
+**User-visible outcome:** Users will see a larger, more prominent logo in the application header across all devices.

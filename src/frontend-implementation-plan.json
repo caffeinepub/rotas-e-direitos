@@ -1,22 +1,22 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Increase logo size and visibility",
+  "title": "Increase logo size further",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Increase the size of the logo image (nova logo-1.png) in the AppLayout header to make it more prominent and visible to users",
+      "id": "REQ-2",
+      "summary": "Increase the logo size in the AppLayout header component beyond the current dimensions to make it even more prominent and visible",
       "acceptanceCriteria": [
-        "Logo in AppLayout.tsx is visibly larger than current implementation",
-        "Logo maintains proper aspect ratio and quality",
-        "Logo fits well within the header layout on both desktop and mobile viewports",
-        "Logo does not cause layout shifts or overflow issues"
+        "Logo in AppLayout header is noticeably larger than the previous increase",
+        "Logo maintains proper aspect ratio and visual quality",
+        "Logo size is appropriate for the header layout without causing overflow or misalignment",
+        "Change is visible on both desktop and mobile viewports"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/AppLayout.tsx",
           "operation": "modify",
-          "description": "Increase the logo image dimensions in the header section. Modify the img element for 'nova logo-1.png' to use larger width and height values (e.g., increase from current size to approximately 150-200px width while maintaining aspect ratio). Ensure responsive behavior is preserved by using appropriate Tailwind classes (e.g., w-32 md:w-48 or similar) to scale appropriately on mobile and desktop viewports. Verify the logo does not cause overflow or alignment issues with adjacent navigation elements."
+          "description": "Increase the logo image dimensions in the header section by modifying the width and height attributes or CSS classes. Ensure the logo uses workspace path 'frontend/public/assets/generated/logo.dim_400x200.png' or 'frontend/public/assets/generated/logo-rotas-e-direitos.dim_512x512.png' depending on which is currently used. Adjust surrounding header spacing if needed to accommodate the larger logo without causing layout issues. Test responsiveness across desktop and mobile viewports to ensure the logo scales appropriately."
         }
       ]
     }

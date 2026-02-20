@@ -7,23 +7,16 @@
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-increase-the-size-of-the-logo-image-nova-logo-1-png-in-the-applayout-header-to-make-it-more-prominent-and-visible-to-users",
-      "title": "Increase the size of the logo image (nova logo-1.png) in the AppLayout header to make it more prominent and visible to users",
+      "id": "feature-increase-the-logo-size-in-the-applayout-header-component-beyond-the-current-dimensions-to-make-it-even-more-prominent-and-visible",
+      "title": "Increase the logo size in the AppLayout header component beyond the current dimensions to make it even more prominent and visible",
       "reqIds": [
-        "REQ-1"
+        "REQ-2"
       ],
       "version": 1
     }
   ],
-  "new_feature_requests": [
-    {
-      "id": "AR-1",
-      "summary": "Make logo larger and more visible",
-      "reqIds": [],
-      "status": "pending"
-    }
-  ],
-  "projectName": "Increase logo size and visibility",
+  "new_feature_requests": [],
+  "projectName": "Increase logo size further",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

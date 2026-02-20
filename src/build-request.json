@@ -1,25 +1,25 @@
 {
   "kind": "build_request",
-  "title": "Increase logo size and visibility",
+  "title": "Increase logo size further",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-1",
-      "text": "Increase the size of the logo image (nova logo-1.png) in the AppLayout header to make it more prominent and visible to users",
+      "id": "REQ-2",
+      "text": "Increase the logo size in the AppLayout header component beyond the current dimensions to make it even more prominent and visible",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-user-final"
         ],
         "quotes": [
-          "deixe a logo maior e mais visivel"
+          "almente ela ainda mais"
         ]
       },
       "acceptanceCriteria": [
-        "Logo in AppLayout.tsx is visibly larger than current implementation",
-        "Logo maintains proper aspect ratio and quality",
-        "Logo fits well within the header layout on both desktop and mobile viewports",
-        "Logo does not cause layout shifts or overflow issues"
+        "Logo in AppLayout header is noticeably larger than the previous increase",
+        "Logo maintains proper aspect ratio and visual quality",
+        "Logo size is appropriate for the header layout without causing overflow or misalignment",
+        "Change is visible on both desktop and mobile viewports"
       ]
     }
   ],
@@ -31,9 +31,9 @@
     "Do not modify files in frontend/src/components/ui"
   ],
   "nonGoals": [
-    "Changing the logo image file itself",
-    "Modifying other header elements beyond the logo",
-    "Redesigning the entire header layout"
+    "Changing logo design or styling beyond size",
+    "Modifying header layout structure",
+    "Adding new navigation elements"
   ],
   "imageRequirements": {
     "required": [],
