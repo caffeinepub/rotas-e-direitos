@@ -1,22 +1,61 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Increase logo size further",
+  "title": "Add fixed PIX QR code to payment checkout",
   "requirements": [
     {
-      "id": "REQ-2",
-      "summary": "Increase the logo size in the AppLayout header component beyond the current dimensions to make it even more prominent and visible",
+      "id": "REQ-1",
+      "summary": "Generate a fixed PIX QR code in the payment checkout flow using the email key proj.defdriver+pagbank@gmail.com",
       "acceptanceCriteria": [
-        "Logo in AppLayout header is noticeably larger than the previous increase",
-        "Logo maintains proper aspect ratio and visual quality",
-        "Logo size is appropriate for the header layout without causing overflow or misalignment",
-        "Change is visible on both desktop and mobile viewports"
+        "PIX QR code is displayed in the checkout page",
+        "QR code uses the fixed PIX key proj.defdriver+pagbank@gmail.com",
+        "QR code is scannable and follows PIX QR code standards",
+        "The PIX key email is visible alongside the QR code for manual entry"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/AppLayout.tsx",
+          "path": "frontend/src/pages/CheckoutPage.tsx",
           "operation": "modify",
-          "description": "Increase the logo image dimensions in the header section by modifying the width and height attributes or CSS classes. Ensure the logo uses workspace path 'frontend/public/assets/generated/logo.dim_400x200.png' or 'frontend/public/assets/generated/logo-rotas-e-direitos.dim_512x512.png' depending on which is currently used. Adjust surrounding header spacing if needed to accommodate the larger logo without causing layout issues. Test responsiveness across desktop and mobile viewports to ensure the logo scales appropriately."
+          "description": "Add PIX payment option display in the checkout page. When PIX is available as a payment method, render the PIX QR code component and display the PIX key email for manual entry. Include clear instructions for PIX payment completion. Ensure the PIX section is responsive and works on mobile devices."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Implement PIX payload generation logic in frontend/src/lib/payments/pixPayload.ts to create valid PIX QR code strings",
+      "acceptanceCriteria": [
+        "Function generates valid PIX EMV QR code payload",
+        "Payload includes the email PIX key proj.defdriver+pagbank@gmail.com",
+        "Payload can optionally include transaction amount and description",
+        "Generated string is compatible with QR code libraries"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/lib/payments/pixPayload.ts",
+          "operation": "modify",
+          "description": "Implement PIX EMV QR code payload generation function. Create a function that generates a valid PIX static QR code string following the EMV QR Code specification. The function should use the fixed PIX key 'proj.defdriver+pagbank@gmail.com' and optionally accept transaction amount and description parameters. Return a string that can be encoded into a QR code. Follow PIX technical standards for payload format (Payload Format Indicator, Merchant Account Information, Transaction Amount, Country Code, Merchant Name, Merchant City, CRC16)."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Integrate QR code display component in CheckoutPage.tsx to render the PIX QR code when PIX payment method is selected",
+      "acceptanceCriteria": [
+        "QR code appears in the checkout flow",
+        "Component displays both the scannable QR code and the PIX key text",
+        "UI provides clear instructions for PIX payment completion",
+        "Layout is responsive and works on mobile devices"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/payments/PixQrCodeDisplay.tsx",
+          "operation": "create",
+          "description": "Create a PIX QR code display component that renders a scannable QR code and displays the PIX key email. Use a QR code library (such as qrcode.react or similar) to render the QR code from the PIX payload string. Display the email key 'proj.defdriver+pagbank@gmail.com' prominently for manual entry. Include clear payment instructions (scan QR code or copy PIX key manually). Style the component with appropriate spacing, borders, and responsive layout that works on mobile and desktop. Use shadcn/ui Card component for consistent styling."
+        },
+        {
+          "path": "frontend/src/pages/CheckoutPage.tsx",
+          "operation": "modify",
+          "description": "Import and integrate the PixQrCodeDisplay component into the checkout flow. Display the PIX QR code when PIX is selected as a payment method or when payment provider supports PIX. Position the component appropriately in the payment flow UI. Ensure the component receives the necessary props (amount, description) from the checkout context. Add conditional rendering logic to show/hide the PIX section based on payment method availability."
         }
       ]
     }

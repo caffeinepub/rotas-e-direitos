@@ -2,10 +2,32 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-increase-the-logo-size-in-the-applayout-header-component-beyond-the-current-dimensions-to-make-it-even-more-prominent-and-visible",
-      "featureTitle": "Increase the logo size in the AppLayout header component beyond the current dimensions to make it even more prominent and visible",
+      "featureId": "feature-generate-a-fixed-pix-qr-code-in-the-payment-checkout-flow-using-the-email-key-proj-defdriver-pagbank-gmail-com",
+      "featureTitle": "Generate a fixed PIX QR code in the payment checkout flow using the email key proj.defdriver+pagbank@gmail.com",
       "files": [
-        "frontend/src/components/AppLayout.tsx"
+        "frontend/src/pages/CheckoutPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-pix-payload-generation-logic-in-frontend-src-lib-payments-pixpayload-ts-to-create-valid-pix-qr-code-strings",
+      "featureTitle": "Implement PIX payload generation logic in frontend/src/lib/payments/pixPayload.ts to create valid PIX QR code strings",
+      "files": [
+        "frontend/src/lib/payments/pixPayload.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -20,6 +42,29 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-integrate-qr-code-display-component-in-checkoutpage-tsx-to-render-the-pix-qr-code-when-pix-payment-method-is-selected",
+      "featureTitle": "Integrate QR code display component in CheckoutPage.tsx to render the PIX QR code when PIX payment method is selected",
+      "files": [
+        "frontend/src/components/payments/PixQrCodeDisplay.tsx",
+        "frontend/src/pages/CheckoutPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0",
+        "blob-storage@4.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

@@ -14,6 +14,7 @@ import { sanitizeGatewayError } from '../lib/payments/gatewayErrorMessages';
 import { sanitizePagBankError } from '../lib/payments/pagbankErrorMessages';
 import TrustBadges from '../components/trust/TrustBadges';
 import PaymentStatusPanel from '../components/payments/PaymentStatusPanel';
+import PixQrCodeDisplay from '../components/payments/PixQrCodeDisplay';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ export default function CheckoutPage() {
   const { flowStatus, startPayment, checkStatus, reset, isInitiating, isCheckingStatus } = paymentHook;
   
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [showPixQrCode, setShowPixQrCode] = useState(false);
 
   useEffect(() => {
     if (!selectedPlan) {
@@ -77,6 +79,11 @@ export default function CheckoutPage() {
   const handleRetry = () => {
     reset();
     setErrorMessage(null);
+    setShowPixQrCode(false);
+  };
+
+  const handleShowPixQrCode = () => {
+    setShowPixQrCode(true);
   };
 
   if (!plan) {
@@ -150,8 +157,11 @@ export default function CheckoutPage() {
         </CardContent>
       </Card>
 
+      {/* PIX QR Code Display */}
+      {showPixQrCode && <PixQrCodeDisplay />}
+
       {/* Payment Status or Initiate Button */}
-      {flowStatus.state === 'idle' ? (
+      {flowStatus.state === 'idle' && !showPixQrCode ? (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -159,9 +169,7 @@ export default function CheckoutPage() {
               Método de Pagamento
             </CardTitle>
             <CardDescription>
-              {activeProvider === 'pagbank' 
-                ? 'Você será redirecionado para o PagBank para concluir o pagamento'
-                : 'Você será redirecionado para o gateway de pagamento para concluir o pagamento'}
+              Escolha como deseja pagar sua assinatura
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -171,9 +179,33 @@ export default function CheckoutPage() {
               </Alert>
             )}
 
+            {/* PIX Payment Option */}
+            <Button
+              onClick={handleShowPixQrCode}
+              variant="default"
+              className="w-full"
+              size="lg"
+            >
+              <CreditCard className="h-4 w-4 mr-2" />
+              Pagar com PIX
+            </Button>
+
+            {/* Alternative Payment Option */}
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Ou
+                </span>
+              </div>
+            </div>
+
             <Button
               onClick={handleInitiatePayment}
               disabled={isInitiating}
+              variant="outline"
               className="w-full"
               size="lg"
             >
@@ -185,7 +217,9 @@ export default function CheckoutPage() {
               ) : (
                 <>
                   <CreditCard className="h-4 w-4 mr-2" />
-                  Prosseguir para Pagamento
+                  {activeProvider === 'pagbank' 
+                    ? 'Pagar com PagBank (Cartão)' 
+                    : 'Pagar com Cartão'}
                 </>
               )}
             </Button>
@@ -193,7 +227,7 @@ export default function CheckoutPage() {
             <TrustBadges />
           </CardContent>
         </Card>
-      ) : (
+      ) : flowStatus.state !== 'idle' ? (
         <PaymentStatusPanel
           flowStatus={flowStatus}
           onRetry={handleRetry}
@@ -201,7 +235,7 @@ export default function CheckoutPage() {
           isCheckingStatus={isCheckingStatus}
           provider={activeProvider}
         />
-      )}
+      ) : null}
     </div>
   );
 }

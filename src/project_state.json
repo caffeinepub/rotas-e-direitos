@@ -7,16 +7,39 @@
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-increase-the-logo-size-in-the-applayout-header-component-beyond-the-current-dimensions-to-make-it-even-more-prominent-and-visible",
-      "title": "Increase the logo size in the AppLayout header component beyond the current dimensions to make it even more prominent and visible",
+      "id": "feature-generate-a-fixed-pix-qr-code-in-the-payment-checkout-flow-using-the-email-key-proj-defdriver-pagbank-gmail-com",
+      "title": "Generate a fixed PIX QR code in the payment checkout flow using the email key proj.defdriver+pagbank@gmail.com",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-pix-payload-generation-logic-in-frontend-src-lib-payments-pixpayload-ts-to-create-valid-pix-qr-code-strings",
+      "title": "Implement PIX payload generation logic in frontend/src/lib/payments/pixPayload.ts to create valid PIX QR code strings",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-integrate-qr-code-display-component-in-checkoutpage-tsx-to-render-the-pix-qr-code-when-pix-payment-method-is-selected",
+      "title": "Integrate QR code display component in CheckoutPage.tsx to render the PIX QR code when PIX payment method is selected",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Increase logo size further",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Add fixed PIX QR code in payment checkout with email key proj.defdriver+pagbank@gmail.com",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Rotas e Direitos",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

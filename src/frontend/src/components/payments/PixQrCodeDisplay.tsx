@@ -1,0 +1,165 @@
+import { useState, useEffect } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Copy, Check, QrCode as QrCodeIcon } from 'lucide-react';
+import { generateFixedPixPayload } from '@/lib/payments/pixPayload';
+import { generateQRCodeDataURL } from '@/lib/payments/qrCodeGenerator';
+
+interface PixQrCodeDisplayProps {
+  amount?: number;
+  description?: string;
+}
+
+export default function PixQrCodeDisplay({ amount, description }: PixQrCodeDisplayProps) {
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>('');
+  const [pixPayload, setPixPayload] = useState<string>('');
+  const [copied, setCopied] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const pixKey = 'proj.defdriver+pagbank@gmail.com';
+
+  useEffect(() => {
+    const loadQRCode = async () => {
+      setIsLoading(true);
+      try {
+        const payload = generateFixedPixPayload();
+        setPixPayload(payload);
+
+        // Generate QR code image
+        const dataUrl = await generateQRCodeDataURL(payload, 300);
+        setQrCodeDataUrl(dataUrl);
+      } catch (err) {
+        console.error('Error generating QR code:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadQRCode();
+  }, [amount, description]);
+
+  const handleCopyPixKey = async () => {
+    try {
+      await navigator.clipboard.writeText(pixKey);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  const handleCopyPayload = async () => {
+    try {
+      await navigator.clipboard.writeText(pixPayload);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <QrCodeIcon className="h-5 w-5" />
+          Pagamento via PIX
+        </CardTitle>
+        <CardDescription>
+          Escaneie o QR Code ou copie a chave PIX para realizar o pagamento
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* QR Code Display */}
+        <div className="flex flex-col items-center space-y-4">
+          {isLoading ? (
+            <div className="w-[300px] h-[300px] bg-muted animate-pulse rounded-lg flex items-center justify-center">
+              <QrCodeIcon className="h-12 w-12 text-muted-foreground" />
+            </div>
+          ) : qrCodeDataUrl ? (
+            <div className="bg-white p-4 rounded-lg border-2 border-border">
+              <img
+                src={qrCodeDataUrl}
+                alt="PIX QR Code"
+                className="w-full max-w-[300px] h-auto"
+              />
+            </div>
+          ) : (
+            <div className="w-[300px] h-[300px] bg-muted rounded-lg flex items-center justify-center">
+              <p className="text-sm text-muted-foreground">Erro ao gerar QR Code</p>
+            </div>
+          )}
+
+          <Alert>
+            <AlertDescription className="text-center">
+              Escaneie este QR Code com o app do seu banco para pagar
+            </AlertDescription>
+          </Alert>
+        </div>
+
+        {/* PIX Key Display */}
+        <div className="space-y-3">
+          <div>
+            <label className="text-sm font-medium text-muted-foreground">
+              Chave PIX (Email)
+            </label>
+            <div className="flex items-center gap-2 mt-1">
+              <div className="flex-1 p-3 bg-muted rounded-md font-mono text-sm break-all">
+                {pixKey}
+              </div>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleCopyPixKey}
+                title="Copiar chave PIX"
+              >
+                {copied ? (
+                  <Check className="h-4 w-4 text-green-600" />
+                ) : (
+                  <Copy className="h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Copy Payload Button */}
+          <Button
+            variant="secondary"
+            className="w-full"
+            onClick={handleCopyPayload}
+            disabled={!pixPayload}
+          >
+            {copied ? (
+              <>
+                <Check className="h-4 w-4 mr-2 text-green-600" />
+                Código PIX Copiado!
+              </>
+            ) : (
+              <>
+                <Copy className="h-4 w-4 mr-2" />
+                Copiar Código PIX (Pix Copia e Cola)
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* Instructions */}
+        <div className="space-y-2 text-sm text-muted-foreground">
+          <p className="font-semibold text-foreground">Como pagar:</p>
+          <ol className="list-decimal list-inside space-y-1 ml-2">
+            <li>Abra o app do seu banco</li>
+            <li>Escolha a opção "Pagar com PIX"</li>
+            <li>Escaneie o QR Code acima OU copie a chave PIX</li>
+            <li>Confirme o pagamento no app do seu banco</li>
+          </ol>
+          <Alert className="mt-4">
+            <AlertDescription>
+              <strong>Importante:</strong> Após realizar o pagamento, aguarde alguns instantes.
+              Sua assinatura será ativada automaticamente.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}

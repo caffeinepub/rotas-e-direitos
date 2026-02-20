@@ -54,7 +54,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-24 md:h-28 lg:h-32 items-center justify-between px-4">
+        <div className="container flex h-32 md:h-40 lg:h-48 items-center justify-between px-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -65,9 +65,9 @@ export default function AppLayout({ children }: AppLayoutProps) {
             </button>
             <Link to="/" className="flex items-center gap-3">
               <img 
-                src="/assets/nova logo-1.png" 
+                src="/assets/generated/logo.dim_400x400.png" 
                 alt="Rotas e Direitos Logo" 
-                className="h-20 w-auto object-contain md:h-24 lg:h-28"
+                className="h-32 w-auto object-contain md:h-40 lg:h-48"
               />
             </Link>
           </div>
@@ -92,7 +92,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         >
-          <nav className="fixed left-0 top-24 md:top-28 lg:top-32 bottom-0 w-64 bg-background border-r border-border p-4 overflow-y-auto">
+          <nav className="fixed left-0 top-32 md:top-40 lg:top-48 bottom-0 w-64 bg-background border-r border-border p-4 overflow-y-auto">
             <div className="space-y-6">
               {isAuthenticated && (
                 <>

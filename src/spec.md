@@ -1,11 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Increase the logo size in the header to make it more prominent and visible.
+**Goal:** Add a fixed PIX QR code to the payment checkout flow using a specific email key.
 
 **Planned changes:**
-- Increase the logo dimensions in the AppLayout header component beyond the current size
-- Ensure the logo maintains proper aspect ratio and visual quality
-- Verify the larger logo works well on both desktop and mobile viewports
+- Generate a PIX QR code payload using the email key proj.defdriver+pagbank@gmail.com
+- Display the scannable QR code in the checkout page when PIX payment is selected
+- Show the PIX key email alongside the QR code for manual entry
+- Provide clear payment instructions for users
 
-**User-visible outcome:** Users will see a larger, more prominent logo in the application header across all devices.
+**User-visible outcome:** Users can complete purchases by scanning a PIX QR code or manually entering the PIX key email during checkout.
