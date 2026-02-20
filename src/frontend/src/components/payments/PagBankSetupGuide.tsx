@@ -2,123 +2,87 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { CheckCircle2, AlertTriangle, ExternalLink, Code, Shield, TestTube } from 'lucide-react';
+import { ExternalLink, CheckCircle2, AlertTriangle, Info, Shield } from 'lucide-react';
+import { generateWebhookUrl } from '../../lib/canisterConfig';
 
 export default function PagBankSetupGuide() {
+  const webhookUrl = generateWebhookUrl();
+
   return (
-    <Card>
+    <Card className="border-2">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
-          <Shield className="h-5 w-5 text-primary" />
-          Guia de Integração PagBank
+          <Info className="h-5 w-5" />
+          Guia de Configuração do PagBank
         </CardTitle>
         <CardDescription>
-          Siga os passos abaixo para configurar o PagBank como provedor de pagamento
+          Siga estas etapas para configurar a integração com o PagBank
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
-        {/* Security Warning */}
-        <Alert variant="destructive">
-          <AlertTriangle className="h-4 w-4" />
+        {/* SSL/HTTPS Notice */}
+        <Alert>
+          <Shield className="h-4 w-4" />
           <AlertDescription>
-            <strong>Importante:</strong> Nunca compartilhe suas credenciais de API. Mantenha o Client Secret e Webhook Secret seguros.
+            <strong>SSL/HTTPS:</strong> O Internet Computer fornece automaticamente certificados SSL para todos os canisters. Sua aplicação já está protegida com HTTPS.
           </AlertDescription>
         </Alert>
 
-        {/* Step 1: Create Account */}
+        {/* Step 1: Account Setup */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Badge variant="default" className="h-6 w-6 rounded-full flex items-center justify-center p-0">
-              1
-            </Badge>
-            <h3 className="font-semibold text-lg">Criar Conta PagBank</h3>
-          </div>
-          <p className="text-sm text-muted-foreground ml-8">
-            Acesse{' '}
-            <a
-              href="https://pagseguro.uol.com.br/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline inline-flex items-center gap-1"
-            >
-              PagBank/PagSeguro
-              <ExternalLink className="h-3 w-3" />
-            </a>{' '}
-            e crie uma conta empresarial. Você precisará fornecer informações da sua empresa e documentação.
-          </p>
-        </div>
-
-        <Separator />
-
-        {/* Step 2: Access Developer Dashboard */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Badge variant="default" className="h-6 w-6 rounded-full flex items-center justify-center p-0">
-              2
-            </Badge>
-            <h3 className="font-semibold text-lg">Acessar Painel de Desenvolvedor</h3>
-          </div>
-          <p className="text-sm text-muted-foreground ml-8">
-            Faça login na sua conta PagBank e acesse o{' '}
-            <a
-              href="https://dev.pagseguro.uol.com.br/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:underline inline-flex items-center gap-1"
-            >
-              Painel de Desenvolvedor
-              <ExternalLink className="h-3 w-3" />
-            </a>
-            . Aqui você encontrará suas credenciais de API.
-          </p>
-        </div>
-
-        <Separator />
-
-        {/* Step 3: Generate API Credentials */}
-        <div className="space-y-3">
-          <div className="flex items-center gap-2">
-            <Badge variant="default" className="h-6 w-6 rounded-full flex items-center justify-center p-0">
-              3
-            </Badge>
-            <h3 className="font-semibold text-lg">Gerar Credenciais de API</h3>
+            <Badge variant="default" className="rounded-full w-6 h-6 flex items-center justify-center p-0">1</Badge>
+            <h3 className="font-semibold text-base">Criar Conta PagBank</h3>
           </div>
           <div className="ml-8 space-y-2">
             <p className="text-sm text-muted-foreground">
-              No painel de desenvolvedor, gere as seguintes credenciais:
+              Se você ainda não tem uma conta PagBank, crie uma em:
             </p>
-            <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-              <li><strong>Client ID:</strong> Identificador da sua aplicação</li>
-              <li><strong>Client Secret:</strong> Chave secreta para autenticação</li>
-              <li><strong>Merchant ID:</strong> Identificador da sua conta de vendedor</li>
-              <li><strong>Webhook Secret:</strong> Chave para validar notificações de webhook</li>
-            </ul>
+            <a
+              href="https://pagseguro.uol.com.br/registration/registration.jhtml"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+            >
+              Criar conta PagBank
+              <ExternalLink className="h-3 w-3" />
+            </a>
           </div>
         </div>
 
         <Separator />
 
-        {/* Step 4: Configure Webhook */}
+        {/* Step 2: API Credentials */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Badge variant="default" className="h-6 w-6 rounded-full flex items-center justify-center p-0">
-              4
-            </Badge>
-            <h3 className="font-semibold text-lg">Configurar Webhook</h3>
+            <Badge variant="default" className="rounded-full w-6 h-6 flex items-center justify-center p-0">2</Badge>
+            <h3 className="font-semibold text-base">Obter Credenciais de API</h3>
           </div>
           <div className="ml-8 space-y-3">
-            <p className="text-sm text-muted-foreground">
-              Configure a URL do webhook no painel PagBank para receber notificações de pagamento:
-            </p>
-            <div className="bg-muted p-3 rounded-md">
-              <code className="text-xs break-all">
-                https://&lt;canister-id&gt;.icp0.io/pagbank-webhook
-              </code>
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Para Checkout Padrão:</p>
+              <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground ml-2">
+                <li>Acesse o painel do PagBank</li>
+                <li>Navegue até <strong>Integrações → Credenciais</strong></li>
+                <li>Copie o <strong>Client ID</strong>, <strong>Client Secret</strong>, <strong>Merchant ID</strong></li>
+                <li>Gere um <strong>Webhook Secret</strong> para validação de notificações</li>
+              </ol>
             </div>
+            
+            <div className="space-y-2">
+              <p className="text-sm font-medium">Para Checkout Transparente:</p>
+              <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground ml-2">
+                <li>No painel do PagBank, vá para <strong>Integrações → Checkout Transparente</strong></li>
+                <li>Copie o <strong>Token</strong> (use sandbox para testes, produção para pagamentos reais)</li>
+                <li>Copie o <strong>Email</strong> da sua conta PagBank</li>
+                <li>Copie a <strong>Public Key</strong> (chave pública)</li>
+              </ol>
+            </div>
+
             <Alert>
-              <Code className="h-4 w-4" />
+              <AlertTriangle className="h-4 w-4" />
               <AlertDescription className="text-xs">
-                Substitua <code>&lt;canister-id&gt;</code> pelo ID do seu canister backend. O webhook receberá notificações sobre mudanças no status dos pagamentos.
+                <strong>Sandbox vs Produção:</strong> Use credenciais de sandbox durante o desenvolvimento e testes. Troque para credenciais de produção apenas quando estiver pronto para processar pagamentos reais.
               </AlertDescription>
             </Alert>
           </div>
@@ -126,52 +90,90 @@ export default function PagBankSetupGuide() {
 
         <Separator />
 
-        {/* Step 5: Test in Sandbox */}
+        {/* Step 3: Webhook Configuration */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Badge variant="default" className="h-6 w-6 rounded-full flex items-center justify-center p-0">
-              5
-            </Badge>
-            <h3 className="font-semibold text-lg">Testar em Modo Sandbox</h3>
+            <Badge variant="default" className="rounded-full w-6 h-6 flex items-center justify-center p-0">3</Badge>
+            <h3 className="font-semibold text-base">Configurar Webhook</h3>
           </div>
-          <div className="ml-8 space-y-3">
+          <div className="ml-8 space-y-2">
             <p className="text-sm text-muted-foreground">
-              Antes de ativar em produção, teste a integração usando o ambiente sandbox do PagBank:
+              Configure o webhook no painel do PagBank para receber notificações de status de pagamento:
             </p>
-            <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-              <li>Use credenciais de sandbox fornecidas pelo PagBank</li>
-              <li>Realize transações de teste com cartões de teste</li>
-              <li>Verifique se os webhooks estão sendo recebidos corretamente</li>
-              <li>Confirme que as assinaturas são ativadas após pagamento aprovado</li>
-            </ul>
+            <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground ml-2">
+              <li>No painel do PagBank, vá para <strong>Integrações → Notificações</strong></li>
+              <li>Clique em <strong>Adicionar URL de Notificação</strong></li>
+              <li>Cole a URL do webhook gerada automaticamente (veja abaixo)</li>
+              <li>Selecione os eventos: <strong>Pagamento Aprovado</strong>, <strong>Pagamento Recusado</strong>, <strong>Pagamento Cancelado</strong></li>
+              <li>Salve a configuração</li>
+            </ol>
+            <div className="mt-3 p-3 bg-muted rounded-md">
+              <p className="text-xs font-medium mb-1">URL do Webhook (gerada automaticamente):</p>
+              <code className="text-xs break-all">{webhookUrl}</code>
+            </div>
           </div>
         </div>
 
         <Separator />
 
-        {/* Step 6: Switch to Production */}
+        {/* Step 4: Testing */}
         <div className="space-y-3">
           <div className="flex items-center gap-2">
-            <Badge variant="default" className="h-6 w-6 rounded-full flex items-center justify-center p-0">
-              6
-            </Badge>
-            <h3 className="font-semibold text-lg">Ativar em Produção</h3>
+            <Badge variant="default" className="rounded-full w-6 h-6 flex items-center justify-center p-0">4</Badge>
+            <h3 className="font-semibold text-base">Testar Integração (Sandbox)</h3>
           </div>
-          <div className="ml-8 space-y-3">
+          <div className="ml-8 space-y-2">
             <p className="text-sm text-muted-foreground">
-              Após validar todos os testes, substitua as credenciais de sandbox pelas credenciais de produção:
+              Use o ambiente sandbox para testar pagamentos sem cobranças reais:
             </p>
+            <div className="space-y-2 text-sm text-muted-foreground">
+              <div>
+                <p className="font-medium">Cartões de Teste:</p>
+                <ul className="list-disc list-inside ml-2 space-y-1">
+                  <li><strong>Aprovado:</strong> 4111 1111 1111 1111</li>
+                  <li><strong>Recusado:</strong> 4000 0000 0000 0002</li>
+                  <li>CVV: qualquer 3 dígitos | Validade: qualquer data futura</li>
+                </ul>
+              </div>
+              <div>
+                <p className="font-medium">PIX de Teste:</p>
+                <p className="ml-2">O QR Code gerado no sandbox pode ser "pago" através do painel de testes do PagBank</p>
+              </div>
+            </div>
+            <a
+              href="https://dev.pagseguro.uol.com.br/reference/testing-intro"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+            >
+              Ver documentação de testes
+              <ExternalLink className="h-3 w-3" />
+            </a>
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Step 5: Production */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2">
+            <Badge variant="default" className="rounded-full w-6 h-6 flex items-center justify-center p-0">5</Badge>
+            <h3 className="font-semibold text-base">Ativar Produção</h3>
+          </div>
+          <div className="ml-8 space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Quando estiver pronto para processar pagamentos reais:
+            </p>
+            <ol className="list-decimal list-inside space-y-1 text-sm text-muted-foreground ml-2">
+              <li>Substitua as credenciais de sandbox pelas credenciais de produção</li>
+              <li>Verifique se o webhook está configurado no ambiente de produção</li>
+              <li>Teste com um pagamento real de valor baixo</li>
+              <li>Monitore os logs de webhook para confirmar que as notificações estão sendo recebidas</li>
+            </ol>
             <Alert>
               <CheckCircle2 className="h-4 w-4" />
               <AlertDescription className="text-xs">
-                <strong>Checklist de Pré-Produção:</strong>
-                <ul className="mt-2 space-y-1 list-disc list-inside">
-                  <li>Todas as transações de teste foram bem-sucedidas</li>
-                  <li>Webhooks estão funcionando corretamente</li>
-                  <li>Credenciais de produção foram obtidas</li>
-                  <li>URL do webhook foi atualizada para produção</li>
-                  <li>Documentação de segurança foi revisada</li>
-                </ul>
+                <strong>Dica:</strong> Mantenha as credenciais de sandbox salvas em um local seguro para poder voltar ao modo de teste quando necessário.
               </AlertDescription>
             </Alert>
           </div>
@@ -180,35 +182,35 @@ export default function PagBankSetupGuide() {
         <Separator />
 
         {/* Additional Resources */}
-        <div className="space-y-3">
-          <h3 className="font-semibold text-lg">Recursos Adicionais</h3>
-          <div className="space-y-2">
+        <div className="space-y-2">
+          <h3 className="font-semibold text-sm">Recursos Adicionais</h3>
+          <div className="space-y-1">
             <a
-              href="https://dev.pagseguro.uol.com.br/reference/api-de-pagamentos"
+              href="https://dev.pagseguro.uol.com.br/reference/intro-checkout-transparente"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-primary hover:underline flex items-center gap-1"
+              className="flex items-center gap-1 text-sm text-primary hover:underline"
             >
+              Documentação do Checkout Transparente
               <ExternalLink className="h-3 w-3" />
-              Documentação da API PagBank
             </a>
             <a
-              href="https://dev.pagseguro.uol.com.br/reference/webhooks"
+              href="https://dev.pagseguro.uol.com.br/reference/webhooks-intro"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-primary hover:underline flex items-center gap-1"
+              className="flex items-center gap-1 text-sm text-primary hover:underline"
             >
+              Documentação de Webhooks
               <ExternalLink className="h-3 w-3" />
-              Guia de Webhooks
             </a>
             <a
-              href="https://dev.pagseguro.uol.com.br/reference/ambiente-de-testes"
+              href="https://faq.pagseguro.uol.com.br/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm text-primary hover:underline flex items-center gap-1"
+              className="flex items-center gap-1 text-sm text-primary hover:underline"
             >
-              <TestTube className="h-3 w-3" />
-              Ambiente de Testes (Sandbox)
+              FAQ do PagBank
+              <ExternalLink className="h-3 w-3" />
             </a>
           </div>
         </div>

@@ -2,11 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-integrate-pagbank-payment-gateway-as-a-payment-provider-option-alongside-the-existing-gateway-provider-add-pagbank-specific-configuration-fields-in-the-admin-payment-settings-panel",
-      "featureTitle": "Integrate PagBank payment gateway as a payment provider option alongside the existing gateway provider. Add PagBank-specific configuration fields in the admin payment settings panel.",
+      "featureId": "feature-change-the-page-background-color-to-black-across-all-pages-and-components",
+      "featureTitle": "Change the page background color to black across all pages and components",
       "files": [
-        "frontend/src/hooks/useAdminPaymentConfig.ts",
-        "frontend/src/pages/AdminDashboardPage.tsx"
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
       ],
       "components": [
         "authorization@4.0.0",
@@ -19,16 +19,16 @@
         "http-outcalls@3.0.0"
       ],
       "testIds": [
-        "REQ-5"
+        "REQ-1"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-create-frontend-pagbank-payment-flow-hook-usepagbankpayment-that-handles-payment-initiation-redirects-users-to-pagbank-checkout-and-polls-for-payment-status-updates-after-return",
-      "featureTitle": "Create frontend PagBank payment flow hook (usePagBankPayment) that handles payment initiation, redirects users to PagBank checkout, and polls for payment status updates after return.",
+      "featureId": "feature-update-text-colors-throughout-the-application-to-use-orange-and-white-color-scheme-with-orange-for-headings-accents-and-white-for-body-text",
+      "featureTitle": "Update text colors throughout the application to use orange and white color scheme, with orange for headings/accents and white for body text",
       "files": [
-        "frontend/src/hooks/usePagBankPayment.ts",
-        "frontend/src/lib/payments/pagbankErrorMessages.ts"
+        "frontend/src/components/AppLayout.tsx",
+        "frontend/src/index.css"
       ],
       "components": [
         "authorization@4.0.0",
@@ -41,17 +41,15 @@
         "http-outcalls@3.0.0"
       ],
       "testIds": [
-        "REQ-7"
+        "REQ-2"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-checkoutpage-to-detect-selected-payment-provider-and-render-pagbank-specific-payment-flow-when-pagbank-is-configured-as-the-active-provider-while-maintaining-existing-gateway-provider-flow",
-      "featureTitle": "Update CheckoutPage to detect selected payment provider and render PagBank-specific payment flow when PagBank is configured as the active provider, while maintaining existing gateway provider flow.",
+      "featureId": "feature-integrate-the-user-provided-logo-into-the-page-layout-harmoniously-without-disrupting-the-existing-layout-or-mobile-responsiveness",
+      "featureTitle": "Integrate the user-provided logo into the page layout harmoniously without disrupting the existing layout or mobile responsiveness",
       "files": [
-        "frontend/src/components/payments/PaymentStatusPanel.tsx",
-        "frontend/src/lib/payments/providerConfig.ts",
-        "frontend/src/pages/CheckoutPage.tsx"
+        "frontend/src/components/AppLayout.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -64,16 +62,16 @@
         "http-outcalls@3.0.0"
       ],
       "testIds": [
-        "REQ-9"
+        "REQ-3"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-create-pagbanksetupguide-component-in-frontend-src-components-payments-that-provides-step-by-step-instructions-for-administrators-to-obtain-pagbank-api-credentials-configure-webhook-urls-and-test-the-integration-in-sandbox-mode",
-      "featureTitle": "Create PagBankSetupGuide component in frontend/src/components/payments/ that provides step-by-step instructions for administrators to obtain PagBank API credentials, configure webhook URLs, and test the integration in sandbox mode.",
+      "featureId": "feature-update-tailwind-css-configuration-and-global-styles-to-support-the-new-black-background-with-orange-and-white-color-palette",
+      "featureTitle": "Update Tailwind CSS configuration and global styles to support the new black background with orange and white color palette",
       "files": [
-        "frontend/src/components/payments/PagBankSetupGuide.tsx",
-        "frontend/src/pages/AdminDashboardPage.tsx"
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
       ],
       "components": [
         "authorization@4.0.0",
@@ -86,7 +84,7 @@
         "http-outcalls@3.0.0"
       ],
       "testIds": [
-        "REQ-10"
+        "REQ-4"
       ],
       "confidence": "high"
     }

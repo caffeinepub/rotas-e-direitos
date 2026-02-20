@@ -1,14 +1,12 @@
 # Specification
 
 ## Summary
-**Goal:** Integrate PagBank payment gateway as an alternative payment provider alongside the existing gateway, allowing administrators to configure and use PagBank for subscription payments.
+**Goal:** Update the application's visual design with a black background, orange and white text colors, and integrate the provided logo harmoniously.
 
 **Planned changes:**
-- Add PagBank as a selectable payment provider option in admin payment settings with API credential configuration fields
-- Implement backend payment session creation endpoint for PagBank that generates checkout URLs and tracks payment sessions
-- Create frontend payment flow hook (usePagBankPayment) for initiating payments, redirecting to PagBank checkout, and polling payment status
-- Add backend webhook handler to receive PagBank payment notifications and activate subscriptions on approved payments
-- Update CheckoutPage to detect active payment provider and render PagBank-specific flow when selected
-- Create PagBankSetupGuide component with step-by-step instructions for administrators to configure PagBank integration
+- Change all page backgrounds to black
+- Update text colors to use orange for headings/accents and white for body text
+- Integrate the user-provided logo into the header without disrupting layout or mobile responsiveness
+- Update Tailwind CSS configuration and global styles to support the new color palette
 
-**User-visible outcome:** Administrators can configure PagBank as the payment provider and users can complete subscription payments through PagBank checkout, with automatic subscription activation upon successful payment.
+**User-visible outcome:** The application will have a modern dark theme with black background, orange and white text, and a prominently displayed logo that works seamlessly across all devices.

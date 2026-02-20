@@ -2,19 +2,12 @@ import Runtime "mo:core/Runtime";
 import List "mo:core/List";
 import Map "mo:core/Map";
 import Time "mo:core/Time";
-import Nat "mo:core/Nat";
-import Text "mo:core/Text";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
-import Blob "mo:core/Blob";
-import Array "mo:core/Array";
 
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
-import OutCall "http-outcalls/outcall";
-import Migration "migration";
 
-(with migration = Migration.run)
 actor {
   type EvidenceType = { #selfie; #screenshot; #audio; #video };
   type Platform = { #ifood; #uber; #rappi; #ninetyNine };
@@ -135,6 +128,16 @@ actor {
     isBlockedByAdmin : Bool;
   };
 
+  public type TestimonialStatus = { #pending; #approved; #rejected };
+
+  public type Testimonial = {
+    id : Nat;
+    submitter : Principal.Principal;
+    content : Text;
+    timestamp : Int;
+    status : TestimonialStatus;
+  };
+
   public type PaymentProviderConfig = {
     enabled : Bool;
   };
@@ -165,6 +168,20 @@ actor {
     enabled : Bool;
   };
 
+  public type PagBankReturnWebhookUrlConfig = {
+    returnUrl : Text;
+    webhookUrl : Text;
+  };
+
+  public type PagBankTransparentCheckoutConfig = {
+    token : Text;
+    email : Text;
+    publicKey : Text;
+    acceptedPaymentTypes : [Text];
+    maxInstallments : Nat;
+    interestRate : ?Float;
+  };
+
   public type PaymentCheckoutResponse = {
     checkoutUrl : ?Text;
     paymentId : Text;
@@ -174,16 +191,6 @@ actor {
     paymentId : Text;
     status : Text;
     rawResponse : Text;
-  };
-
-  public type TestimonialStatus = { #pending; #approved; #rejected };
-
-  public type Testimonial = {
-    id : Nat;
-    submitter : Principal.Principal;
-    content : Text;
-    timestamp : Int;
-    status : TestimonialStatus;
   };
 
   public type PagBankWebhookPayload = {
@@ -222,6 +229,10 @@ actor {
       webhookSecret = null;
     };
   };
+
+  var pagbankTransparentCheckoutConfig : ?PagBankTransparentCheckoutConfig = null;
+
+  var pagbankReturnWebhookUrls : ?PagBankReturnWebhookUrlConfig = null;
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
     if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
@@ -311,6 +322,34 @@ actor {
     };
     validatePaymentConfig(config);
     paymentConfig := config;
+  };
+
+  public shared ({ caller }) func setPagBankTransparentCheckoutConfig(config : PagBankTransparentCheckoutConfig) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can set PagBank transparent checkout config");
+    };
+    pagbankTransparentCheckoutConfig := ?config;
+  };
+
+  public query ({ caller }) func getPagBankTransparentCheckoutConfig() : async ?PagBankTransparentCheckoutConfig {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can view PagBank transparent checkout config");
+    };
+    pagbankTransparentCheckoutConfig;
+  };
+
+  public shared ({ caller }) func setPagBankReturnWebhookUrls(config : PagBankReturnWebhookUrlConfig) : async () {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can set return & webhook URLs");
+    };
+    pagbankReturnWebhookUrls := ?config;
+  };
+
+  public query ({ caller }) func getPagBankReturnWebhookUrls() : async ?PagBankReturnWebhookUrlConfig {
+    if (not AccessControl.isAdmin(accessControlState, caller)) {
+      Runtime.trap("Unauthorized: Only admin can view return & webhook URLs");
+    };
+    pagbankReturnWebhookUrls;
   };
 
   public query func getPublicPaymentConfig() : async PublicPaymentConfig {
@@ -414,7 +453,7 @@ actor {
 
   func verifyPagBankWebhookSignature(payload : PagBankWebhookPayload) : Bool {
     switch (paymentConfig.pagbankProvider.webhookSecret) {
-      case (?secret) {
+      case (?_secret) {
         payload.signature.size() > 0;
       };
       case (null) {

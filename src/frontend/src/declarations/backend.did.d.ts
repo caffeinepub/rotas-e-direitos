@@ -23,6 +23,18 @@ export interface PagBankConfig {
   'enabled' : boolean,
   'clientSecret' : [] | [string],
 }
+export interface PagBankReturnWebhookUrlConfig {
+  'returnUrl' : string,
+  'webhookUrl' : string,
+}
+export interface PagBankTransparentCheckoutConfig {
+  'token' : string,
+  'publicKey' : string,
+  'maxInstallments' : bigint,
+  'email' : string,
+  'interestRate' : [] | [number],
+  'acceptedPaymentTypes' : Array<string>,
+}
 export interface PagBankWebhookPayload {
   'status' : string,
   'signature' : string,
@@ -120,6 +132,14 @@ export interface _SERVICE {
   'getApprovedTestimonials' : ActorMethod<[], Array<Testimonial>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getPagBankReturnWebhookUrls' : ActorMethod<
+    [],
+    [] | [PagBankReturnWebhookUrlConfig]
+  >,
+  'getPagBankTransparentCheckoutConfig' : ActorMethod<
+    [],
+    [] | [PagBankTransparentCheckoutConfig]
+  >,
   'getPendingTestimonials' : ActorMethod<[], Array<Testimonial>>,
   'getPublicPaymentConfig' : ActorMethod<[], PublicPaymentConfig>,
   'getSubscriptionStatus' : ActorMethod<[], SubscriptionStatus>,
@@ -129,6 +149,14 @@ export interface _SERVICE {
   'logWorkSession' : ActorMethod<[{ 'city' : string }], WorkSession>,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   'setLossProfile' : ActorMethod<[LossProfile], undefined>,
+  'setPagBankReturnWebhookUrls' : ActorMethod<
+    [PagBankReturnWebhookUrlConfig],
+    undefined
+  >,
+  'setPagBankTransparentCheckoutConfig' : ActorMethod<
+    [PagBankTransparentCheckoutConfig],
+    undefined
+  >,
   'setPaymentConfig' : ActorMethod<[PaymentConfig], undefined>,
   'submitTestimonial' : ActorMethod<[string], bigint>,
   'updateTestimonialStatus' : ActorMethod<

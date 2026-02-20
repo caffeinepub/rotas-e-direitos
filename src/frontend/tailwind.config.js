@@ -72,6 +72,11 @@ export default {
                     'accent-foreground': 'oklch(var(--sidebar-accent-foreground))',
                     border: 'oklch(var(--sidebar-border))',
                     ring: 'oklch(var(--sidebar-ring))'
+                },
+                orange: {
+                    DEFAULT: 'oklch(0.65 0.20 45)',
+                    light: 'oklch(0.70 0.22 45)',
+                    dark: 'oklch(0.60 0.18 45)'
                 }
             },
             borderRadius: {

@@ -1,166 +1,234 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { Menu, Home, FileText, Calculator, MessageSquare, BarChart3, CreditCard, User, Search, ShieldCheck } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
-import { Separator } from '@/components/ui/separator';
-import LoginButton from './LoginButton';
-import { useState } from 'react';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useIsAdmin } from '../hooks/useIsAdmin';
+import LoginButton from './LoginButton';
+import { 
+  Home, 
+  FileText, 
+  Camera, 
+  Calculator, 
+  Users, 
+  BookOpen, 
+  HelpCircle, 
+  Shield,
+  CreditCard,
+  User,
+  Search,
+  Menu,
+  X
+} from 'lucide-react';
+import { useState, ReactNode } from 'react';
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
+interface AppLayoutProps {
+  children: ReactNode;
+}
+
+export default function AppLayout({ children }: AppLayoutProps) {
   const { identity } = useInternetIdentity();
-  const isAuthenticated = !!identity;
   const { isAdmin } = useIsAdmin();
+  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const isAuthenticated = !!identity;
 
   const navItems = [
-    { to: '/', label: 'Início', icon: Home },
-    { to: '/evidencias', label: 'Evidências', icon: FileText },
-    { to: '/calculadora', label: 'Calculadora', icon: Calculator },
-    { to: '/recursos', label: 'Recursos', icon: MessageSquare },
-    { to: '/dados-coletivos', label: 'Dados Coletivos', icon: BarChart3 },
+    { to: '/', icon: Home, label: 'Dashboard' },
+    { to: '/evidencias', icon: Camera, label: 'Evidências' },
+    { to: '/calculadora', icon: Calculator, label: 'Calculadora' },
+    { to: '/recursos', icon: FileText, label: 'Recursos' },
+    { to: '/dados-coletivos', icon: Users, label: 'Coletivo' },
   ];
 
-  const quickAccessItems = [
-    { to: '/pagamentos', label: 'Pagamentos', icon: CreditCard },
-    { to: '/perfil', label: 'Perfil', icon: User },
-    { to: '/consulta-rapida', label: 'Consulta Rápida', icon: Search },
+  const accountItems = [
+    { to: '/perfil', icon: User, label: 'Perfil' },
+    { to: '/planos', icon: CreditCard, label: 'Planos' },
+    { to: '/consulta-rapida', icon: Search, label: 'Processos' },
   ];
 
-  const handleNavClick = (to: string) => {
-    setOpen(false);
-    navigate({ to });
-  };
+  const legalItems = [
+    { to: '/privacidade', icon: Shield, label: 'Privacidade' },
+    { to: '/politica-dados', icon: Shield, label: 'Dados' },
+  ];
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
-      <header className="sticky top-0 z-50 w-full border-b border-border/60 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/70 shadow-sm">
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between px-4">
           <div className="flex items-center gap-4">
-            <Sheet open={open} onOpenChange={setOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="md:hidden">
-                  <Menu className="h-6 w-6" />
-                  <span className="sr-only">Menu</span>
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="left" className="w-64">
-                <nav className="flex flex-col gap-2 mt-8">
-                  {navItems.map((item) => {
-                    const Icon = item.icon;
-                    return (
-                      <Button
-                        key={item.to}
-                        variant="ghost"
-                        className="justify-start text-lg h-14"
-                        onClick={() => handleNavClick(item.to)}
-                      >
-                        <Icon className="mr-3 h-5 w-5" />
-                        {item.label}
-                      </Button>
-                    );
-                  })}
-                  {isAuthenticated && (
-                    <>
-                      <Separator className="my-2" />
-                      <div className="px-3 py-2 text-sm font-semibold text-muted-foreground">
-                        Acesso Rápido
-                      </div>
-                      {quickAccessItems.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                          <Button
-                            key={item.to}
-                            variant="ghost"
-                            className="justify-start text-base h-12"
-                            onClick={() => handleNavClick(item.to)}
-                          >
-                            <Icon className="mr-3 h-4 w-4" />
-                            {item.label}
-                          </Button>
-                        );
-                      })}
-                      {isAdmin && (
-                        <>
-                          <Separator className="my-2" />
-                          <Button
-                            variant="ghost"
-                            className="justify-start text-base h-12 text-primary"
-                            onClick={() => handleNavClick('/admin')}
-                          >
-                            <ShieldCheck className="mr-3 h-4 w-4" />
-                            Admin
-                          </Button>
-                        </>
-                      )}
-                    </>
-                  )}
-                </nav>
-              </SheetContent>
-            </Sheet>
-
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="lg:hidden p-2 hover:bg-accent/20 rounded-md transition-colors text-foreground"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
             <Link to="/" className="flex items-center gap-3">
-              <img
-                src="/assets/generated/logo-rotas-e-direitos.dim_512x512.png"
-                alt="ROTAS E DIREITOS"
-                className="h-10 w-10"
+              <img 
+                src="/assets/generated/logo.dim_200x80.png" 
+                alt="Rotas e Direitos Logo" 
+                className="h-10 w-auto object-contain md:h-12"
               />
-              <span className="font-bold text-xl hidden sm:inline-block bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                ROTAS E DIREITOS
-              </span>
+              <h1 className="text-lg md:text-xl font-bold text-primary hidden sm:block">
+                Rotas e Direitos
+              </h1>
             </Link>
           </div>
-
-          <nav className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              return (
-                <Button key={item.to} variant="ghost" asChild className="text-base">
-                  <Link to={item.to}>
-                    <Icon className="mr-2 h-4 w-4" />
-                    {item.label}
-                  </Link>
-                </Button>
-              );
-            })}
-            {isAdmin && (
-              <Button variant="ghost" asChild className="text-base text-primary">
-                <Link to="/admin">
-                  <ShieldCheck className="mr-2 h-4 w-4" />
-                  Admin
-                </Link>
-              </Button>
+          <div className="flex items-center gap-4">
+            {isAuthenticated && (
+              <Link
+                to="/"
+                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/20 hover:bg-primary/30 text-primary transition-colors"
+              >
+                <Home className="h-4 w-4" />
+                <span className="font-medium">Dashboard</span>
+              </Link>
             )}
-          </nav>
-
-          <LoginButton />
+            <LoginButton />
+          </div>
         </div>
       </header>
 
-      <main className="flex-1 container px-4 py-8">{children}</main>
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <nav className="fixed left-0 top-16 bottom-0 w-64 bg-background border-r border-border p-4 overflow-y-auto">
+            <div className="space-y-6">
+              {isAuthenticated && (
+                <>
+                  <div>
+                    <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                      Navegação
+                    </h3>
+                    <div className="space-y-1">
+                      {navItems.map((item) => (
+                        <Link
+                          key={item.to}
+                          to={item.to}
+                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/20 transition-colors text-foreground"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <item.icon className="h-4 w-4 text-primary" />
+                          <span>{item.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
 
-      <footer className="border-t border-border/60 bg-card/30 backdrop-blur-sm mt-auto">
-        <div className="container px-4 py-6">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="flex flex-wrap justify-center gap-4 text-sm text-muted-foreground">
-              <Link to="/privacidade" className="hover:text-foreground underline transition-colors">
-                Política de Privacidade
-              </Link>
-              <Link to="/politica-dados" className="hover:text-foreground underline transition-colors">
-                Política de Dados
-              </Link>
+                  <div>
+                    <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                      Conta
+                    </h3>
+                    <div className="space-y-1">
+                      {accountItems.map((item) => (
+                        <Link
+                          key={item.to}
+                          to={item.to}
+                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/20 transition-colors text-foreground"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <item.icon className="h-4 w-4 text-primary" />
+                          <span>{item.label}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+
+                  {isAdmin && (
+                    <div>
+                      <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                        Admin
+                      </h3>
+                      <div className="space-y-1">
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/20 transition-colors text-foreground"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Shield className="h-4 w-4 text-primary" />
+                          <span>Painel Admin</span>
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              <div>
+                <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                  Legal
+                </h3>
+                <div className="space-y-1">
+                  {legalItems.map((item) => (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/20 transition-colors text-foreground"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <item.icon className="h-4 w-4 text-primary" />
+                      <span>{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
             </div>
-            <p className="text-sm text-muted-foreground text-center">
-              © {new Date().getFullYear()} • Construído com ❤️ usando{' '}
+          </nav>
+        </div>
+      )}
+
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8">
+        {children}
+      </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border bg-card/30 backdrop-blur-sm mt-16">
+        <div className="container mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="font-semibold mb-3 text-primary">
+                Rotas e Direitos
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Plataforma de apoio para trabalhadores de aplicativos
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-3 text-primary">Links Rápidos</h4>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <Link to="/privacidade" className="text-muted-foreground hover:text-primary transition-colors">
+                    Política de Privacidade
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/politica-dados" className="text-muted-foreground hover:text-primary transition-colors">
+                    Política de Dados
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold mb-3 text-primary">Contato</h4>
+              <p className="text-sm text-muted-foreground">
+                Para dúvidas e suporte, entre em contato conosco
+              </p>
+            </div>
+          </div>
+          <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
+            <p>
+              © {new Date().getFullYear()} Rotas e Direitos. Built with ❤️ using{' '}
               <a
                 href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${encodeURIComponent(
                   typeof window !== 'undefined' ? window.location.hostname : 'rotas-e-direitos'
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="underline hover:text-foreground transition-colors"
+                className="text-primary hover:underline"
               >
                 caffeine.ai
               </a>

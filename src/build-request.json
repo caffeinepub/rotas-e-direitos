@@ -1,45 +1,67 @@
 {
   "kind": "build_request",
-  "title": "PagBank Payment Gateway Integration",
-  "projectName": "ROTAS E DIREITOS",
+  "title": "Update page layout with black background, orange/white text, and harmonious logo integration",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-5",
-      "text": "Integrate PagBank payment gateway as a payment provider option alongside the existing gateway provider. Add PagBank-specific configuration fields in the admin payment settings panel.",
-      "target": "both",
+      "id": "REQ-1",
+      "text": "Change the page background color to black across all pages and components",
+      "target": "frontend",
       "source": {
         "messageIds": [
           "msg-last"
         ],
         "quotes": [
-          "gostaria de fazer a integracao do gateway de pagamento com o pagbank como procedre passo a passo"
+          "MUDE O LAYOUTE DA PAGINA PARA UM FUNDO PRETO"
         ]
       },
       "acceptanceCriteria": [
-        "Admin can select PagBank as a payment provider in the payment configuration panel",
-        "PagBank configuration includes fields for API credentials (token, email) and sandbox/production mode toggle",
-        "Configuration is persisted in backend state and retrievable via public payment config query"
+        "All page backgrounds are black (#000000 or equivalent)",
+        "Background color is consistent across all routes and components",
+        "Dark mode CSS variables are updated to use black background"
       ]
     },
     {
-      "id": "REQ-6",
-      "text": "Implement backend PagBank payment session creation endpoint that generates payment links or checkout URLs using PagBank's API. Store payment sessions with reference IDs, amounts, and status tracking.",
-      "target": "backend",
+      "id": "REQ-2",
+      "text": "Update text colors throughout the application to use orange and white color scheme, with orange for headings/accents and white for body text",
+      "target": "frontend",
       "source": {
         "messageIds": [
           "msg-last"
+        ],
+        "quotes": [
+          "CORES DE LETRAS LARANJA E BRANCO"
         ]
       },
       "acceptanceCriteria": [
-        "Backend method createPagBankPayment accepts subscription plan ID and returns payment session data with checkout URL",
-        "Payment sessions are stored with unique reference IDs, timestamps, and initial 'pending' status",
-        "Method returns structured payment data including PagBank checkout URL and session reference"
+        "Primary headings and accent text use orange color",
+        "Body text and general content use white color",
+        "Text maintains sufficient contrast against black background for accessibility",
+        "Color scheme is applied consistently across all components"
       ]
     },
     {
-      "id": "REQ-7",
-      "text": "Create frontend PagBank payment flow hook (usePagBankPayment) that handles payment initiation, redirects users to PagBank checkout, and polls for payment status updates after return.",
+      "id": "REQ-3",
+      "text": "Integrate the user-provided logo into the page layout harmoniously without disrupting the existing layout or mobile responsiveness",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-last"
+        ],
+        "quotes": [
+          "COLOQUE ESTA LOGO NA PAGINA DE FORMA ARMONICA SEM PREJUDICAR O LAYOUT OU A ABERTURA DA PAGINA PARA DISPOSIVIVOS MOVEIS"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Logo is placed in a prominent but non-intrusive location (e.g., header)",
+        "Logo scales appropriately for mobile devices",
+        "Logo does not break or interfere with existing navigation or content layout",
+        "Logo maintains aspect ratio and quality across all screen sizes"
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Update Tailwind CSS configuration and global styles to support the new black background with orange and white color palette",
       "target": "frontend",
       "source": {
         "messageIds": [
@@ -47,75 +69,28 @@
         ]
       },
       "acceptanceCriteria": [
-        "Hook provides mutation to create PagBank payment with selected plan",
-        "On successful session creation, user is redirected to PagBank checkout URL",
-        "After returning from PagBank, hook polls payment status and updates UI accordingly",
-        "Hook invalidates subscription queries on successful payment completion"
-      ]
-    },
-    {
-      "id": "REQ-8",
-      "text": "Add PagBank webhook handler endpoint in backend to receive payment notifications from PagBank and update payment session status (approved, rejected, cancelled). Activate user subscription upon approved payment.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Backend method processPagBankWebhook validates and processes payment notifications",
-        "Payment session status is updated based on notification type (approved, rejected, cancelled)",
-        "On approved payment, user subscription is activated with appropriate plan and expiry date",
-        "Webhook signature validation ensures notifications are authentic"
-      ]
-    },
-    {
-      "id": "REQ-9",
-      "text": "Update CheckoutPage to detect selected payment provider and render PagBank-specific payment flow when PagBank is configured as the active provider, while maintaining existing gateway provider flow.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ]
-      },
-      "acceptanceCriteria": [
-        "CheckoutPage reads active payment provider from public payment config",
-        "When PagBank is active, page uses usePagBankPayment hook instead of useGatewayPayment",
-        "Payment status panel displays PagBank-specific status messages and actions",
-        "Existing gateway payment flow continues to work when gateway provider is selected"
-      ]
-    },
-    {
-      "id": "REQ-10",
-      "text": "Create PagBankSetupGuide component in frontend/src/components/payments/ that provides step-by-step instructions for administrators to obtain PagBank API credentials, configure webhook URLs, and test the integration in sandbox mode.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-last"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Component displays numbered steps with clear instructions for PagBank account creation",
-        "Includes guidance on obtaining API token and email credentials from PagBank dashboard",
-        "Provides webhook URL format and instructions for configuring it in PagBank settings",
-        "Includes testing checklist for sandbox mode validation before production use"
+        "CSS variables are updated with new color values",
+        "Tailwind theme configuration includes orange and white as primary colors",
+        "All components respect the new color system"
       ]
     }
   ],
   "constraints": [
-    "PagBank integration must coexist with existing gateway provider without breaking current payment flows",
-    "Payment provider selection must be configurable by admin and stored in backend state",
-    "PagBank API credentials must be stored securely in backend configuration",
-    "Webhook endpoint must validate PagBank notification signatures to prevent fraud"
+    "Do not modify the Internet Identity authentication components (frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts)",
+    "Do not edit components in frontend/src/components/ui directory",
+    "Maintain mobile responsiveness for all layout changes",
+    "Preserve all existing functionality while applying visual updates"
   ],
   "nonGoals": [
-    "Removing or replacing the existing gateway payment provider",
-    "Supporting multiple simultaneous payment providers for a single transaction",
-    "Implementing PIX payment method (unless specifically required by PagBank integration)",
-    "Automatic migration of existing payment data to PagBank format"
+    "Changing the functionality of any existing features",
+    "Modifying backend logic or data structures",
+    "Adding new pages or navigation items",
+    "Redesigning the overall information architecture"
   ],
   "imageRequirements": {
-    "required": [],
+    "required": [
+      "Logo image suitable for header placement with transparent background, optimized for both light and dark backgrounds (logo.dim_200x80.png)"
+    ],
     "edits": []
   }
 }

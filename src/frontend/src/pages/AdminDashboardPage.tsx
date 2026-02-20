@@ -9,7 +9,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Users, Settings, TrendingUp, Loader2, Save, AlertCircle, CheckCircle2, Ban, Unlock, ShieldAlert, Info, MessageSquare, ChevronDown, ChevronUp, HelpCircle } from 'lucide-react';
 import { useGetAllUserAccessInfo, useBlockUser, useUnblockUser } from '../hooks/useAdmin';
 import { useUpdatePaymentConfig } from '../hooks/useAdminPaymentConfig';
@@ -19,6 +19,7 @@ import { toast } from 'sonner';
 import { Principal } from '@dfinity/principal';
 import AdminTestimonialsModerationPanel from '../components/admin/AdminTestimonialsModerationPanel';
 import PagBankSetupGuide from '../components/payments/PagBankSetupGuide';
+import PagBankTransparentCheckoutForm from '../components/admin/PagBankTransparentCheckoutForm';
 import AdminGate from '../components/AdminGate';
 
 export default function AdminDashboardPage() {
@@ -434,52 +435,48 @@ export default function AdminDashboardPage() {
                           />
                         </div>
                       </div>
+
+                      <div className="flex items-center gap-3 pt-4">
+                        <Button onClick={handleSaveConfig} disabled={isSaving} className="min-w-[120px]">
+                          {isSaving ? (
+                            <>
+                              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                              Salvando...
+                            </>
+                          ) : (
+                            <>
+                              <Save className="h-4 w-4 mr-2" />
+                              Salvar
+                            </>
+                          )}
+                        </Button>
+
+                        {saveSuccess && (
+                          <div className="flex items-center text-sm text-green-600">
+                            <CheckCircle2 className="h-4 w-4 mr-2" />
+                            Salvo com sucesso
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </>
                 )}
               </CardContent>
             </Card>
 
-            {/* Save Configuration */}
-            <Card>
-              <CardContent className="pt-6 space-y-4">
-                {saveSuccess && (
-                  <Alert>
-                    <CheckCircle2 className="h-4 w-4" />
-                    <AlertDescription>
-                      Configuração salva com sucesso
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                {updateConfig.isError && (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>
-                      Falha ao salvar configuração. Por favor, tente novamente.
-                    </AlertDescription>
-                  </Alert>
-                )}
-
-                <Button
-                  onClick={handleSaveConfig}
-                  disabled={isSaving}
-                  className="w-full"
-                >
-                  {isSaving ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Salvando...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-4 w-4 mr-2" />
-                      Salvar Configuração
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
+            {/* PagBank Transparent Checkout Configuration */}
+            <Accordion type="single" collapsible className="w-full">
+              <AccordionItem value="transparent-checkout">
+                <AccordionTrigger className="text-lg font-semibold">
+                  Configuração do Checkout Transparente PagBank
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="pt-4">
+                    <PagBankTransparentCheckoutForm />
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
           </TabsContent>
         </Tabs>
       </div>

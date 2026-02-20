@@ -1,46 +1,41 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "Project with user dashboard, document verification system, and payment gateway integration",
-  "architectural_notes": [
-    "User data stored securely in Motoko backend canister",
-    "Document files stored as binary data in backend",
-    "Pop-up registration modal appears on first user access",
-    "Admin-only access control for user management and document viewing",
-    "PagBank payment gateway integration for transactions"
-  ],
+  "summary": "New project",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
+  "imageRequirements": "## Required Images\n- Logo image suitable for header placement with transparent background, optimized for both light and dark backgrounds (logo.dim_200x80.png)",
   "existing_features": [
     {
-      "id": "feature-integrate-pagbank-payment-gateway-as-a-payment-provider-option-alongside-the-existing-gateway-provider-add-pagbank-specific-configuration-fields-in-the-admin-payment-settings-panel",
-      "title": "Integrate PagBank payment gateway as a payment provider option alongside the existing gateway provider. Add PagBank-specific configuration fields in the admin payment settings panel.",
+      "id": "feature-change-the-page-background-color-to-black-across-all-pages-and-components",
+      "title": "Change the page background color to black across all pages and components",
       "reqIds": [
-        "REQ-5"
+        "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-create-frontend-pagbank-payment-flow-hook-usepagbankpayment-that-handles-payment-initiation-redirects-users-to-pagbank-checkout-and-polls-for-payment-status-updates-after-return",
-      "title": "Create frontend PagBank payment flow hook (usePagBankPayment) that handles payment initiation, redirects users to PagBank checkout, and polls for payment status updates after return.",
+      "id": "feature-update-text-colors-throughout-the-application-to-use-orange-and-white-color-scheme-with-orange-for-headings-accents-and-white-for-body-text",
+      "title": "Update text colors throughout the application to use orange and white color scheme, with orange for headings/accents and white for body text",
       "reqIds": [
-        "REQ-7"
+        "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-checkoutpage-to-detect-selected-payment-provider-and-render-pagbank-specific-payment-flow-when-pagbank-is-configured-as-the-active-provider-while-maintaining-existing-gateway-provider-flow",
-      "title": "Update CheckoutPage to detect selected payment provider and render PagBank-specific payment flow when PagBank is configured as the active provider, while maintaining existing gateway provider flow.",
+      "id": "feature-integrate-the-user-provided-logo-into-the-page-layout-harmoniously-without-disrupting-the-existing-layout-or-mobile-responsiveness",
+      "title": "Integrate the user-provided logo into the page layout harmoniously without disrupting the existing layout or mobile responsiveness",
       "reqIds": [
-        "REQ-9"
+        "REQ-3"
       ],
       "version": 1
     },
     {
-      "id": "feature-create-pagbanksetupguide-component-in-frontend-src-components-payments-that-provides-step-by-step-instructions-for-administrators-to-obtain-pagbank-api-credentials-configure-webhook-urls-and-test-the-integration-in-sandbox-mode",
-      "title": "Create PagBankSetupGuide component in frontend/src/components/payments/ that provides step-by-step instructions for administrators to obtain PagBank API credentials, configure webhook URLs, and test the integration in sandbox mode.",
+      "id": "feature-update-tailwind-css-configuration-and-global-styles-to-support-the-new-black-background-with-orange-and-white-color-palette",
+      "title": "Update Tailwind CSS configuration and global styles to support the new black background with orange and white color palette",
       "reqIds": [
-        "REQ-10"
+        "REQ-4"
       ],
       "version": 1
     }
@@ -48,46 +43,18 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "User registration dashboard with personal data collection (name, RG, CPF, birth date, mother's name, marital status, address, CEP, reference point)",
+      "summary": "Change page layout to black background with orange and white text colors",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Document upload system for CNH (digital or front/back), RG (front/back), or passport",
+      "summary": "Add logo to page harmoniously without affecting mobile responsiveness",
       "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-3",
-      "summary": "Administrative panel to view users, search/filter data, and block/unblock access",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-4",
-      "summary": "PagBank payment gateway integration",
-      "reqIds": [],
-      "status": "pending"
-    },
-    {
-      "id": "AR-6",
-      "summary": "Implement backend PagBank payment session creation endpoint that generates payment links or checkout URLs using PagBank's API. Store payment sessions with reference IDs, amounts, and status tracking.",
-      "reqIds": [
-        "REQ-6"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-8",
-      "summary": "Add PagBank webhook handler endpoint in backend to receive payment notifications from PagBank and update payment session status (approved, rejected, cancelled). Activate user subscription upon approved payment.",
-      "reqIds": [
-        "REQ-8"
-      ],
       "status": "pending"
     }
   ],
-  "projectName": "ROTAS E DIREITOS",
+  "projectName": "Update page layout with black background, orange/white text, and harmonious logo integration",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

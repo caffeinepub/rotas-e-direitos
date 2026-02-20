@@ -55,6 +55,18 @@ export const Testimonial = IDL.Record({
   'submitter' : Principal,
   'timestamp' : IDL.Int,
 });
+export const PagBankReturnWebhookUrlConfig = IDL.Record({
+  'returnUrl' : IDL.Text,
+  'webhookUrl' : IDL.Text,
+});
+export const PagBankTransparentCheckoutConfig = IDL.Record({
+  'token' : IDL.Text,
+  'publicKey' : IDL.Text,
+  'maxInstallments' : IDL.Nat,
+  'email' : IDL.Text,
+  'interestRate' : IDL.Opt(IDL.Float64),
+  'acceptedPaymentTypes' : IDL.Vec(IDL.Text),
+});
 export const PublicPaymentProviderConfig = IDL.Record({ 'enabled' : IDL.Bool });
 export const PublicPagBankConfig = IDL.Record({ 'enabled' : IDL.Bool });
 export const PublicPaymentConfig = IDL.Record({
@@ -134,6 +146,16 @@ export const idlService = IDL.Service({
   'getApprovedTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getPagBankReturnWebhookUrls' : IDL.Func(
+      [],
+      [IDL.Opt(PagBankReturnWebhookUrlConfig)],
+      ['query'],
+    ),
+  'getPagBankTransparentCheckoutConfig' : IDL.Func(
+      [],
+      [IDL.Opt(PagBankTransparentCheckoutConfig)],
+      ['query'],
+    ),
   'getPendingTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
   'getPublicPaymentConfig' : IDL.Func([], [PublicPaymentConfig], ['query']),
   'getSubscriptionStatus' : IDL.Func([], [SubscriptionStatus], ['query']),
@@ -147,6 +169,16 @@ export const idlService = IDL.Service({
     ),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'setLossProfile' : IDL.Func([LossProfile], [], []),
+  'setPagBankReturnWebhookUrls' : IDL.Func(
+      [PagBankReturnWebhookUrlConfig],
+      [],
+      [],
+    ),
+  'setPagBankTransparentCheckoutConfig' : IDL.Func(
+      [PagBankTransparentCheckoutConfig],
+      [],
+      [],
+    ),
   'setPaymentConfig' : IDL.Func([PaymentConfig], [], []),
   'submitTestimonial' : IDL.Func([IDL.Text], [IDL.Nat], []),
   'updateTestimonialStatus' : IDL.Func([IDL.Nat, TestimonialStatus], [], []),
@@ -201,6 +233,18 @@ export const idlFactory = ({ IDL }) => {
     'content' : IDL.Text,
     'submitter' : Principal,
     'timestamp' : IDL.Int,
+  });
+  const PagBankReturnWebhookUrlConfig = IDL.Record({
+    'returnUrl' : IDL.Text,
+    'webhookUrl' : IDL.Text,
+  });
+  const PagBankTransparentCheckoutConfig = IDL.Record({
+    'token' : IDL.Text,
+    'publicKey' : IDL.Text,
+    'maxInstallments' : IDL.Nat,
+    'email' : IDL.Text,
+    'interestRate' : IDL.Opt(IDL.Float64),
+    'acceptedPaymentTypes' : IDL.Vec(IDL.Text),
   });
   const PublicPaymentProviderConfig = IDL.Record({ 'enabled' : IDL.Bool });
   const PublicPagBankConfig = IDL.Record({ 'enabled' : IDL.Bool });
@@ -281,6 +325,16 @@ export const idlFactory = ({ IDL }) => {
     'getApprovedTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getPagBankReturnWebhookUrls' : IDL.Func(
+        [],
+        [IDL.Opt(PagBankReturnWebhookUrlConfig)],
+        ['query'],
+      ),
+    'getPagBankTransparentCheckoutConfig' : IDL.Func(
+        [],
+        [IDL.Opt(PagBankTransparentCheckoutConfig)],
+        ['query'],
+      ),
     'getPendingTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
     'getPublicPaymentConfig' : IDL.Func([], [PublicPaymentConfig], ['query']),
     'getSubscriptionStatus' : IDL.Func([], [SubscriptionStatus], ['query']),
@@ -294,6 +348,16 @@ export const idlFactory = ({ IDL }) => {
       ),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'setLossProfile' : IDL.Func([LossProfile], [], []),
+    'setPagBankReturnWebhookUrls' : IDL.Func(
+        [PagBankReturnWebhookUrlConfig],
+        [],
+        [],
+      ),
+    'setPagBankTransparentCheckoutConfig' : IDL.Func(
+        [PagBankTransparentCheckoutConfig],
+        [],
+        [],
+      ),
     'setPaymentConfig' : IDL.Func([PaymentConfig], [], []),
     'submitTestimonial' : IDL.Func([IDL.Text], [IDL.Nat], []),
     'updateTestimonialStatus' : IDL.Func([IDL.Nat, TestimonialStatus], [], []),

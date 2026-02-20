@@ -1,102 +1,86 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "PagBank Payment Gateway Integration",
+  "title": "Update page layout with black background, orange/white text, and harmonious logo integration",
   "requirements": [
     {
-      "id": "REQ-5",
-      "summary": "Add PagBank payment provider configuration UI in admin dashboard alongside existing gateway provider settings",
+      "id": "REQ-1",
+      "summary": "Change the page background color to black across all pages and components",
       "acceptanceCriteria": [
-        "Admin can select PagBank as a payment provider in the payment configuration panel",
-        "PagBank configuration includes fields for API credentials (token, email) and sandbox/production mode toggle",
-        "Configuration is persisted in backend state and retrievable via public payment config query"
+        "All page backgrounds are black (#000000 or equivalent)",
+        "Background color is consistent across all routes and components",
+        "Dark mode CSS variables are updated to use black background"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/AdminDashboardPage.tsx",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Add PagBank configuration section with form fields for merchantId, clientId, clientSecret, webhookSecret, and enabled toggle. Include sandbox/production mode indicator. Wire the PagBank fields into the existing payment configuration mutation alongside the gateway provider section. Display current PagBank config state from usePublicPaymentConfig hook. Verify the authorization component's usage instructions before implementing admin-only access."
+          "description": "Update CSS variables in the :root selector to use black (#000000) for background colors. Modify --background, --card, --popover, and related background color tokens to use pure black or OKLCH equivalent (oklch(0% 0 0)). Ensure the dark mode color scheme uses black as the base background across all color variants (default, variant-b, variant-c)."
         },
         {
-          "path": "frontend/src/hooks/useAdminPaymentConfig.ts",
+          "path": "frontend/tailwind.config.js",
           "operation": "modify",
-          "description": "Update the PaymentConfig type to match the backend interface structure with both gatewayProvider and pagbankProvider fields. Ensure the mutation properly serializes PagBank configuration fields when calling setPaymentConfig backend method."
-        },
-        {
-          "path": "frontend/src/hooks/usePublicPaymentConfig.ts",
-          "operation": "modify",
-          "description": "Update return type to match backend's PublicPaymentConfig structure including pagbankProvider field with enabled flag. Ensure the query properly handles both gateway and PagBank provider configurations."
+          "description": "Update the Tailwind theme configuration to include black as the default background color in the color system. Ensure backgroundColor utilities reference the updated CSS variables that now use black. Verify that container and component backgrounds inherit the black color scheme."
         }
       ]
     },
     {
-      "id": "REQ-7",
-      "summary": "Create PagBank payment flow hook that initiates payment sessions and handles checkout redirects",
+      "id": "REQ-2",
+      "summary": "Update text colors throughout the application to use orange and white color scheme, with orange for headings/accents and white for body text",
       "acceptanceCriteria": [
-        "Hook provides mutation to create PagBank payment with selected plan",
-        "On successful session creation, user is redirected to PagBank checkout URL",
-        "After returning from PagBank, hook polls payment status and updates UI accordingly",
-        "Hook invalidates subscription queries on successful payment completion"
+        "Primary headings and accent text use orange color",
+        "Body text and general content use white color",
+        "Text maintains sufficient contrast against black background for accessibility",
+        "Color scheme is applied consistently across all components"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/usePagBankPayment.ts",
-          "operation": "create",
-          "description": "Create a custom hook that mirrors the structure of useGatewayPayment.ts. Provide mutations for creating PagBank payment sessions via createPagBankPaymentSession backend method and checking payment status via checkPaymentStatus. Include state management for paymentId, checkoutUrl, and polling status. Implement redirect logic to navigate to PagBank checkout URL on successful session creation. Add polling mechanism that checks payment status every 5 seconds after user returns from checkout. Invalidate subscription queries on payment completion. Return interface matching useGatewayPayment for consistency."
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Update CSS variables for text colors to use white for --foreground (body text) and orange for --primary (headings and accents). Set --foreground to white (oklch(100% 0 0) or #FFFFFF) and --primary to orange (oklch(0.65 0.15 45) or a suitable orange like #FF8C00). Update --muted-foreground, --accent-foreground, and other text-related tokens to maintain the orange/white palette. Ensure sufficient contrast ratios for accessibility (WCAG AA minimum 4.5:1 for body text, 3:1 for large text)."
         },
         {
-          "path": "frontend/src/lib/payments/pagbankErrorMessages.ts",
-          "operation": "create",
-          "description": "Create error sanitization utility following the pattern of gatewayErrorMessages.ts. Map backend PagBank error responses to user-friendly Portuguese messages. Categorize errors by type (configuration, authentication, network, validation) and indicate whether admin action is required. Export sanitizePagBankError function."
+          "path": "frontend/src/components/AppLayout.tsx",
+          "operation": "modify",
+          "description": "Update text color classes in the AppLayout component to use the new orange/white scheme. Apply white text color classes (text-white or text-foreground) to navigation items, menu text, and general content. Use orange color classes (text-primary or text-orange-500) for headings, active navigation states, and accent elements. Ensure the header and sidebar text colors follow the new scheme."
         }
       ]
     },
     {
-      "id": "REQ-9",
-      "summary": "Update CheckoutPage to conditionally render PagBank payment flow based on active provider configuration",
+      "id": "REQ-3",
+      "summary": "Integrate the user-provided logo into the page layout harmoniously without disrupting the existing layout or mobile responsiveness",
       "acceptanceCriteria": [
-        "CheckoutPage reads active payment provider from public payment config",
-        "When PagBank is active, page uses usePagBankPayment hook instead of useGatewayPayment",
-        "Payment status panel displays PagBank-specific status messages and actions",
-        "Existing gateway payment flow continues to work when gateway provider is selected"
+        "Logo is placed in a prominent but non-intrusive location (e.g., header)",
+        "Logo scales appropriately for mobile devices",
+        "Logo does not break or interfere with existing navigation or content layout",
+        "Logo maintains aspect ratio and quality across all screen sizes"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/CheckoutPage.tsx",
+          "path": "frontend/src/components/AppLayout.tsx",
           "operation": "modify",
-          "description": "Add logic to read public payment config via usePublicPaymentConfig hook. Conditionally import and use either useGatewayPayment or usePagBankPayment based on which provider is enabled in the config. If both are enabled, prioritize PagBank. Pass the appropriate payment hook state to PaymentStatusPanel. Ensure backward compatibility with existing gateway flow."
-        },
-        {
-          "path": "frontend/src/components/payments/PaymentStatusPanel.tsx",
-          "operation": "modify",
-          "description": "Add provider parameter to distinguish between gateway and PagBank payment flows. Update status messages to be provider-aware (e.g., 'Redirecting to PagBank...' vs 'Redirecting to gateway...'). Handle PagBank-specific status codes and error messages using the pagbankErrorMessages utility. Maintain existing gateway flow UI."
-        },
-        {
-          "path": "frontend/src/lib/payments/providerConfig.ts",
-          "operation": "modify",
-          "description": "Extend provider selection storage to support 'pagbank' as a valid provider option alongside 'gateway'. Update type definitions and validation logic. Add helper functions to determine active provider from PublicPaymentConfig."
+          "description": "Add the generated logo image (frontend/public/assets/generated/logo.dim_200x80.png) to the header section of AppLayout. Place the logo in the left side of the header before or alongside the application title. Use an <img> tag with responsive width classes (e.g., w-32 md:w-40) to ensure the logo scales appropriately on mobile and desktop. Set max-height constraints (e.g., h-12 md:h-16) to prevent the logo from disrupting header layout. Ensure the logo has object-fit: contain to maintain aspect ratio. Add appropriate alt text for accessibility. Verify the logo displays correctly in both the desktop header and mobile menu states without breaking navigation functionality."
         }
       ]
     },
     {
-      "id": "REQ-10",
-      "summary": "Create PagBank setup guide component with step-by-step integration instructions for administrators",
+      "id": "REQ-4",
+      "summary": "Update Tailwind CSS configuration and global styles to support the new black background with orange and white color palette",
       "acceptanceCriteria": [
-        "Component displays numbered steps with clear instructions for PagBank account creation",
-        "Includes guidance on obtaining API token and email credentials from PagBank dashboard",
-        "Provides webhook URL format and instructions for configuring it in PagBank settings",
-        "Includes testing checklist for sandbox mode validation before production use"
+        "CSS variables are updated with new color values",
+        "Tailwind theme configuration includes orange and white as primary colors",
+        "All components respect the new color system"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/payments/PagBankSetupGuide.tsx",
-          "operation": "create",
-          "description": "Create an instructional component following the pattern intended for MercadoPagoSetupGuide.tsx. Structure content with numbered steps covering: (1) Creating a PagBank business account, (2) Accessing the PagBank developer dashboard, (3) Generating API credentials (merchant ID, client ID, client secret), (4) Configuring webhook URL (provide format: https://<canister-id>.icp0.io/pagbank-webhook), (5) Testing in sandbox mode, (6) Switching to production. Include code snippets, links to PagBank documentation, and a pre-production testing checklist. Use Card and Alert components from shadcn/ui for layout."
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Extend the Tailwind theme to include orange as a custom color in the colors object (e.g., 'orange': '#FF8C00' or appropriate orange shade). Ensure the backgroundColor, textColor, and borderColor utilities can access the new orange color. Update the theme configuration to map 'primary' to orange and ensure background defaults to black. Verify that all color tokens (primary, secondary, accent, destructive, etc.) work harmoniously with the black background and orange/white text scheme."
         },
         {
-          "path": "frontend/src/pages/AdminDashboardPage.tsx",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Add a collapsible section or dialog trigger that renders the PagBankSetupGuide component within the payment configuration area. Position it near the PagBank configuration form to provide contextual help to administrators."
+          "description": "Add global CSS rules to enforce the black background and orange/white text scheme across all pages. Set body background to black and default text color to white. Add utility classes or global overrides for common UI elements (cards, modals, sidebars) to ensure they use the black background. Update any hardcoded color values in global styles to use the new CSS variables. Ensure all variant classes (variant-b, variant-c) also support the black background with orange/white text."
         }
       ]
     }
