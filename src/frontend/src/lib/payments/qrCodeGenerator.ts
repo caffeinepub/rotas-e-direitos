@@ -1,37 +1,38 @@
 /**
- * Lightweight QR Code generator using Canvas API
- * This is a simplified implementation for generating QR codes client-side
+ * QR Code generator using a public API service
+ * Generates QR codes without requiring additional npm dependencies
  */
 
 export async function generateQRCodeDataURL(text: string, size: number = 300): Promise<string> {
-  // Use a public QR code API as a reliable fallback
-  // This approach works without additional dependencies
-  const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}&format=png&margin=10`;
-  
   try {
+    // Use qrserver.com API - a reliable public QR code generation service
+    const apiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}&format=png&margin=10&ecc=H`;
+    
     // Fetch the QR code image from the API
     const response = await fetch(apiUrl);
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const blob = await response.blob();
     
     // Convert blob to data URL
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
-      reader.onloadend = () => resolve(reader.result as string);
-      reader.onerror = reject;
+      reader.onloadend = () => {
+        const result = reader.result as string;
+        if (result) {
+          resolve(result);
+        } else {
+          reject(new Error('Failed to convert blob to data URL'));
+        }
+      };
+      reader.onerror = () => reject(new Error('FileReader error'));
       reader.readAsDataURL(blob);
     });
   } catch (error) {
     console.error('Error generating QR code:', error);
-    // Return a placeholder or throw
     throw new Error('Failed to generate QR code');
   }
-}
-
-/**
- * Alternative: Generate QR code using canvas (more complex, requires QR algorithm)
- * For now, we use the API approach which is simpler and reliable
- */
-export function getQRCodeImageUrl(text: string, size: number = 300): string {
-  // Direct URL approach - browser will fetch the image
-  return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}&format=png&margin=10`;
 }

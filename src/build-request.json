@@ -1,71 +1,70 @@
 {
   "kind": "build_request",
-  "title": "Add fixed PIX QR code to payment checkout",
-  "projectName": "Rotas e Direitos",
-  "priority": "normal",
+  "title": "Fix PIX QR code display bug in checkout",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Generate a fixed PIX QR code in the payment checkout flow using the email key proj.defdriver+pagbank@gmail.com",
+      "text": "Debug and fix the PIX QR code generation and display logic in the checkout flow to ensure the QR code appears correctly when users select PIX payment method",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-last"
+          "msg-6"
         ],
         "quotes": [
-          "no checkout de pagamento crie um qr code pix fixo com a chave email: proj.defdriver+pagbank@gmail.com"
+          "corrija bugs na criacao do qr code pix . ele nao esta aparecendo!"
         ]
       },
       "acceptanceCriteria": [
-        "PIX QR code is displayed in the checkout page",
-        "QR code uses the fixed PIX key proj.defdriver+pagbank@gmail.com",
-        "QR code is scannable and follows PIX QR code standards",
-        "The PIX key email is visible alongside the QR code for manual entry"
+        "PIX QR code image renders visibly in the checkout page when PIX payment is selected",
+        "QR code payload is generated correctly using the pixPayload utility",
+        "QR code image URL is generated successfully via qrCodeGenerator",
+        "Copy-to-clipboard functionality works for both QR payload and PIX key",
+        "No console errors related to QR code generation or display"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Implement PIX payload generation logic in frontend/src/lib/payments/pixPayload.ts to create valid PIX QR code strings",
+      "text": "Verify that the PixQrCodeDisplay component properly receives the PIX email key and displays it alongside the QR code",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-last"
+          "msg-6"
         ]
       },
       "acceptanceCriteria": [
-        "Function generates valid PIX EMV QR code payload",
-        "Payload includes the email PIX key proj.defdriver+pagbank@gmail.com",
-        "Payload can optionally include transaction amount and description",
-        "Generated string is compatible with QR code libraries"
+        "PIX email key is passed correctly to PixQrCodeDisplay component",
+        "Email key displays below the QR code with copy button",
+        "Component handles loading and error states appropriately"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Integrate QR code display component in CheckoutPage.tsx to render the PIX QR code when PIX payment method is selected",
+      "text": "Check CheckoutPage integration with payment providers to ensure PIX QR code display is triggered correctly for both Gateway and PagBank payment flows",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-last"
+          "msg-6"
         ]
       },
       "acceptanceCriteria": [
-        "QR code appears in the checkout flow",
-        "Component displays both the scannable QR code and the PIX key text",
-        "UI provides clear instructions for PIX payment completion",
-        "Layout is responsive and works on mobile devices"
+        "PIX QR code displays when using Gateway provider",
+        "PIX QR code displays when using PagBank provider",
+        "Proper conditional rendering based on selected payment provider",
+        "Payment amount is correctly passed to QR code generation"
       ]
     }
   ],
   "constraints": [
-    "Use the exact PIX key email: proj.defdriver+pagbank@gmail.com",
-    "QR code must be a fixed/static code, not dynamically generated per transaction",
-    "Implementation must be frontend-only; no backend changes required"
+    "Do not modify the PIX payload generation algorithm in frontend/src/lib/payments/pixPayload.ts unless a format error is identified",
+    "Maintain existing QR code API integration with qrserver.com in frontend/src/lib/payments/qrCodeGenerator.ts",
+    "Preserve the PixQrCodeDisplay component's copy-to-clipboard functionality"
   ],
   "nonGoals": [
-    "Dynamic PIX keys or per-transaction QR codes",
-    "Backend payment verification or webhook integration",
-    "Integration with payment gateway APIs for PIX",
-    "Automatic payment confirmation or status tracking"
+    "Adding new payment methods beyond PIX",
+    "Redesigning the checkout page layout",
+    "Implementing payment webhook handling",
+    "Adding payment confirmation notifications"
   ],
   "imageRequirements": {
     "required": [],

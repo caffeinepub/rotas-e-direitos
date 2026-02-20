@@ -48,7 +48,7 @@
   "frontend/src/hooks/usePublicPaymentConfig.ts": "React Query hook for fetching public payment provider configuration including both gateway and PagBank enabled status with proper error handling and caching.",
   "frontend/src/lib/payments/providerConfig.ts": "Payment provider configuration layer managing 'gateway' and 'pagbank' provider identifiers with localStorage utilities and helper function to determine active provider from public config with PagBank priority.",
   "frontend/package.json": "Frontend package configuration with all dependencies including the newly added qrcode library for PIX QR code generation.",
-  "frontend/src/types/qrcode.d.ts": "TypeScript type declarations for the qrcode npm package defining the toDataURL function and its options interface.",
+  "frontend/src/types/qrcode.d.ts": "TypeScript type declarations for the qrcode npm package defining the toDataURL function with comprehensive options interface including error correction levels, colors, dimensions, and output formats.",
   "frontend/src/types/case.ts": "TypeScript type definitions for Case management including case structure, evidence/appeal attachments, timeline events, and case status enums.",
   "frontend/src/lib/casesStorage.ts": "Offline-first localStorage-based case persistence layer with CRUD operations, evidence/appeal linking, and timeline event management scoped by authenticated principal.",
   "frontend/src/hooks/useCases.ts": "React Query hooks for case management operations including create, read, update, attach evidence, and attach appeals with proper cache invalidation.",
@@ -111,6 +111,6 @@
   "frontend/src/components/admin/PagBankWebhookUrlDisplay.tsx": "Component that displays the auto-generated webhook URL with copy-to-clipboard functionality and allows configuration of the return URL with validation.",
   "frontend/src/components/admin/PagBankTransparentCheckoutForm.tsx": "Form component for PagBank transparent checkout configuration with input fields for token, email, public key, payment type checkboxes, installment settings, and interest rate with validation and save functionality.",
   "frontend/src/hooks/useActor.ts": "Actor initialization hook that creates backend actor with proper identity handling, error handling, and query invalidation without calling non-existent initialization methods.",
-  "frontend/src/components/payments/PixQrCodeDisplay.tsx": "PIX QR code display component that renders a scannable QR code using an external API service, displays the PIX key email for manual entry, includes copy-to-clipboard functionality for both the key and payload, and provides clear payment instructions in Portuguese with proper loading states.",
-  "frontend/src/lib/payments/qrCodeGenerator.ts": "QR code generator utility using a public QR code API service to generate QR code images from text without requiring additional npm dependencies."
+  "frontend/src/components/payments/PixQrCodeDisplay.tsx": "PIX QR code display component that generates and renders a scannable QR code using a public API service, displays the PIX key email for manual entry, includes separate copy-to-clipboard functionality for both the key and payload with individual state tracking, provides clear payment instructions in Portuguese, and shows proper loading and error states.",
+  "frontend/src/lib/payments/qrCodeGenerator.ts": "QR code generator utility using the qrserver.com public API to generate QR code data URLs without requiring npm dependencies, with proper error handling and blob-to-dataURL conversion."
 }

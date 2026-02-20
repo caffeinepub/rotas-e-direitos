@@ -1,45 +1,44 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "New project",
-  "architectural_notes": [],
-  "known_issues": [],
-  "isFixRequest": false,
+  "summary": "E-commerce application with PIX payment integration",
+  "architectural_notes": [
+    "PIX QR code generation integrated in checkout flow",
+    "Email-based PIX key implementation"
+  ],
+  "known_issues": [
+    "PIX QR code not displaying in checkout"
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-generate-a-fixed-pix-qr-code-in-the-payment-checkout-flow-using-the-email-key-proj-defdriver-pagbank-gmail-com",
-      "title": "Generate a fixed PIX QR code in the payment checkout flow using the email key proj.defdriver+pagbank@gmail.com",
+      "id": "feature-debug-and-fix-the-pix-qr-code-generation-and-display-logic-in-the-checkout-flow-to-ensure-the-qr-code-appears-correctly-when-users-select-pix-payment-method",
+      "title": "Debug and fix the PIX QR code generation and display logic in the checkout flow to ensure the QR code appears correctly when users select PIX payment method",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-implement-pix-payload-generation-logic-in-frontend-src-lib-payments-pixpayload-ts-to-create-valid-pix-qr-code-strings",
-      "title": "Implement PIX payload generation logic in frontend/src/lib/payments/pixPayload.ts to create valid PIX QR code strings",
+      "id": "feature-verify-that-the-pixqrcodedisplay-component-properly-receives-the-pix-email-key-and-displays-it-alongside-the-qr-code",
+      "title": "Verify that the PixQrCodeDisplay component properly receives the PIX email key and displays it alongside the QR code",
       "reqIds": [
         "REQ-2"
-      ],
-      "version": 1
-    },
-    {
-      "id": "feature-integrate-qr-code-display-component-in-checkoutpage-tsx-to-render-the-pix-qr-code-when-pix-payment-method-is-selected",
-      "title": "Integrate QR code display component in CheckoutPage.tsx to render the PIX QR code when PIX payment method is selected",
-      "reqIds": [
-        "REQ-3"
       ],
       "version": 1
     }
   ],
   "new_feature_requests": [
     {
-      "id": "AR-1",
-      "summary": "Add fixed PIX QR code in payment checkout with email key proj.defdriver+pagbank@gmail.com",
-      "reqIds": [],
+      "id": "AR-3",
+      "summary": "Check CheckoutPage integration with payment providers to ensure PIX QR code display is triggered correctly for both Gateway and PagBank payment flows",
+      "reqIds": [
+        "REQ-3"
+      ],
       "status": "pending"
     }
   ],
-  "projectName": "Rotas e Direitos",
+  "projectName": "Fix PIX QR code display bug in checkout",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

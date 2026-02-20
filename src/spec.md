@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Add a fixed PIX QR code to the payment checkout flow using a specific email key.
+**Goal:** Fix the PIX QR code display bug in the checkout flow so it appears correctly when users select PIX payment.
 
 **Planned changes:**
-- Generate a PIX QR code payload using the email key proj.defdriver+pagbank@gmail.com
-- Display the scannable QR code in the checkout page when PIX payment is selected
-- Show the PIX key email alongside the QR code for manual entry
-- Provide clear payment instructions for users
+- Debug and fix PIX QR code generation and display logic in checkout
+- Verify PixQrCodeDisplay component receives and displays PIX email key correctly
+- Check CheckoutPage integration with Gateway and PagBank payment providers to ensure QR code triggers properly
 
-**User-visible outcome:** Users can complete purchases by scanning a PIX QR code or manually entering the PIX key email during checkout.
+**User-visible outcome:** Users can see the PIX QR code and copy the payment information when selecting PIX as their payment method during checkout.
