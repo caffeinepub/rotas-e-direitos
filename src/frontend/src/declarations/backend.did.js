@@ -8,6 +8,17 @@
 
 import { IDL } from '@icp-sdk/core/candid';
 
+export const _CaffeineStorageCreateCertificateResult = IDL.Record({
+  'method' : IDL.Text,
+  'blob_hash' : IDL.Text,
+});
+export const _CaffeineStorageRefillInformation = IDL.Record({
+  'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+});
+export const _CaffeineStorageRefillResult = IDL.Record({
+  'success' : IDL.Opt(IDL.Bool),
+  'topped_up_amount' : IDL.Opt(IDL.Nat),
+});
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
@@ -33,9 +44,23 @@ export const SubscriptionStatus = IDL.Record({
   'endTime' : IDL.Opt(IDL.Int),
   'currentPlan' : SubscriptionPlan,
 });
+export const Region = IDL.Variant({
+  'maracanau' : IDL.Null,
+  'caucaia' : IDL.Null,
+  'fortaleza' : IDL.Null,
+});
+export const Platform = IDL.Variant({
+  'uber' : IDL.Null,
+  'ninetyNine' : IDL.Null,
+  'ifood' : IDL.Null,
+  'rappi' : IDL.Null,
+});
 export const UserProfile = IDL.Record({
+  'region' : IDL.Opt(Region),
   'name' : IDL.Text,
+  'platform' : IDL.Opt(Platform),
   'email' : IDL.Opt(IDL.Text),
+  'phone' : IDL.Opt(IDL.Text),
 });
 export const UserAccessInfo = IDL.Record({
   'principal' : Principal,
@@ -103,12 +128,6 @@ export const WorkSession = IDL.Record({
   'city' : IDL.Text,
   'weatherSamples' : IDL.Vec(WeatherSample),
 });
-export const Platform = IDL.Variant({
-  'uber' : IDL.Null,
-  'ninetyNine' : IDL.Null,
-  'ifood' : IDL.Null,
-  'rappi' : IDL.Null,
-});
 export const LossProfile = IDL.Record({
   'dailyEarnings' : IDL.Float64,
   'deactivationDate' : IDL.Int,
@@ -129,6 +148,32 @@ export const PaymentConfig = IDL.Record({
 });
 
 export const idlService = IDL.Service({
+  '_caffeineStorageBlobIsLive' : IDL.Func(
+      [IDL.Vec(IDL.Nat8)],
+      [IDL.Bool],
+      ['query'],
+    ),
+  '_caffeineStorageBlobsToDelete' : IDL.Func(
+      [],
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      ['query'],
+    ),
+  '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+      [IDL.Vec(IDL.Vec(IDL.Nat8))],
+      [],
+      [],
+    ),
+  '_caffeineStorageCreateCertificate' : IDL.Func(
+      [IDL.Text],
+      [_CaffeineStorageCreateCertificateResult],
+      [],
+    ),
+  '_caffeineStorageRefillCashier' : IDL.Func(
+      [IDL.Opt(_CaffeineStorageRefillInformation)],
+      [_CaffeineStorageRefillResult],
+      [],
+    ),
+  '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
   'checkPaymentStatus' : IDL.Func([IDL.Text], [PaymentStatus], []),
@@ -187,6 +232,17 @@ export const idlService = IDL.Service({
 export const idlInitArgs = [];
 
 export const idlFactory = ({ IDL }) => {
+  const _CaffeineStorageCreateCertificateResult = IDL.Record({
+    'method' : IDL.Text,
+    'blob_hash' : IDL.Text,
+  });
+  const _CaffeineStorageRefillInformation = IDL.Record({
+    'proposed_top_up_amount' : IDL.Opt(IDL.Nat),
+  });
+  const _CaffeineStorageRefillResult = IDL.Record({
+    'success' : IDL.Opt(IDL.Bool),
+    'topped_up_amount' : IDL.Opt(IDL.Nat),
+  });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
     'user' : IDL.Null,
@@ -212,9 +268,23 @@ export const idlFactory = ({ IDL }) => {
     'endTime' : IDL.Opt(IDL.Int),
     'currentPlan' : SubscriptionPlan,
   });
+  const Region = IDL.Variant({
+    'maracanau' : IDL.Null,
+    'caucaia' : IDL.Null,
+    'fortaleza' : IDL.Null,
+  });
+  const Platform = IDL.Variant({
+    'uber' : IDL.Null,
+    'ninetyNine' : IDL.Null,
+    'ifood' : IDL.Null,
+    'rappi' : IDL.Null,
+  });
   const UserProfile = IDL.Record({
+    'region' : IDL.Opt(Region),
     'name' : IDL.Text,
+    'platform' : IDL.Opt(Platform),
     'email' : IDL.Opt(IDL.Text),
+    'phone' : IDL.Opt(IDL.Text),
   });
   const UserAccessInfo = IDL.Record({
     'principal' : Principal,
@@ -282,12 +352,6 @@ export const idlFactory = ({ IDL }) => {
     'city' : IDL.Text,
     'weatherSamples' : IDL.Vec(WeatherSample),
   });
-  const Platform = IDL.Variant({
-    'uber' : IDL.Null,
-    'ninetyNine' : IDL.Null,
-    'ifood' : IDL.Null,
-    'rappi' : IDL.Null,
-  });
   const LossProfile = IDL.Record({
     'dailyEarnings' : IDL.Float64,
     'deactivationDate' : IDL.Int,
@@ -308,6 +372,32 @@ export const idlFactory = ({ IDL }) => {
   });
   
   return IDL.Service({
+    '_caffeineStorageBlobIsLive' : IDL.Func(
+        [IDL.Vec(IDL.Nat8)],
+        [IDL.Bool],
+        ['query'],
+      ),
+    '_caffeineStorageBlobsToDelete' : IDL.Func(
+        [],
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        ['query'],
+      ),
+    '_caffeineStorageConfirmBlobDeletion' : IDL.Func(
+        [IDL.Vec(IDL.Vec(IDL.Nat8))],
+        [],
+        [],
+      ),
+    '_caffeineStorageCreateCertificate' : IDL.Func(
+        [IDL.Text],
+        [_CaffeineStorageCreateCertificateResult],
+        [],
+      ),
+    '_caffeineStorageRefillCashier' : IDL.Func(
+        [IDL.Opt(_CaffeineStorageRefillInformation)],
+        [_CaffeineStorageRefillResult],
+        [],
+      ),
+    '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
     'checkPaymentStatus' : IDL.Func([IDL.Text], [PaymentStatus], []),

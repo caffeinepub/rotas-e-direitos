@@ -15,7 +15,8 @@ import {
   User,
   Search,
   Menu,
-  X
+  X,
+  LayoutDashboard
 } from 'lucide-react';
 import { useState, ReactNode } from 'react';
 
@@ -32,7 +33,8 @@ export default function AppLayout({ children }: AppLayoutProps) {
   const isAuthenticated = !!identity;
 
   const navItems = [
-    { to: '/', icon: Home, label: 'Dashboard' },
+    { to: '/', icon: Home, label: 'Início' },
+    { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { to: '/evidencias', icon: Camera, label: 'Evidências' },
     { to: '/calculadora', icon: Calculator, label: 'Calculadora' },
     { to: '/recursos', icon: FileText, label: 'Recursos' },
@@ -74,10 +76,10 @@ export default function AppLayout({ children }: AppLayoutProps) {
           <div className="flex items-center gap-4">
             {isAuthenticated && (
               <Link
-                to="/"
+                to="/dashboard"
                 className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/20 hover:bg-primary/30 text-primary transition-colors"
               >
-                <Home className="h-4 w-4" />
+                <LayoutDashboard className="h-4 w-4" />
                 <span className="font-medium">Dashboard</span>
               </Link>
             )}
@@ -94,64 +96,62 @@ export default function AppLayout({ children }: AppLayoutProps) {
         >
           <nav className="fixed left-0 top-32 md:top-40 lg:top-48 bottom-0 w-64 bg-background border-r border-border p-4 overflow-y-auto">
             <div className="space-y-6">
+              <div>
+                <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                  Navegação
+                </h3>
+                <div className="space-y-1">
+                  {navItems.map((item) => (
+                    <Link
+                      key={item.to}
+                      to={item.to}
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/20 transition-colors text-foreground"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <item.icon className="h-4 w-4 text-primary" />
+                      <span>{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
               {isAuthenticated && (
-                <>
-                  <div>
-                    <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
-                      Navegação
-                    </h3>
-                    <div className="space-y-1">
-                      {navItems.map((item) => (
-                        <Link
-                          key={item.to}
-                          to={item.to}
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/20 transition-colors text-foreground"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <item.icon className="h-4 w-4 text-primary" />
-                          <span>{item.label}</span>
-                        </Link>
-                      ))}
-                    </div>
+                <div>
+                  <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                    Conta
+                  </h3>
+                  <div className="space-y-1">
+                    {accountItems.map((item) => (
+                      <Link
+                        key={item.to}
+                        to={item.to}
+                        className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/20 transition-colors text-foreground"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <item.icon className="h-4 w-4 text-primary" />
+                        <span>{item.label}</span>
+                      </Link>
+                    ))}
                   </div>
+                </div>
+              )}
 
-                  <div>
-                    <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
-                      Conta
-                    </h3>
-                    <div className="space-y-1">
-                      {accountItems.map((item) => (
-                        <Link
-                          key={item.to}
-                          to={item.to}
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/20 transition-colors text-foreground"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <item.icon className="h-4 w-4 text-primary" />
-                          <span>{item.label}</span>
-                        </Link>
-                      ))}
-                    </div>
+              {isAdmin && (
+                <div>
+                  <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
+                    Admin
+                  </h3>
+                  <div className="space-y-1">
+                    <Link
+                      to="/admin"
+                      className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/20 transition-colors text-foreground"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Shield className="h-4 w-4 text-primary" />
+                      <span>Painel Admin</span>
+                    </Link>
                   </div>
-
-                  {isAdmin && (
-                    <div>
-                      <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">
-                        Admin
-                      </h3>
-                      <div className="space-y-1">
-                        <Link
-                          to="/admin"
-                          className="flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-accent/20 transition-colors text-foreground"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          <Shield className="h-4 w-4 text-primary" />
-                          <span>Painel Admin</span>
-                        </Link>
-                      </div>
-                    </div>
-                  )}
-                </>
+                </div>
               )}
 
               <div>

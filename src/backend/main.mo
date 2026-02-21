@@ -5,8 +5,14 @@ import Time "mo:core/Time";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
 
+
+import MixinStorage "blob-storage/Mixin";
+import Storage "blob-storage/Storage";
+
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
+
+// IMPORTANT: Only persist user-facing or long-lived data in backend actor state!
 
 actor {
   type EvidenceType = { #selfie; #screenshot; #audio; #video };
@@ -43,6 +49,7 @@ actor {
     duration : ?Nat;
     audioQuality : ?Text;
     videoQuality : ?Text;
+    file : ?Storage.ExternalBlob;
   };
 
   public type WeatherSample = {
@@ -85,6 +92,9 @@ actor {
   public type UserProfile = {
     name : Text;
     email : ?Text;
+    platform : ?Platform;
+    region : ?Region;
+    phone : ?Text;
   };
 
   type Appeal = {
@@ -202,6 +212,7 @@ actor {
 
   let accessControlState = AccessControl.initState();
   include MixinAuthorization(accessControlState);
+  include MixinStorage();
 
   var collectiveReports = List.empty<CollectiveReport>();
   var nextEvidenceId : Nat = 3501;
@@ -585,3 +596,4 @@ actor {
     };
   };
 };
+

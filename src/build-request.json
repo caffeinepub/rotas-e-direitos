@@ -1,49 +1,27 @@
 {
   "kind": "build_request",
-  "title": "Fix PIX QR code generation and display",
-  "priority": "high",
+  "title": "Update app color scheme to match logo tonality",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Fix the PIX QR code generation on the checkout page so that the QR code displays correctly when a user selects PIX as payment method",
+      "text": "Update the application's color palette in frontend/index.css to use the same tonality as the logo colors. Replace the current warm orange primary and deep navy blue secondary colors with colors that match the logo's visual identity while maintaining appropriate contrast ratios for accessibility.",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-6"
-        ],
-        "quotes": [
-          "a pagina de geracao do qr code pix naoesta funcionando e nem aparece o qr code"
         ]
       },
       "acceptanceCriteria": [
-        "When a user selects PIX payment on the checkout page, a valid QR code image is generated and displayed",
-        "The QR code encodes a valid PIX payload following BR Code specification",
-        "The user can see the QR code image without errors",
-        "Loading states are shown while the QR code is being generated"
+        "The primary and secondary color variables in the CSS use tonalities matching the logo",
+        "All color references throughout the app reflect the new palette",
+        "Text remains readable with appropriate contrast against backgrounds",
+        "Dark mode color variants are updated to maintain consistency"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Debug and fix any console errors or exceptions occurring in the PixQrCodeDisplay component that prevent QR code rendering",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-6"
-        ],
-        "quotes": [
-          "a pagina de geracao do qr code pix naoesta funcionando"
-        ]
-      },
-      "acceptanceCriteria": [
-        "No JavaScript errors appear in the browser console when the PIX payment page loads",
-        "The qrCodeGenerator utility successfully generates QR code data URLs",
-        "The pixPayload utility generates valid PIX EMV format strings",
-        "Error states are properly handled and displayed to users if QR code generation fails"
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "text": "Verify that the PIX key and payload are correctly retrieved from the payment configuration and passed to the QR code generator",
+      "text": "Update the theme color in frontend/index.html and frontend/public/manifest.webmanifest to match the updated primary color from the new palette, ensuring consistency across browser UI elements and PWA theming.",
       "target": "frontend",
       "source": {
         "messageIds": [
@@ -51,22 +29,21 @@
         ]
       },
       "acceptanceCriteria": [
-        "The PIX key is successfully retrieved from the payment configuration",
-        "The payment amount is correctly formatted and included in the PIX payload",
-        "The generated PIX payload follows the EMV QRCode standard with proper CRC16 checksum",
-        "Copy-to-clipboard functionality works for both PIX key and payload"
+        "The theme-color meta tag in index.html reflects the new primary color",
+        "The theme_color in manifest.webmanifest matches the updated palette",
+        "Browser UI chrome displays the correct brand color"
       ]
     }
   ],
   "constraints": [
-    "Do not modify the PIX payload generation logic in lib/payments/pixPayload.ts unless a bug is identified",
-    "Preserve the existing QR code generation approach using qrcodejs library",
-    "Maintain the current component structure in PixQrCodeDisplay.tsx"
+    "Do not modify any files in frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
+    "Maintain WCAG AA contrast ratio standards for text and interactive elements",
+    "Preserve the OKLCH color space system already in use"
   ],
   "nonGoals": [
-    "Adding new payment methods beyond fixing PIX",
-    "Redesigning the checkout page UI",
-    "Implementing MercadoPago integration"
+    "Creating or modifying the logo file itself",
+    "Changing the overall layout or component structure",
+    "Modifying backend color-related configurations"
   ],
   "imageRequirements": {
     "required": [],

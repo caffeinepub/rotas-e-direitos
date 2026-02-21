@@ -1,81 +1,43 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix PIX QR code generation and display",
+  "title": "Update app color scheme to match logo tonality",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Fix the PIX QR code generation on the checkout page so that the QR code displays correctly when a user selects PIX as payment method",
+      "summary": "Update the application's color palette in frontend/index.css to use the same tonality as the logo colors, replacing the current warm orange primary and deep navy blue secondary colors while maintaining OKLCH color space and accessibility standards",
       "acceptanceCriteria": [
-        "When a user selects PIX payment on the checkout page, a valid QR code image is generated and displayed",
-        "The QR code encodes a valid PIX payload following BR Code specification",
-        "The user can see the QR code image without errors",
-        "Loading states are shown while the QR code is being generated"
+        "The primary and secondary color variables in the CSS use tonalities matching the logo",
+        "All color references throughout the app reflect the new palette",
+        "Text remains readable with appropriate contrast against backgrounds",
+        "Dark mode color variants are updated to maintain consistency"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/payments/PixQrCodeDisplay.tsx",
+          "path": "frontend/index.css",
           "operation": "modify",
-          "description": "Fix QR code generation and rendering logic. Verify that the qrCodeGenerator utility is called correctly with the generated PIX payload. Ensure proper error boundaries catch any exceptions during QR code generation. Add proper loading states while the QR code is being generated. Verify the component properly handles the async nature of QR code generation and updates the DOM with the generated data URL."
-        },
-        {
-          "path": "frontend/src/pages/CheckoutPage.tsx",
-          "operation": "modify",
-          "description": "Verify that the PixQrCodeDisplay component is properly integrated into the checkout flow when PIX payment method is selected. Ensure payment configuration data (PIX key, amount) is correctly passed to PixQrCodeDisplay as props. Add loading states for the entire payment section while payment session is being created."
+          "description": "Update the CSS custom properties defining the color palette to match the logo's tonality. Extract colors from frontend/public/assets/generated/logo-rotas-e-direitos.dim_512x512.png and frontend/public/assets/generated/logo.dim_400x400.png. Replace the current warm orange primary colors (--color-primary, --color-primary-foreground) and deep navy blue secondary colors (--color-secondary, --color-secondary-foreground) with OKLCH values that match the logo's visual identity. Update all color variants including accent, muted, card, popover, and their dark mode counterparts to maintain visual consistency with the new palette. Ensure all color changes preserve WCAG AA contrast ratios for text and interactive elements. Maintain the existing OKLCH color space format and structure of the CSS variables. Do not modify the overall layout, typography, or component styling beyond color values."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Debug and fix any console errors or exceptions occurring in the PixQrCodeDisplay component that prevent QR code rendering",
+      "summary": "Update the theme color in frontend/index.html and frontend/public/manifest.webmanifest to match the updated primary color from the new palette, ensuring consistency across browser UI elements and PWA theming",
       "acceptanceCriteria": [
-        "No JavaScript errors appear in the browser console when the PIX payment page loads",
-        "The qrCodeGenerator utility successfully generates QR code data URLs",
-        "The pixPayload utility generates valid PIX EMV format strings",
-        "Error states are properly handled and displayed to users if QR code generation fails"
+        "The theme-color meta tag in index.html reflects the new primary color",
+        "The theme_color in manifest.webmanifest matches the updated palette",
+        "Browser UI chrome displays the correct brand color"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/lib/payments/qrCodeGenerator.ts",
+          "path": "frontend/index.html",
           "operation": "modify",
-          "description": "Debug and fix the QR code generation function. Verify that the qrcodejs library loads correctly from CDN. Add proper error handling for library loading failures. Ensure the function correctly generates base64 data URLs from the input payload. Add validation to check if the payload is a valid non-empty string before attempting QR code generation. Return descriptive error messages for debugging."
+          "description": "Update the theme-color meta tag to use the new primary color value that matches the logo tonality. Convert the OKLCH primary color value from frontend/index.css to a hex color code for the meta tag. Ensure the color value is consistent with the updated palette from REQ-1."
         },
         {
-          "path": "frontend/src/lib/payments/pixPayload.ts",
+          "path": "frontend/public/manifest.webmanifest",
           "operation": "modify",
-          "description": "Debug and verify the PIX payload generation follows BR Code specification correctly. Validate that all required EMV fields (Merchant Account Information, Transaction Amount, Country Code, Merchant Name, Merchant City) are present and properly formatted. Verify CRC16 checksum calculation is correct. Add input validation to ensure pixKey and amount parameters are valid before generating payload. Add error handling for invalid inputs."
-        },
-        {
-          "path": "frontend/src/components/payments/PixQrCodeDisplay.tsx",
-          "operation": "modify",
-          "description": "Add comprehensive error handling with user-friendly error messages. Wrap QR code generation in try-catch blocks. Display specific error states for different failure scenarios (library load failure, invalid payload, generation timeout). Add console.error logging for debugging. Ensure error states are visually distinct and guide users on next steps."
-        }
-      ]
-    },
-    {
-      "id": "REQ-3",
-      "summary": "Verify that the PIX key and payload are correctly retrieved from the payment configuration and passed to the QR code generator",
-      "acceptanceCriteria": [
-        "The PIX key is successfully retrieved from the payment configuration",
-        "The payment amount is correctly formatted and included in the PIX payload",
-        "The generated PIX payload follows the EMV QRCode standard with proper CRC16 checksum",
-        "Copy-to-clipboard functionality works for both PIX key and payload"
-      ],
-      "file_operations": [
-        {
-          "path": "frontend/src/pages/CheckoutPage.tsx",
-          "operation": "modify",
-          "description": "Verify payment configuration retrieval and data flow to PixQrCodeDisplay. Ensure the selected plan amount is correctly formatted as a decimal string with two decimal places. Verify PIX key is extracted from the payment configuration or session response. Add validation that required payment data (amount, PIX key) exists before rendering PixQrCodeDisplay. Add loading and error states if payment configuration is missing or incomplete."
-        },
-        {
-          "path": "frontend/src/components/payments/PixQrCodeDisplay.tsx",
-          "operation": "modify",
-          "description": "Validate props (pixKey, amount) at component entry. Add PropTypes or TypeScript validation to ensure pixKey and amount are provided and valid. Verify the component correctly passes the pixKey and amount to the pixPayload generator. Ensure the generated payload string is correctly passed to the qrCodeGenerator. Verify copy-to-clipboard functionality works for both PIX key and the full EMV payload string. Add visual feedback (toast or temporary checkmark) when copy succeeds."
-        },
-        {
-          "path": "frontend/src/lib/payments/pixPayload.ts",
-          "operation": "modify",
-          "description": "Add validation for pixKey format (email, phone, CPF, CNPJ, or random key). Validate that amount is a positive number and format it correctly with exactly two decimal places. Ensure the payload generation handles edge cases like very small or very large amounts. Add unit test cases or inline validation to verify CRC16 calculation matches BR Code specification examples."
+          "description": "Update the theme_color field in the PWA manifest to match the new primary color from the updated palette. Convert the OKLCH primary color value from frontend/index.css to a hex color code. Ensure consistency with the theme-color meta tag in frontend/index.html and the overall brand identity from the logo."
         }
       ]
     }

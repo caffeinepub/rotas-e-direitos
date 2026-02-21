@@ -1,6 +1,7 @@
 import { createRouter, RouterProvider, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import AppLayout from './components/AppLayout';
+import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
 import PublicOverviewPage from './pages/PublicOverviewPage';
 import EvidenceTrackerPage from './pages/EvidenceTrackerPage';
@@ -34,11 +35,6 @@ function RootComponent() {
   );
 }
 
-function IndexComponent() {
-  const { identity } = useInternetIdentity();
-  return identity ? <Dashboard /> : <PublicOverviewPage />;
-}
-
 const rootRoute = createRootRoute({
   component: RootComponent,
 });
@@ -46,7 +42,13 @@ const rootRoute = createRootRoute({
 const indexRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: IndexComponent,
+  component: HomePage,
+});
+
+const dashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/dashboard',
+  component: Dashboard,
 });
 
 const evidenceRoute = createRoute({
@@ -141,6 +143,7 @@ const adminRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   indexRoute,
+  dashboardRoute,
   evidenceRoute,
   evidenceDetailRoute,
   sessionDetailRoute,

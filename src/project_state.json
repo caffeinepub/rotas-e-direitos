@@ -3,38 +3,35 @@
   "projectStateVersion": 3,
   "summary": "New project",
   "architectural_notes": [],
-  "known_issues": [
-    "QR code Pix generation page is not working and QR code is not displaying"
-  ],
-  "isFixRequest": true,
+  "known_issues": [],
+  "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-fix-the-pix-qr-code-generation-on-the-checkout-page-so-that-the-qr-code-displays-correctly-when-a-user-selects-pix-as-payment-method",
-      "title": "Fix the PIX QR code generation on the checkout page so that the QR code displays correctly when a user selects PIX as payment method",
+      "id": "feature-update-the-application-s-color-palette-in-frontend-index-css-to-use-the-same-tonality-as-the-logo-colors-replace-the-current-warm-orange-primary-and-deep-navy-blue-secondary-colors-with-colors-that-match-the-logo-s-visual-identity-while-maintaining-appropriate-contrast-ratios-for-accessibility",
+      "title": "Update the application's color palette in frontend/index.css to use the same tonality as the logo colors. Replace the current warm orange primary and deep navy blue secondary colors with colors that match the logo's visual identity while maintaining appropriate contrast ratios for accessibility.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-debug-and-fix-any-console-errors-or-exceptions-occurring-in-the-pixqrcodedisplay-component-that-prevent-qr-code-rendering",
-      "title": "Debug and fix any console errors or exceptions occurring in the PixQrCodeDisplay component that prevent QR code rendering",
+      "id": "feature-update-the-theme-color-in-frontend-index-html-and-frontend-public-manifest-webmanifest-to-match-the-updated-primary-color-from-the-new-palette-ensuring-consistency-across-browser-ui-elements-and-pwa-theming",
+      "title": "Update the theme color in frontend/index.html and frontend/public/manifest.webmanifest to match the updated primary color from the new palette, ensuring consistency across browser UI elements and PWA theming.",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
-    },
-    {
-      "id": "feature-verify-that-the-pix-key-and-payload-are-correctly-retrieved-from-the-payment-configuration-and-passed-to-the-qr-code-generator",
-      "title": "Verify that the PIX key and payload are correctly retrieved from the payment configuration and passed to the QR code generator",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "version": 1
     }
   ],
-  "new_feature_requests": [],
-  "projectName": "Fix PIX QR code generation and display",
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "Update app color scheme to match logo tonality",
+      "reqIds": [],
+      "status": "pending"
+    }
+  ],
+  "projectName": "Update app color scheme to match logo tonality",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

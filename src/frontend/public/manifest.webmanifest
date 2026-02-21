@@ -4,8 +4,8 @@
   "description": "Seu Guia Jurídico nas Estradas",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1E3A5F",
-  "theme_color": "#F5A623",
+  "background_color": "#3D4F6B",
+  "theme_color": "#E89A3C",
   "icons": [
     {
       "src": "/assets/generated/app-icon-192.dim_192x192.png",

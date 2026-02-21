@@ -66,6 +66,9 @@ export interface PublicPaymentConfig {
   'pagbankProvider' : PublicPagBankConfig,
 }
 export interface PublicPaymentProviderConfig { 'enabled' : boolean }
+export type Region = { 'maracanau' : null } |
+  { 'caucaia' : null } |
+  { 'fortaleza' : null };
 export type SubscriptionPlan = { 'free_24h' : null } |
   { 'pro_monthly' : null } |
   { 'pro_annual' : null };
@@ -91,7 +94,13 @@ export interface UserAccessInfo {
   'subscriptionStatus' : SubscriptionStatus,
   'profile' : [] | [UserProfile],
 }
-export interface UserProfile { 'name' : string, 'email' : [] | [string] }
+export interface UserProfile {
+  'region' : [] | [Region],
+  'name' : string,
+  'platform' : [] | [Platform],
+  'email' : [] | [string],
+  'phone' : [] | [string],
+}
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };
@@ -116,7 +125,33 @@ export interface WorkSession {
   'city' : string,
   'weatherSamples' : Array<WeatherSample>,
 }
+export interface _CaffeineStorageCreateCertificateResult {
+  'method' : string,
+  'blob_hash' : string,
+}
+export interface _CaffeineStorageRefillInformation {
+  'proposed_top_up_amount' : [] | [bigint],
+}
+export interface _CaffeineStorageRefillResult {
+  'success' : [] | [boolean],
+  'topped_up_amount' : [] | [bigint],
+}
 export interface _SERVICE {
+  '_caffeineStorageBlobIsLive' : ActorMethod<[Uint8Array], boolean>,
+  '_caffeineStorageBlobsToDelete' : ActorMethod<[], Array<Uint8Array>>,
+  '_caffeineStorageConfirmBlobDeletion' : ActorMethod<
+    [Array<Uint8Array>],
+    undefined
+  >,
+  '_caffeineStorageCreateCertificate' : ActorMethod<
+    [string],
+    _CaffeineStorageCreateCertificateResult
+  >,
+  '_caffeineStorageRefillCashier' : ActorMethod<
+    [[] | [_CaffeineStorageRefillInformation]],
+    _CaffeineStorageRefillResult
+  >,
+  '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   'checkPaymentStatus' : ActorMethod<[string], PaymentStatus>,

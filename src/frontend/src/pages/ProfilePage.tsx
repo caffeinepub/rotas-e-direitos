@@ -1,20 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useGetCallerUserProfile, useSaveCallerUserProfile } from '../hooks/useUserProfile';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { toast } from 'sonner';
-import { User, Mail, Shield } from 'lucide-react';
+import { User, Mail, Shield, MapPin, Smartphone, Briefcase } from 'lucide-react';
+import { Platform, Region } from '../backend';
 
 export default function ProfilePage() {
   const { data: profile, isLoading } = useGetCallerUserProfile();
   const { identity } = useInternetIdentity();
   const saveProfile = useSaveCallerUserProfile();
   
-  const [name, setName] = useState(profile?.name || '');
-  const [email, setEmail] = useState(profile?.email || '');
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [platform, setPlatform] = useState<Platform | ''>('');
+  const [region, setRegion] = useState<Region | ''>('');
+  const [phone, setPhone] = useState('');
+
+  useEffect(() => {
+    if (profile) {
+      setName(profile.name || '');
+      setEmail(profile.email || '');
+      setPlatform(profile.platform || '');
+      setRegion(profile.region || '');
+      setPhone(profile.phone || '');
+    }
+  }, [profile]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +43,9 @@ export default function ProfilePage() {
       await saveProfile.mutateAsync({
         name: name.trim(),
         email: email.trim() || undefined,
+        platform: platform || undefined,
+        region: region || undefined,
+        phone: phone.trim() || undefined,
       });
       toast.success('Perfil atualizado com sucesso!');
     } catch (error) {
@@ -91,6 +109,65 @@ export default function ProfilePage() {
               </div>
               <p className="text-sm text-muted-foreground">
                 Usado para enviar recibos e notificações importantes
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="platform">Plataforma (opcional)</Label>
+              <div className="relative">
+                <Briefcase className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                <Select value={platform} onValueChange={(value) => setPlatform(value as Platform)}>
+                  <SelectTrigger id="platform" className="pl-10">
+                    <SelectValue placeholder="Selecione a plataforma" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={Platform.uber}>Uber</SelectItem>
+                    <SelectItem value={Platform.ninetyNine}>99</SelectItem>
+                    <SelectItem value={Platform.ifood}>iFood</SelectItem>
+                    <SelectItem value={Platform.rappi}>Rappi</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Plataforma principal onde você trabalha
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="region">Região (opcional)</Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground z-10" />
+                <Select value={region} onValueChange={(value) => setRegion(value as Region)}>
+                  <SelectTrigger id="region" className="pl-10">
+                    <SelectValue placeholder="Selecione a região" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={Region.fortaleza}>Fortaleza</SelectItem>
+                    <SelectItem value={Region.caucaia}>Caucaia</SelectItem>
+                    <SelectItem value={Region.maracanau}>Maracanaú</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Região onde você atua
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="phone">Telefone (opcional)</Label>
+              <div className="relative">
+                <Smartphone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="phone"
+                  type="tel"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  placeholder="(85) 99999-9999"
+                  className="pl-10"
+                />
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Número de contato para comunicações importantes
               </p>
             </div>
 

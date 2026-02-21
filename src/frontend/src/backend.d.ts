@@ -1,40 +1,12 @@
 import type { Principal } from "@icp-sdk/core/principal";
-
 export interface Some<T> {
     __kind__: "Some";
     value: T;
 }
-
 export interface None {
     __kind__: "None";
 }
-
 export type Option<T> = Some<T> | None;
-
-export interface UserProfile {
-    name: string;
-    email?: string;
-}
-
-export interface Testimonial {
-    id: bigint;
-    status: TestimonialStatus;
-    content: string;
-    submitter: Principal;
-    timestamp: bigint;
-}
-
-export interface PaymentConfig {
-    gatewayProvider: PaymentProviderConfig;
-    pagbankProvider: PagBankConfig;
-}
-
-export type Time = bigint;
-
-export interface PublicPagBankConfig {
-    enabled: boolean;
-}
-
 export interface PagBankTransparentCheckoutConfig {
     token: string;
     publicKey: string;
@@ -43,80 +15,6 @@ export interface PagBankTransparentCheckoutConfig {
     interestRate?: number;
     acceptedPaymentTypes: Array<string>;
 }
-
-export interface LossProfile {
-    dailyEarnings: number;
-    deactivationDate: bigint;
-    platform: Platform;
-    daysPerWeek: bigint;
-}
-
-export interface UserAccessInfo {
-    principal: Principal;
-    isBlockedByAdmin: boolean;
-    subscriptionStatus: SubscriptionStatus;
-    profile?: UserProfile;
-}
-
-export type Principal = Principal;
-
-export interface PaymentProviderConfig {
-    enabled: boolean;
-}
-
-export interface WeatherSample {
-    city: string;
-    timestamp: Time;
-    temperatureC: number;
-    condition: WeatherCondition;
-}
-
-export interface PublicPaymentConfig {
-    gatewayProvider: PublicPaymentProviderConfig;
-    pagbankProvider: PublicPagBankConfig;
-}
-
-export interface PagBankConfig {
-    webhookSecret?: string;
-    clientId?: string;
-    merchantId?: string;
-    enabled: boolean;
-    clientSecret?: string;
-}
-
-export interface PaymentCheckoutResponse {
-    paymentId: string;
-    checkoutUrl?: string;
-}
-
-export interface PaymentStatus {
-    status: string;
-    paymentId: string;
-    rawResponse: string;
-}
-
-export interface PagBankWebhookPayload {
-    status: string;
-    signature: string;
-    paymentId: string;
-    rawData: string;
-}
-
-export interface PagBankReturnWebhookUrlConfig {
-    returnUrl: string;
-    webhookUrl: string;
-}
-
-export interface SubscriptionStatus {
-    startTime?: bigint;
-    endTime?: bigint;
-    currentPlan: SubscriptionPlan;
-}
-
-export interface PublicPaymentProviderConfig {
-    enabled: boolean;
-}
-
 export interface WorkSession {
     id: bigint;
     startTime: Time;
@@ -125,32 +23,114 @@ export interface WorkSession {
     city: string;
     weatherSamples: Array<WeatherSample>;
 }
-
+export interface Testimonial {
+    id: bigint;
+    status: TestimonialStatus;
+    content: string;
+    submitter: Principal;
+    timestamp: bigint;
+}
+export type Time = bigint;
+export interface PublicPagBankConfig {
+    enabled: boolean;
+}
+export interface WeatherSample {
+    city: string;
+    timestamp: Time;
+    temperatureC: number;
+    condition: WeatherCondition;
+}
+export interface PaymentCheckoutResponse {
+    paymentId: string;
+    checkoutUrl?: string;
+}
+export interface SubscriptionStatus {
+    startTime?: bigint;
+    endTime?: bigint;
+    currentPlan: SubscriptionPlan;
+}
+export interface PaymentConfig {
+    gatewayProvider: PaymentProviderConfig;
+    pagbankProvider: PagBankConfig;
+}
+export interface LossProfile {
+    dailyEarnings: number;
+    deactivationDate: bigint;
+    platform: Platform;
+    daysPerWeek: bigint;
+}
+export interface UserAccessInfo {
+    principal: Principal;
+    isBlockedByAdmin: boolean;
+    subscriptionStatus: SubscriptionStatus;
+    profile?: UserProfile;
+}
+export type Principal = Principal;
+export interface PaymentProviderConfig {
+    enabled: boolean;
+}
+export interface PublicPaymentConfig {
+    gatewayProvider: PublicPaymentProviderConfig;
+    pagbankProvider: PublicPagBankConfig;
+}
+export interface PagBankConfig {
+    webhookSecret?: string;
+    clientId?: string;
+    merchantId?: string;
+    enabled: boolean;
+    clientSecret?: string;
+}
+export interface PaymentStatus {
+    status: string;
+    paymentId: string;
+    rawResponse: string;
+}
+export interface PagBankWebhookPayload {
+    status: string;
+    signature: string;
+    paymentId: string;
+    rawData: string;
+}
+export interface PagBankReturnWebhookUrlConfig {
+    returnUrl: string;
+    webhookUrl: string;
+}
+export interface PublicPaymentProviderConfig {
+    enabled: boolean;
+}
+export interface UserProfile {
+    region?: Region;
+    name: string;
+    platform?: Platform;
+    email?: string;
+    phone?: string;
+}
 export enum Platform {
     uber = "uber",
     ninetyNine = "ninetyNine",
     ifood = "ifood",
     rappi = "rappi"
 }
-
+export enum Region {
+    maracanau = "maracanau",
+    caucaia = "caucaia",
+    fortaleza = "fortaleza"
+}
 export enum SubscriptionPlan {
     free_24h = "free_24h",
     pro_monthly = "pro_monthly",
     pro_annual = "pro_annual"
 }
-
 export enum TestimonialStatus {
     pending = "pending",
     approved = "approved",
     rejected = "rejected"
 }
-
 export enum UserRole {
     admin = "admin",
     user = "user",
     guest = "guest"
 }
-
 export enum WeatherCondition {
     cloudy = "cloudy",
     clear = "clear",
@@ -160,7 +140,6 @@ export enum WeatherCondition {
     windy = "windy",
     rainy = "rainy"
 }
-
 export interface backendInterface {
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     checkPaymentStatus(paymentId: string): Promise<PaymentStatus>;

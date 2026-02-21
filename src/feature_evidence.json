@@ -2,10 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-fix-the-pix-qr-code-generation-on-the-checkout-page-so-that-the-qr-code-displays-correctly-when-a-user-selects-pix-as-payment-method",
-      "featureTitle": "Fix the PIX QR code generation on the checkout page so that the QR code displays correctly when a user selects PIX as payment method",
+      "featureId": "feature-update-the-application-s-color-palette-in-frontend-index-css-to-use-the-same-tonality-as-the-logo-colors-replace-the-current-warm-orange-primary-and-deep-navy-blue-secondary-colors-with-colors-that-match-the-logo-s-visual-identity-while-maintaining-appropriate-contrast-ratios-for-accessibility",
+      "featureTitle": "Update the application's color palette in frontend/index.css to use the same tonality as the logo colors. Replace the current warm orange primary and deep navy blue secondary colors with colors that match the logo's visual identity while maintaining appropriate contrast ratios for accessibility.",
       "files": [
-        "frontend/src/components/payments/PixQrCodeDisplay.tsx"
+        "frontend/index.css"
       ],
       "components": [
         "authorization@4.0.0",
@@ -25,11 +25,11 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-debug-and-fix-any-console-errors-or-exceptions-occurring-in-the-pixqrcodedisplay-component-that-prevent-qr-code-rendering",
-      "featureTitle": "Debug and fix any console errors or exceptions occurring in the PixQrCodeDisplay component that prevent QR code rendering",
+      "featureId": "feature-update-the-theme-color-in-frontend-index-html-and-frontend-public-manifest-webmanifest-to-match-the-updated-primary-color-from-the-new-palette-ensuring-consistency-across-browser-ui-elements-and-pwa-theming",
+      "featureTitle": "Update the theme color in frontend/index.html and frontend/public/manifest.webmanifest to match the updated primary color from the new palette, ensuring consistency across browser UI elements and PWA theming.",
       "files": [
-        "frontend/src/components/payments/PixQrCodeDisplay.tsx",
-        "frontend/src/lib/payments/qrCodeGenerator.ts"
+        "frontend/index.html",
+        "frontend/public/manifest.webmanifest"
       ],
       "components": [
         "authorization@4.0.0",
@@ -45,29 +45,6 @@
       ],
       "testIds": [
         "REQ-2"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-verify-that-the-pix-key-and-payload-are-correctly-retrieved-from-the-payment-configuration-and-passed-to-the-qr-code-generator",
-      "featureTitle": "Verify that the PIX key and payload are correctly retrieved from the payment configuration and passed to the QR code generator",
-      "files": [
-        "frontend/src/components/payments/PixQrCodeDisplay.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0",
-        "camera@1.0.0",
-        "http-outcalls@3.0.0",
-        "blob-storage@4.0.0",
-        "qr-code@1.0.0"
-      ],
-      "testIds": [
-        "REQ-3"
       ],
       "confidence": "high"
     }
