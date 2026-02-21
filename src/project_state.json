@@ -4,38 +4,37 @@
   "summary": "New project",
   "architectural_notes": [],
   "known_issues": [
-    "QR Code PIX not displaying in checkout"
+    "QR code Pix generation page is not working and QR code is not displaying"
   ],
   "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-debug-and-fix-the-pix-qr-code-display-issue-in-the-checkout-flow-the-qr-code-should-be-visible-when-users-select-pix-as-the-payment-method",
-      "title": "Debug and fix the PIX QR code display issue in the checkout flow. The QR code should be visible when users select PIX as the payment method.",
+      "id": "feature-fix-the-pix-qr-code-generation-on-the-checkout-page-so-that-the-qr-code-displays-correctly-when-a-user-selects-pix-as-payment-method",
+      "title": "Fix the PIX QR code generation on the checkout page so that the QR code displays correctly when a user selects PIX as payment method",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
-    }
-  ],
-  "new_feature_requests": [
+    },
     {
-      "id": "AR-2",
-      "summary": "Verify the PixQrCodeDisplay component is properly integrated in CheckoutPage and receives correct payment data from the PagBank payment flow.",
+      "id": "feature-debug-and-fix-any-console-errors-or-exceptions-occurring-in-the-pixqrcodedisplay-component-that-prevent-qr-code-rendering",
+      "title": "Debug and fix any console errors or exceptions occurring in the PixQrCodeDisplay component that prevent QR code rendering",
       "reqIds": [
         "REQ-2"
       ],
-      "status": "pending"
+      "version": 1
     },
     {
-      "id": "AR-3",
-      "summary": "Ensure the PIX payload generation in pixPayload.ts creates valid BR Code format with correct CRC16 checksum for QR code scanning.",
+      "id": "feature-verify-that-the-pix-key-and-payload-are-correctly-retrieved-from-the-payment-configuration-and-passed-to-the-qr-code-generator",
+      "title": "Verify that the PIX key and payload are correctly retrieved from the payment configuration and passed to the QR code generator",
       "reqIds": [
         "REQ-3"
       ],
-      "status": "pending"
+      "version": 1
     }
   ],
-  "projectName": "Fix PIX QR code not displaying in checkout",
+  "new_feature_requests": [],
+  "projectName": "Fix PIX QR code generation and display",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

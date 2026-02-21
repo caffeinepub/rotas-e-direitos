@@ -74,9 +74,14 @@ export default {
                     ring: 'oklch(var(--sidebar-ring))'
                 },
                 orange: {
-                    DEFAULT: 'oklch(0.65 0.20 45)',
-                    light: 'oklch(0.70 0.22 45)',
-                    dark: 'oklch(0.60 0.18 45)'
+                    DEFAULT: 'oklch(0.75 0.15 55)',
+                    light: 'oklch(0.78 0.18 55)',
+                    dark: 'oklch(0.70 0.12 55)'
+                },
+                navy: {
+                    DEFAULT: 'oklch(0.30 0.08 240)',
+                    light: 'oklch(0.35 0.10 240)',
+                    dark: 'oklch(0.25 0.06 240)'
                 }
             },
             borderRadius: {

@@ -1,45 +1,49 @@
 {
   "kind": "build_request",
-  "title": "Fix PIX QR code not displaying in checkout",
+  "title": "Fix PIX QR code generation and display",
   "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Debug and fix the PIX QR code display issue in the checkout flow. The QR code should be visible when users select PIX as the payment method.",
+      "text": "Fix the PIX QR code generation on the checkout page so that the QR code displays correctly when a user selects PIX as payment method",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-6"
         ],
         "quotes": [
-          "o qr code pix nao ta aparecendo"
+          "a pagina de geracao do qr code pix naoesta funcionando e nem aparece o qr code"
         ]
       },
       "acceptanceCriteria": [
-        "PIX QR code image renders correctly on the checkout page",
-        "QR code is scannable and contains valid payment payload",
-        "Copy-to-clipboard functionality works for PIX key and payload",
-        "QR code displays properly on both desktop and mobile viewports"
+        "When a user selects PIX payment on the checkout page, a valid QR code image is generated and displayed",
+        "The QR code encodes a valid PIX payload following BR Code specification",
+        "The user can see the QR code image without errors",
+        "Loading states are shown while the QR code is being generated"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Verify the PixQrCodeDisplay component is properly integrated in CheckoutPage and receives correct payment data from the PagBank payment flow.",
+      "text": "Debug and fix any console errors or exceptions occurring in the PixQrCodeDisplay component that prevent QR code rendering",
       "target": "frontend",
       "source": {
         "messageIds": [
           "msg-6"
+        ],
+        "quotes": [
+          "a pagina de geracao do qr code pix naoesta funcionando"
         ]
       },
       "acceptanceCriteria": [
-        "PixQrCodeDisplay component receives valid PIX payload data",
-        "Payment status updates correctly after QR code is displayed",
-        "Error states are handled gracefully if payment data is missing"
+        "No JavaScript errors appear in the browser console when the PIX payment page loads",
+        "The qrCodeGenerator utility successfully generates QR code data URLs",
+        "The pixPayload utility generates valid PIX EMV format strings",
+        "Error states are properly handled and displayed to users if QR code generation fails"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Ensure the PIX payload generation in pixPayload.ts creates valid BR Code format with correct CRC16 checksum for QR code scanning.",
+      "text": "Verify that the PIX key and payload are correctly retrieved from the payment configuration and passed to the QR code generator",
       "target": "frontend",
       "source": {
         "messageIds": [
@@ -47,21 +51,22 @@
         ]
       },
       "acceptanceCriteria": [
-        "Generated PIX payload follows EMV QR Code specification",
-        "CRC16 checksum is calculated correctly",
-        "Payload can be successfully scanned by banking apps"
+        "The PIX key is successfully retrieved from the payment configuration",
+        "The payment amount is correctly formatted and included in the PIX payload",
+        "The generated PIX payload follows the EMV QRCode standard with proper CRC16 checksum",
+        "Copy-to-clipboard functionality works for both PIX key and payload"
       ]
     }
   ],
   "constraints": [
-    "Do not modify the backend payment configuration logic",
-    "Maintain compatibility with existing PagBank integration",
-    "Preserve the current checkout flow and payment status tracking"
+    "Do not modify the PIX payload generation logic in lib/payments/pixPayload.ts unless a bug is identified",
+    "Preserve the existing QR code generation approach using qrcodejs library",
+    "Maintain the current component structure in PixQrCodeDisplay.tsx"
   ],
   "nonGoals": [
-    "Adding new payment methods",
-    "Changing the overall checkout page design",
-    "Modifying payment provider selection logic"
+    "Adding new payment methods beyond fixing PIX",
+    "Redesigning the checkout page UI",
+    "Implementing MercadoPago integration"
   ],
   "imageRequirements": {
     "required": [],

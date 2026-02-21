@@ -2,8 +2,31 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-debug-and-fix-the-pix-qr-code-display-issue-in-the-checkout-flow-the-qr-code-should-be-visible-when-users-select-pix-as-the-payment-method",
-      "featureTitle": "Debug and fix the PIX QR code display issue in the checkout flow. The QR code should be visible when users select PIX as the payment method.",
+      "featureId": "feature-fix-the-pix-qr-code-generation-on-the-checkout-page-so-that-the-qr-code-displays-correctly-when-a-user-selects-pix-as-payment-method",
+      "featureTitle": "Fix the PIX QR code generation on the checkout page so that the QR code displays correctly when a user selects PIX as payment method",
+      "files": [
+        "frontend/src/components/payments/PixQrCodeDisplay.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0",
+        "blob-storage@4.0.0",
+        "qr-code@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-debug-and-fix-any-console-errors-or-exceptions-occurring-in-the-pixqrcodedisplay-component-that-prevent-qr-code-rendering",
+      "featureTitle": "Debug and fix any console errors or exceptions occurring in the PixQrCodeDisplay component that prevent QR code rendering",
       "files": [
         "frontend/src/components/payments/PixQrCodeDisplay.tsx",
         "frontend/src/lib/payments/qrCodeGenerator.ts"
@@ -21,7 +44,30 @@
         "qr-code@1.0.0"
       ],
       "testIds": [
-        "REQ-1"
+        "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-verify-that-the-pix-key-and-payload-are-correctly-retrieved-from-the-payment-configuration-and-passed-to-the-qr-code-generator",
+      "featureTitle": "Verify that the PIX key and payload are correctly retrieved from the payment configuration and passed to the QR code generator",
+      "files": [
+        "frontend/src/components/payments/PixQrCodeDisplay.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0",
+        "blob-storage@4.0.0",
+        "qr-code@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

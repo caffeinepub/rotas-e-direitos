@@ -1,9 +1,9 @@
 /**
- * QR Code generator using qrcodejs library
- * Generates QR codes client-side without external API dependencies
+ * QR Code generator using qrcode library via CDN
+ * Generates QR codes client-side without npm dependencies
  */
 
-// Load qrcodejs library dynamically if not already loaded
+// Load qrcode library dynamically if not already loaded
 let qrCodeLibLoaded = false;
 let qrCodeLibPromise: Promise<void> | null = null;
 
@@ -25,7 +25,7 @@ function loadQRCodeLibrary(): Promise<void> {
     }
 
     const script = document.createElement('script');
-    script.src = 'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+    script.src = 'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js';
     script.async = true;
     script.onload = () => {
       qrCodeLibLoaded = true;
@@ -33,7 +33,7 @@ function loadQRCodeLibrary(): Promise<void> {
     };
     script.onerror = () => {
       qrCodeLibPromise = null;
-      reject(new Error('Failed to load QR code library'));
+      reject(new Error('Failed to load QR code library from CDN'));
     };
     document.head.appendChild(script);
   });
@@ -41,55 +41,41 @@ function loadQRCodeLibrary(): Promise<void> {
   return qrCodeLibPromise;
 }
 
+/**
+ * Generates a QR code as a data URL from the given text
+ * @param text - The text to encode in the QR code
+ * @param size - The size of the QR code in pixels (default: 300)
+ * @returns Promise that resolves to a data URL string
+ */
 export async function generateQRCodeDataURL(text: string, size: number = 300): Promise<string> {
+  if (!text || text.trim().length === 0) {
+    throw new Error('Text cannot be empty');
+  }
+
   try {
     // Load the QR code library
     await loadQRCodeLibrary();
 
-    // Create a temporary container
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    document.body.appendChild(container);
-
-    try {
-      // Generate QR code using qrcodejs
-      const QRCode = (window as any).QRCode;
-      const qrcode = new QRCode(container, {
-        text: text,
-        width: size,
-        height: size,
-        colorDark: '#000000',
-        colorLight: '#ffffff',
-        correctLevel: QRCode.CorrectLevel.H, // High error correction
-      });
-
-      // Wait a bit for the QR code to render
-      await new Promise(resolve => setTimeout(resolve, 100));
-
-      // Get the canvas or image element
-      const canvas = container.querySelector('canvas') as HTMLCanvasElement;
-      const img = container.querySelector('img') as HTMLImageElement;
-
-      let dataUrl: string;
-
-      if (canvas) {
-        // If canvas is available, use it directly
-        dataUrl = canvas.toDataURL('image/png');
-      } else if (img && img.src) {
-        // If only image is available, use its src
-        dataUrl = img.src;
-      } else {
-        throw new Error('Failed to generate QR code image');
-      }
-
-      return dataUrl;
-    } finally {
-      // Clean up the temporary container
-      document.body.removeChild(container);
+    const QRCode = (window as any).QRCode;
+    
+    if (!QRCode || !QRCode.toDataURL) {
+      throw new Error('QR Code library not properly loaded');
     }
+
+    // Generate QR code using the library's toDataURL method
+    const dataUrl = await QRCode.toDataURL(text, {
+      width: size,
+      margin: 1,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF',
+      },
+      errorCorrectionLevel: 'H', // High error correction
+    });
+
+    return dataUrl;
   } catch (error) {
     console.error('Error generating QR code:', error);
-    throw new Error('Failed to generate QR code');
+    throw new Error('Failed to generate QR code: ' + (error instanceof Error ? error.message : 'Unknown error'));
   }
 }

@@ -1,79 +1,81 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Fix PIX QR code not displaying in checkout",
+  "title": "Fix PIX QR code generation and display",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Debug and fix the PIX QR code display issue in the checkout flow so QR codes render correctly when users select PIX as payment method",
+      "summary": "Fix the PIX QR code generation on the checkout page so that the QR code displays correctly when a user selects PIX as payment method",
       "acceptanceCriteria": [
-        "PIX QR code image renders correctly on the checkout page",
-        "QR code is scannable and contains valid payment payload",
-        "Copy-to-clipboard functionality works for PIX key and payload",
-        "QR code displays properly on both desktop and mobile viewports"
+        "When a user selects PIX payment on the checkout page, a valid QR code image is generated and displayed",
+        "The QR code encodes a valid PIX payload following BR Code specification",
+        "The user can see the QR code image without errors",
+        "Loading states are shown while the QR code is being generated"
       ],
       "file_operations": [
         {
           "path": "frontend/src/components/payments/PixQrCodeDisplay.tsx",
           "operation": "modify",
-          "description": "Debug and fix QR code rendering logic. Verify that the component correctly receives PIX payload data from props, generates QR code image using qrCodeGenerator utility, displays the image with proper dimensions and responsive styling, and implements copy-to-clipboard for both PIX key and payload string. Ensure error states are handled when QR generation fails."
-        },
-        {
-          "path": "frontend/src/lib/payments/qrCodeGenerator.ts",
-          "operation": "modify",
-          "description": "Verify QR code generation function creates valid data URLs from PIX payloads. Check URL encoding, size parameters passed to qrserver.com API, and error handling for failed requests. Ensure generated QR codes are properly formatted and base64-encoded."
+          "description": "Fix QR code generation and rendering logic. Verify that the qrCodeGenerator utility is called correctly with the generated PIX payload. Ensure proper error boundaries catch any exceptions during QR code generation. Add proper loading states while the QR code is being generated. Verify the component properly handles the async nature of QR code generation and updates the DOM with the generated data URL."
         },
         {
           "path": "frontend/src/pages/CheckoutPage.tsx",
           "operation": "modify",
-          "description": "Debug payment flow integration with PixQrCodeDisplay component. Verify that after PagBank payment session creation, the PIX payload is correctly extracted from the response and passed to PixQrCodeDisplay. Check conditional rendering logic that shows/hides the QR code based on payment status and provider selection. Ensure proper state management during the payment lifecycle."
+          "description": "Verify that the PixQrCodeDisplay component is properly integrated into the checkout flow when PIX payment method is selected. Ensure payment configuration data (PIX key, amount) is correctly passed to PixQrCodeDisplay as props. Add loading states for the entire payment section while payment session is being created."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Verify PixQrCodeDisplay component integration in CheckoutPage receives correct payment data from PagBank payment flow",
+      "summary": "Debug and fix any console errors or exceptions occurring in the PixQrCodeDisplay component that prevent QR code rendering",
       "acceptanceCriteria": [
-        "PixQrCodeDisplay component receives valid PIX payload data",
-        "Payment status updates correctly after QR code is displayed",
-        "Error states are handled gracefully if payment data is missing"
+        "No JavaScript errors appear in the browser console when the PIX payment page loads",
+        "The qrCodeGenerator utility successfully generates QR code data URLs",
+        "The pixPayload utility generates valid PIX EMV format strings",
+        "Error states are properly handled and displayed to users if QR code generation fails"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/CheckoutPage.tsx",
+          "path": "frontend/src/lib/payments/qrCodeGenerator.ts",
           "operation": "modify",
-          "description": "Verify component wiring between payment session creation and PixQrCodeDisplay. Check that payment response data structure matches expected format and PIX payload is properly extracted. Add console logging or error boundaries to debug data flow. Ensure PaymentStatusPanel coordinates with PixQrCodeDisplay to show appropriate UI states (pending, completed, failed)."
+          "description": "Debug and fix the QR code generation function. Verify that the qrcodejs library loads correctly from CDN. Add proper error handling for library loading failures. Ensure the function correctly generates base64 data URLs from the input payload. Add validation to check if the payload is a valid non-empty string before attempting QR code generation. Return descriptive error messages for debugging."
         },
         {
-          "path": "frontend/src/hooks/usePagBankPayment.ts",
+          "path": "frontend/src/lib/payments/pixPayload.ts",
           "operation": "modify",
-          "description": "Review payment session creation mutation and verify the response data structure includes PIX payload in the expected format. Check error handling for failed session creation. Ensure payment status checking mutation properly updates React Query cache to trigger UI updates in CheckoutPage."
+          "description": "Debug and verify the PIX payload generation follows BR Code specification correctly. Validate that all required EMV fields (Merchant Account Information, Transaction Amount, Country Code, Merchant Name, Merchant City) are present and properly formatted. Verify CRC16 checksum calculation is correct. Add input validation to ensure pixKey and amount parameters are valid before generating payload. Add error handling for invalid inputs."
         },
         {
-          "path": "frontend/src/components/payments/PaymentStatusPanel.tsx",
+          "path": "frontend/src/components/payments/PixQrCodeDisplay.tsx",
           "operation": "modify",
-          "description": "Verify payment status panel coordinates with PIX QR code display. Ensure proper conditional rendering based on payment state (pending shows QR code, completed hides it, failed shows retry). Check that status updates from backend properly trigger re-renders."
+          "description": "Add comprehensive error handling with user-friendly error messages. Wrap QR code generation in try-catch blocks. Display specific error states for different failure scenarios (library load failure, invalid payload, generation timeout). Add console.error logging for debugging. Ensure error states are visually distinct and guide users on next steps."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Ensure PIX payload generation creates valid BR Code format with correct CRC16 checksum for QR code scanning",
+      "summary": "Verify that the PIX key and payload are correctly retrieved from the payment configuration and passed to the QR code generator",
       "acceptanceCriteria": [
-        "Generated PIX payload follows EMV QR Code specification",
-        "CRC16 checksum is calculated correctly",
-        "Payload can be successfully scanned by banking apps"
+        "The PIX key is successfully retrieved from the payment configuration",
+        "The payment amount is correctly formatted and included in the PIX payload",
+        "The generated PIX payload follows the EMV QRCode standard with proper CRC16 checksum",
+        "Copy-to-clipboard functionality works for both PIX key and payload"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/lib/payments/pixPayload.ts",
-          "operation": "modify",
-          "description": "Debug and verify PIX payload generation follows EMV QR Code specification for BR Code format. Review CRC16 checksum calculation implementation for correctness. Validate TLV (Tag-Length-Value) formatting of all required fields including merchant account information, transaction amount, merchant category code, and country code. Test generated payloads with banking app scanners to ensure compliance. Add comprehensive error handling for invalid input parameters."
-        },
-        {
           "path": "frontend/src/pages/CheckoutPage.tsx",
           "operation": "modify",
-          "description": "Verify that payment amount, merchant details, and transaction ID are correctly passed to PIX payload generator. Check that the generated payload string is properly formatted before being sent to QR code generator. Add validation to ensure all required PIX parameters are present before attempting payload generation."
+          "description": "Verify payment configuration retrieval and data flow to PixQrCodeDisplay. Ensure the selected plan amount is correctly formatted as a decimal string with two decimal places. Verify PIX key is extracted from the payment configuration or session response. Add validation that required payment data (amount, PIX key) exists before rendering PixQrCodeDisplay. Add loading and error states if payment configuration is missing or incomplete."
+        },
+        {
+          "path": "frontend/src/components/payments/PixQrCodeDisplay.tsx",
+          "operation": "modify",
+          "description": "Validate props (pixKey, amount) at component entry. Add PropTypes or TypeScript validation to ensure pixKey and amount are provided and valid. Verify the component correctly passes the pixKey and amount to the pixPayload generator. Ensure the generated payload string is correctly passed to the qrCodeGenerator. Verify copy-to-clipboard functionality works for both PIX key and the full EMV payload string. Add visual feedback (toast or temporary checkmark) when copy succeeds."
+        },
+        {
+          "path": "frontend/src/lib/payments/pixPayload.ts",
+          "operation": "modify",
+          "description": "Add validation for pixKey format (email, phone, CPF, CNPJ, or random key). Validate that amount is a positive number and format it correctly with exactly two decimal places. Ensure the payload generation handles edge cases like very small or very large amounts. Add unit test cases or inline validation to verify CRC16 calculation matches BR Code specification examples."
         }
       ]
     }

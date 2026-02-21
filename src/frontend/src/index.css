@@ -5,131 +5,136 @@
 @layer base {
     :root {
         --radius: 0.75rem;
-        /* Black background with orange and white color scheme */
-        --background: 0 0 0;
-        --foreground: 1 0 0;
-        --card: 0.05 0 0;
-        --card-foreground: 1 0 0;
-        --popover: 0.05 0 0;
-        --popover-foreground: 1 0 0;
-        /* Vibrant orange primary */
-        --primary: 0.65 0.20 45;
-        --primary-foreground: 0 0 0;
-        /* Soft neutral secondary */
-        --secondary: 0.15 0 0;
-        --secondary-foreground: 1 0 0;
-        /* Subtle muted tones */
-        --muted: 0.20 0 0;
-        --muted-foreground: 0.70 0.05 45;
-        /* Vibrant accent - bright orange */
-        --accent: 0.70 0.22 40;
-        --accent-foreground: 0 0 0;
-        /* Modern destructive - red */
+        /* 
+         * Brand-aligned color palette extracted from Rotas e Direitos logo
+         * Primary: Warm orange/gold from logo (#F5A623 / oklch(0.75 0.15 55))
+         * Secondary: Deep navy blue from logo (#1E3A5F / oklch(0.30 0.08 240))
+         * Background: Rich dark for contrast
+         */
+        --background: 0.08 0.01 240;
+        --foreground: 0.98 0.01 55;
+        --card: 0.12 0.02 240;
+        --card-foreground: 0.98 0.01 55;
+        --popover: 0.12 0.02 240;
+        --popover-foreground: 0.98 0.01 55;
+        /* Brand orange - primary color from logo */
+        --primary: 0.75 0.15 55;
+        --primary-foreground: 0.10 0.02 240;
+        /* Deep navy blue - secondary color from logo */
+        --secondary: 0.30 0.08 240;
+        --secondary-foreground: 0.98 0.01 55;
+        /* Muted tones with brand hue */
+        --muted: 0.22 0.04 240;
+        --muted-foreground: 0.65 0.08 55;
+        /* Accent - lighter orange for highlights */
+        --accent: 0.78 0.18 50;
+        --accent-foreground: 0.10 0.02 240;
+        /* Destructive - warm red */
         --destructive: 0.58 0.22 15;
-        --destructive-foreground: 1 0 0;
-        /* Success green */
+        --destructive-foreground: 0.98 0.01 55;
+        /* Success - balanced green */
         --success: 0.65 0.18 150;
-        --success-foreground: 0 0 0;
-        /* Refined borders and inputs */
-        --border: 0.25 0.05 45;
-        --input: 0.25 0.05 45;
-        --ring: 0.65 0.20 45;
-        /* Modern chart colors */
-        --chart-1: 0.65 0.20 45;
-        --chart-2: 0.65 0.18 200;
-        --chart-3: 0.70 0.16 150;
-        --chart-4: 0.62 0.20 300;
-        --chart-5: 0.68 0.18 40;
+        --success-foreground: 0.10 0.02 240;
+        /* Borders and inputs with subtle brand tint */
+        --border: 0.28 0.06 240;
+        --input: 0.28 0.06 240;
+        --ring: 0.75 0.15 55;
+        /* Chart colors harmonized with brand palette */
+        --chart-1: 0.75 0.15 55;
+        --chart-2: 0.58 0.18 220;
+        --chart-3: 0.68 0.16 150;
+        --chart-4: 0.62 0.20 280;
+        --chart-5: 0.70 0.14 40;
     }
 
     .dark {
-        /* Deep black dark mode */
-        --background: 0 0 0;
-        --foreground: 1 0 0;
-        --card: 0.05 0 0;
-        --card-foreground: 1 0 0;
-        --popover: 0.08 0 0;
-        --popover-foreground: 1 0 0;
-        /* Brighter orange for dark mode */
-        --primary: 0.70 0.22 45;
-        --primary-foreground: 0 0 0;
-        /* Elevated secondary */
-        --secondary: 0.15 0 0;
-        --secondary-foreground: 1 0 0;
-        /* Balanced muted */
-        --muted: 0.20 0 0;
-        --muted-foreground: 0.70 0.05 45;
+        /* Dark mode with enhanced brand colors */
+        --background: 0.08 0.01 240;
+        --foreground: 0.98 0.01 55;
+        --card: 0.12 0.02 240;
+        --card-foreground: 0.98 0.01 55;
+        --popover: 0.15 0.03 240;
+        --popover-foreground: 0.98 0.01 55;
+        /* Brighter orange for dark mode visibility */
+        --primary: 0.78 0.18 55;
+        --primary-foreground: 0.10 0.02 240;
+        /* Elevated navy for dark mode */
+        --secondary: 0.35 0.10 240;
+        --secondary-foreground: 0.98 0.01 55;
+        /* Balanced muted tones */
+        --muted: 0.22 0.04 240;
+        --muted-foreground: 0.68 0.10 55;
         /* Vibrant accent for dark */
-        --accent: 0.72 0.24 40;
-        --accent-foreground: 0 0 0;
+        --accent: 0.80 0.20 50;
+        --accent-foreground: 0.10 0.02 240;
         /* Softer destructive for dark */
         --destructive: 0.62 0.20 15;
-        --destructive-foreground: 1 0 0;
+        --destructive-foreground: 0.98 0.01 55;
         /* Success for dark */
         --success: 0.68 0.18 150;
-        --success-foreground: 0 0 0;
+        --success-foreground: 0.10 0.02 240;
         /* Subtle borders */
-        --border: 0.25 0.05 45;
-        --input: 0.25 0.05 45;
-        --ring: 0.70 0.22 45;
+        --border: 0.28 0.06 240;
+        --input: 0.28 0.06 240;
+        --ring: 0.78 0.18 55;
         /* Chart colors optimized for dark */
-        --chart-1: 0.70 0.22 45;
-        --chart-2: 0.68 0.20 200;
-        --chart-3: 0.72 0.18 150;
-        --chart-4: 0.66 0.22 300;
-        --chart-5: 0.70 0.20 40;
+        --chart-1: 0.78 0.18 55;
+        --chart-2: 0.62 0.20 220;
+        --chart-3: 0.70 0.18 150;
+        --chart-4: 0.66 0.22 280;
+        --chart-5: 0.72 0.16 40;
     }
 
-    /* Style B Variant - Teal/Cyan Modern */
+    /* Style B Variant - Cool Blue Emphasis */
     .home-style-b {
-        --background: 0 0 0;
-        --card: 0.05 0 0;
-        --accent: 0.72 0.20 185;
-        --border: 0.25 0.05 185;
-        --ring: 0.58 0.22 180;
-        --muted: 0.20 0 0;
-        --secondary: 0.15 0 0;
-        --primary: 0.65 0.22 180;
-        --primary-foreground: 0 0 0;
+        --background: 0.08 0.01 240;
+        --card: 0.12 0.02 240;
+        --accent: 0.65 0.20 220;
+        --border: 0.28 0.06 220;
+        --ring: 0.65 0.20 220;
+        --muted: 0.22 0.04 240;
+        --secondary: 0.35 0.10 240;
+        --primary: 0.65 0.20 220;
+        --primary-foreground: 0.10 0.02 240;
     }
 
     /* Style B Variant - Dark Mode */
     .dark .home-style-b {
-        --background: 0 0 0;
-        --card: 0.05 0 0;
-        --accent: 0.75 0.22 185;
-        --border: 0.25 0.05 185;
-        --ring: 0.65 0.24 180;
-        --muted: 0.20 0 0;
-        --secondary: 0.15 0 0;
-        --primary: 0.68 0.24 180;
-        --primary-foreground: 0 0 0;
+        --background: 0.08 0.01 240;
+        --card: 0.12 0.02 240;
+        --accent: 0.68 0.22 220;
+        --border: 0.28 0.06 220;
+        --ring: 0.68 0.22 220;
+        --muted: 0.22 0.04 240;
+        --secondary: 0.35 0.10 240;
+        --primary: 0.68 0.22 220;
+        --primary-foreground: 0.10 0.02 240;
     }
 
-    /* Style C Variant - Warm Sunset (Orange/Amber) */
+    /* Style C Variant - Warm Orange Emphasis */
     .home-style-c {
-        --background: 0 0 0;
-        --card: 0.05 0 0;
-        --accent: 0.75 0.22 50;
-        --border: 0.25 0.05 45;
-        --ring: 0.60 0.24 35;
-        --muted: 0.20 0 0;
-        --secondary: 0.15 0 0;
-        --primary: 0.65 0.22 30;
-        --primary-foreground: 0 0 0;
+        --background: 0.08 0.01 240;
+        --card: 0.12 0.02 240;
+        --accent: 0.80 0.20 45;
+        --border: 0.28 0.06 50;
+        --ring: 0.75 0.18 50;
+        --muted: 0.22 0.04 240;
+        --secondary: 0.30 0.08 240;
+        --primary: 0.75 0.18 45;
+        --primary-foreground: 0.10 0.02 240;
     }
 
     /* Style C Variant - Dark Mode */
     .dark .home-style-c {
-        --background: 0 0 0;
-        --card: 0.05 0 0;
-        --accent: 0.78 0.24 50;
-        --border: 0.25 0.05 40;
-        --ring: 0.68 0.26 35;
-        --muted: 0.20 0 0;
-        --secondary: 0.15 0 0;
-        --primary: 0.70 0.24 32;
-        --primary-foreground: 0 0 0;
+        --background: 0.08 0.01 240;
+        --card: 0.12 0.02 240;
+        --accent: 0.82 0.22 45;
+        --border: 0.28 0.06 50;
+        --ring: 0.78 0.20 50;
+        --muted: 0.22 0.04 240;
+        --secondary: 0.30 0.08 240;
+        --primary: 0.78 0.20 45;
+        --primary-foreground: 0.10 0.02 240;
     }
 
     * {
