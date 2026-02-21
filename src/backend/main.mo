@@ -4,7 +4,7 @@ import Map "mo:core/Map";
 import Time "mo:core/Time";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
-import Migration "migration";
+
 
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
@@ -12,7 +12,7 @@ import Storage "blob-storage/Storage";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
-(with migration = Migration.run)
+
 actor {
   type EvidenceType = { #selfie; #screenshot; #audio; #video };
   type Platform = { #ifood; #uber; #rappi; #ninetyNine };

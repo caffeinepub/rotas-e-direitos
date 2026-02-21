@@ -96,7 +96,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
           className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         >
-          <nav className="fixed left-0 top-20 bottom-0 w-64 bg-background border-r border-border p-4 overflow-y-auto">
+          <nav className="fixed left-0 top-20 bottom-0 w-64 bg-card border-r border-border p-4 overflow-y-auto shadow-xl">
             <div className="space-y-6">
               <div>
                 <h3 className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">

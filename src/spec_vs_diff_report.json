@@ -1,64 +1,27 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T21:28:07.568Z",
-  "summary": "The diff demonstrates significant progress on all three requirements. REQ-1 (transparent checkout cart) is implemented via TransparentCheckoutCart component and integrated into CheckoutPage. REQ-2 (subscription plan updates) is fully implemented in plans.ts with correct pricing, limits, and discount badges. REQ-3 (home page plan comparison) is implemented via PlanComparisonMatrix component and integrated into HomePage and PublicOverviewPage. However, backend payment integration remains stubbed, and some acceptance criteria around smooth payment flow completion cannot be fully verified without functional backend methods.",
-  "missing_requirements": [
-    {
-      "id": "REQ-1",
-      "requirement": "Smooth transition from plan selection to payment completion",
-      "reason": "Payment hooks (useGatewayPayment.ts, usePagBankPayment.ts) throw 'not yet implemented in backend' errors. Payment flow cannot complete successfully without backend integration.",
-      "evidence": [
-        "frontend/src/hooks/useGatewayPayment.ts",
-        "frontend/src/hooks/usePagBankPayment.ts"
-      ]
-    },
-    {
-      "id": "REQ-2",
-      "requirement": "Backend subscription logic enforces defense credit limits per plan",
-      "reason": "Backend main.mo shows SubscriptionStatus type but no enforcement logic for defense credit limits (defensesLimit field exists in frontend plans only).",
-      "evidence": [
-        "backend/main.mo"
-      ]
-    }
-  ],
-  "hallucinated_features": [
-    {
-      "description": "Homepage style variant toggle system with A/B/C variants",
-      "reason": "PublicOverviewPage includes a style variant toggle feature (useHomepageStyleVariant hook) that was not requested in the BuildRequest.",
-      "evidence": [
-        "frontend/src/pages/PublicOverviewPage.tsx"
-      ]
-    },
-    {
-      "description": "Backend migration module for user access restructuring",
-      "reason": "backend/migration.mo removes userAccess field from actor state, which was not mentioned as a requirement or constraint.",
-      "evidence": [
-        "backend/migration.mo"
-      ]
-    }
-  ],
-  "confidence": 0.85,
+  "generatedAt": "2026-02-21T21:56:47.393Z",
+  "summary": "All three requirements (REQ-1, REQ-2, REQ-3) are fully implemented in the diff. The financial loss calculator includes input fields, accurate calculations for weekly/monthly/accumulated losses, and a projection chart. PDF export functionality generates comprehensive reports with all required data. Dark mode is implemented with OKLCH color system optimized for drivers with reduced eye strain. No missing requirements or hallucinated features detected.",
+  "missing_requirements": [],
+  "hallucinated_features": [],
+  "confidence": 0.95,
   "changed_files": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/payments/TransparentCheckoutCart.tsx",
-    "frontend/src/components/subscription/PlanComparisonMatrix.tsx",
-    "frontend/src/hooks/useAdmin.ts",
-    "frontend/src/hooks/useGatewayPayment.ts",
-    "frontend/src/hooks/usePagBankPayment.ts",
-    "frontend/src/hooks/useSubscription.ts",
-    "frontend/src/hooks/useTestimonials.ts",
-    "frontend/src/lib/payments/checkoutState.ts",
-    "frontend/src/lib/subscriptions/plans.ts",
-    "frontend/src/lib/subscriptions/rules.ts",
-    "frontend/src/pages/CheckoutPage.tsx",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/pages/PlansBillingPage.tsx",
-    "frontend/src/pages/PlansDashboardPage.tsx",
-    "frontend/src/pages/PublicOverviewPage.tsx",
-    "frontend/src/types/backend-extended.ts",
+    "frontend/src/App.tsx",
+    "frontend/src/components/AppLayout.tsx",
+    "frontend/src/components/collective/PlatformDistribution.tsx",
+    "frontend/src/components/collective/ReasonDistribution.tsx",
+    "frontend/src/components/collective/TrendChart.tsx",
+    "frontend/src/components/loss/LossProjectionChart.tsx",
+    "frontend/src/components/loss/LossReportActions.tsx",
+    "frontend/src/components/loss/LossResultsCards.tsx",
+    "frontend/src/components/sessions/WorkSessionsList.tsx",
+    "frontend/src/index.css",
+    "frontend/src/lib/pdfReport.ts",
+    "frontend/src/pages/LossCalculatorPage.tsx",
+    "frontend/src/pages/WorkSessionDetailPage.tsx",
+    "frontend/src/types/jspdf.d.ts",
     "project_state.json"
   ]
 }

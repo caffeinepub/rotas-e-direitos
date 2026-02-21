@@ -2,11 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-create-a-simplified-transparent-checkout-cart-component-that-displays-selected-plan-details-price-breakdown-and-payment-options-in-a-clean-objective-interface-without-excessive-navigation-steps",
-      "featureTitle": "Create a simplified transparent checkout cart component that displays selected plan details, price breakdown, and payment options in a clean, objective interface without excessive navigation steps",
+      "featureId": "feature-create-a-comprehensive-financial-loss-calculator-that-allows-drivers-to-input-their-daily-earnings-work-days-per-week-and-deactivation-date-to-calculate-weekly-monthly-and-accumulated-losses",
+      "featureTitle": "Create a comprehensive financial loss calculator that allows drivers to input their daily earnings, work days per week, and deactivation date to calculate weekly, monthly, and accumulated losses",
       "files": [
-        "frontend/src/components/payments/TransparentCheckoutCart.tsx",
-        "frontend/src/pages/CheckoutPage.tsx"
+        "frontend/src/components/loss/LossProjectionChart.tsx",
+        "frontend/src/components/loss/LossResultsCards.tsx",
+        "frontend/src/pages/LossCalculatorPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -26,12 +27,12 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-subscription-plan-configuration-to-free-24h-access-1-defense-pro-monthly-r-29-99-5-defenses-per-month-and-pro-annual-r-119-99-67-discount-unlimited-everything",
-      "featureTitle": "Update subscription plan configuration to Free (24h access, 1 defense), PRO Monthly R$29.99 (5 defenses per month), and PRO Annual R$119.99 (67% discount, unlimited everything)",
+      "featureId": "feature-enhance-the-existing-loss-calculator-with-pdf-export-functionality-that-generates-a-downloadable-financial-loss-report-including-all-calculated-values-platform-information-and-a-summary-of-the-driver-s-situation",
+      "featureTitle": "Enhance the existing loss calculator with PDF export functionality that generates a downloadable financial loss report including all calculated values, platform information, and a summary of the driver's situation",
       "files": [
-        "frontend/src/lib/subscriptions/plans.ts",
-        "frontend/src/pages/PlansBillingPage.tsx",
-        "frontend/src/pages/PlansDashboardPage.tsx"
+        "frontend/src/components/loss/LossReportActions.tsx",
+        "frontend/src/lib/pdfReport.ts",
+        "frontend/src/pages/LossCalculatorPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -51,12 +52,16 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-redesign-the-home-page-plan-comparison-section-to-visually-showcase-benefits-and-limitations-of-each-plan-with-clear-feature-matrices-highlighting-what-s-included-and-excluded-per-tier",
-      "featureTitle": "Redesign the home page plan comparison section to visually showcase benefits and limitations of each plan with clear feature matrices highlighting what's included and excluded per tier",
+      "featureId": "feature-implement-a-comprehensive-dark-mode-theme-optimized-specifically-for-drivers-ensuring-all-pages-and-components-have-excellent-contrast-readability-and-reduced-eye-strain-during-nighttime-work",
+      "featureTitle": "Implement a comprehensive dark mode theme optimized specifically for drivers, ensuring all pages and components have excellent contrast, readability, and reduced eye strain during nighttime work",
       "files": [
-        "frontend/src/components/subscription/PlanComparisonMatrix.tsx",
-        "frontend/src/pages/HomePage.tsx",
-        "frontend/src/pages/PublicOverviewPage.tsx"
+        "frontend/src/components/AppLayout.tsx",
+        "frontend/src/components/collective/PlatformDistribution.tsx",
+        "frontend/src/components/collective/ReasonDistribution.tsx",
+        "frontend/src/components/collective/TrendChart.tsx",
+        "frontend/src/components/loss/LossProjectionChart.tsx",
+        "frontend/src/index.css",
+        "frontend/src/pages/LossCalculatorPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",

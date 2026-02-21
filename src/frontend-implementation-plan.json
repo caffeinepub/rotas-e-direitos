@@ -1,84 +1,158 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Simplify checkout with transparent cart and update subscription plans",
+  "title": "Add financial loss calculator for drivers",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Create a simplified transparent checkout cart component that displays selected plan details, price breakdown, and payment options in a clean, objective interface without excessive navigation steps",
+      "summary": "Create a comprehensive financial loss calculator that allows drivers to input their daily earnings, work days per week, and deactivation date to calculate weekly, monthly, and accumulated losses",
       "acceptanceCriteria": [
-        "Cart displays selected plan name and price clearly",
-        "Payment method selection is integrated directly in the cart view",
-        "No multi-step wizard; all information visible in one screen",
-        "Smooth transition from plan selection to payment completion"
+        "Calculator displays input fields for daily earnings, work days per week, and deactivation date",
+        "System calculates and displays weekly loss amount in BRL",
+        "System calculates and displays monthly loss amount in BRL",
+        "System calculates and displays accumulated total loss in BRL",
+        "Calculator shows a projection chart visualizing loss over time (up to 90 days)",
+        "All calculations are accurate based on the input values"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/payments/TransparentCheckoutCart.tsx",
-          "operation": "create",
-          "description": "Create a new transparent checkout cart component that displays the selected subscription plan (name, price, features), payment method selector (PIX, credit card, bank slip), and payment action button all in a single view without multi-step navigation. The component should read the selected plan from checkout state and provide a streamlined flow to complete payment."
+          "path": "frontend/src/components/loss/LossProfileForm.tsx",
+          "operation": "modify",
+          "description": "Review and ensure the form includes all required input fields (daily earnings, work days per week, deactivation date, platform) with proper validation and labels in Portuguese. Verify form submission saves the profile correctly using the setLossProfile mutation hook."
         },
         {
-          "path": "frontend/src/pages/CheckoutPage.tsx",
+          "path": "frontend/src/components/loss/LossResultsCards.tsx",
           "operation": "modify",
-          "description": "Replace the existing checkout flow with the new TransparentCheckoutCart component. Remove any multi-step wizards or complex navigation, and ensure the cart component is prominently displayed with all payment information visible at once. Keep existing payment provider logic (Gateway and PagBank) and status tracking, but simplify the layout to show cart, payment options, and status in a single cohesive view."
+          "description": "Review and ensure the component displays all three loss calculations (weekly, monthly, accumulated) in separate cards with proper BRL currency formatting, icons, and clear labels. Verify calculations use the correct functions from lib/lossCalculations.ts."
+        },
+        {
+          "path": "frontend/src/components/loss/LossProjectionChart.tsx",
+          "operation": "modify",
+          "description": "Review and ensure the chart visualizes projected losses over 90 days using Recharts line chart. Verify the chart uses data points at appropriate intervals (10-day intervals as currently implemented or adjust for better visualization), displays proper axis labels in Portuguese, formats BRL currency on Y-axis, and maintains readability."
+        },
+        {
+          "path": "frontend/src/lib/lossCalculations.ts",
+          "operation": "modify",
+          "description": "Review and verify all calculation functions (calculateWeeklyLoss, calculateMonthlyLoss, calculateAccumulatedLoss, calculateProjectedLosses) produce accurate results based on the LossProfile inputs. Ensure the formulas correctly handle daily earnings, work days per week, and time elapsed since deactivation. Add any missing calculation functions if needed."
+        },
+        {
+          "path": "frontend/src/pages/LossCalculatorPage.tsx",
+          "operation": "modify",
+          "description": "Review and ensure the page properly integrates all calculator components (LossProfileForm, LossResultsCards, LossProjectionChart). Verify the page shows the form for input, displays results when a profile exists, and handles loading/error states appropriately. Ensure proper layout and spacing for all calculator sections."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Update subscription plan configuration to Free (24h access, 1 defense), PRO Monthly R$29.99 (5 defenses per month), and PRO Annual R$119.99 (67% discount, unlimited everything)",
+      "summary": "Enhance the existing loss calculator with PDF export functionality that generates a downloadable financial loss report including all calculated values, platform information, and a summary of the driver's situation",
       "acceptanceCriteria": [
-        "Free plan grants 24 hours of access with 1 defense credit",
-        "PRO Monthly costs R$29.99 and provides 5 defenses per month",
-        "PRO Annual costs R$119.99 with 67% discount badge displayed",
-        "PRO Annual includes unlimited defenses and all features",
-        "Plan data structure in frontend/src/lib/subscriptions/plans.ts reflects new pricing and limits",
-        "Backend subscription logic enforces defense credit limits per plan"
+        "User can click a button to generate and download a PDF report of their financial losses",
+        "PDF includes driver's platform, deactivation date, daily earnings, and work schedule",
+        "PDF displays all calculated loss values (weekly, monthly, accumulated)",
+        "PDF includes the loss projection over time",
+        "PDF is properly formatted and readable",
+        "Download initiates immediately upon button click"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/lib/subscriptions/plans.ts",
+          "path": "frontend/src/lib/pdfReport.ts",
           "operation": "modify",
-          "description": "Update the subscription plan definitions to reflect the new pricing and features: Free plan with 24-hour access and 1 defense credit, PRO Monthly at R$29.99 with 5 defenses per month, and PRO Annual at R$119.99 with 67% discount badge and unlimited defenses. Update the plan configuration objects to include these new limits, pricing, and feature descriptions that will be displayed throughout the UI."
+          "description": "Replace the current plain text report generation with a comprehensive PDF generation function using a client-side PDF library (e.g., jspdf or pdfmake loaded from CDN). The function should accept LossProfile and calculated loss values, generate a formatted PDF document including platform information, deactivation date, earnings details, work schedule, all calculated loss values (weekly, monthly, accumulated), and a projection chart or table showing losses over time. Return the PDF as a Blob for download. Ensure proper Portuguese labels and BRL currency formatting throughout the document."
         },
         {
-          "path": "frontend/src/pages/PlansBillingPage.tsx",
+          "path": "frontend/src/components/loss/LossReportActions.tsx",
           "operation": "modify",
-          "description": "Update the plan comparison cards to display the new pricing (Free 24h/1 defense, PRO Monthly R$29.99/5 defenses, PRO Annual R$119.99/unlimited with 67% discount badge). Ensure the discount badge is visually prominent on the PRO Annual plan and that feature lists clearly communicate the defense credit limits for each tier."
+          "description": "Update the download button to call the new PDF generation function from lib/pdfReport.ts instead of the plain text report. Ensure the downloaded file has a .pdf extension and a meaningful filename (e.g., 'relatorio-perdas-financeiras-{date}.pdf'). Keep the share button functionality for text-based sharing if needed, or adapt it to share a summary with a note that the full PDF can be downloaded. Add loading states during PDF generation."
         },
         {
-          "path": "frontend/src/pages/PlansDashboardPage.tsx",
+          "path": "frontend/src/pages/LossCalculatorPage.tsx",
           "operation": "modify",
-          "description": "Update the subscription management dashboard to reflect the new plan structure and pricing. Display current subscription details with the updated plan names and limits, and ensure the side-by-side plan comparison shows Free (24h, 1 defense), PRO Monthly (R$29.99, 5 defenses), and PRO Annual (R$119.99, 67% OFF, unlimited) accurately."
+          "description": "Ensure the LossReportActions component is properly integrated and visible when loss results are displayed. Pass all necessary props (LossProfile, calculated values) to enable PDF generation. Verify the download button is prominently displayed and accessible."
         }
       ]
     },
     {
       "id": "REQ-3",
-      "summary": "Redesign the home page plan comparison section to visually showcase benefits and limitations of each plan with clear feature matrices highlighting what's included and excluded per tier",
+      "summary": "Implement a comprehensive dark mode theme optimized specifically for drivers, ensuring all pages and components have excellent contrast, readability, and reduced eye strain during nighttime work",
       "acceptanceCriteria": [
-        "Plan comparison table or cards display all three plans side-by-side",
-        "Each plan clearly lists included features with checkmarks or similar indicators",
-        "Limitations and restrictions are explicitly shown (e.g., '1 defense only' for Free)",
-        "Visual hierarchy emphasizes PRO Annual as best value with discount badge",
-        "Comparison section is prominent on the home/landing page"
+        "All pages and components render properly in dark mode",
+        "Text has high contrast against dark backgrounds for readability",
+        "Interactive elements (buttons, inputs, links) are clearly visible in dark mode",
+        "Color scheme avoids harsh whites and uses softer tones to reduce eye strain",
+        "Important information and warnings remain clearly distinguishable",
+        "Dark mode is consistently applied across the entire application",
+        "Charts and visualizations remain legible with appropriate color adjustments"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/subscription/PlanComparisonMatrix.tsx",
-          "operation": "create",
-          "description": "Create a new plan comparison matrix component that displays all three subscription tiers (Free, PRO Monthly, PRO Annual) side-by-side with clear visual indicators for included features (checkmarks) and limitations (explicit restrictions like '1 defense only'). Use visual hierarchy to emphasize PRO Annual as the best value with a prominent 67% discount badge. The matrix should include rows for key features: access duration, defense credits, appeal generation, evidence storage, loss calculator, and collective data access."
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Review and enhance the existing dark mode color definitions using the OKLCH color system already in place. Ensure all CSS custom properties have dark mode variants that provide high contrast (WCAG AA minimum) while avoiding harsh pure whites. Use softer tones for backgrounds (dark grays/blues rather than pure black) and text (off-whites rather than pure white). Verify primary, secondary, accent, and semantic colors (success, warning, error, info) all have appropriate dark mode variants. Add any missing color definitions needed for comprehensive dark mode coverage across all UI elements."
         },
         {
-          "path": "frontend/src/pages/HomePage.tsx",
+          "path": "frontend/tailwind.config.js",
           "operation": "modify",
-          "description": "Integrate the new PlanComparisonMatrix component into the home page in a prominent position after the hero section and main feature cards. Ensure the comparison section is visually distinct and easily scannable, with a clear call-to-action to view detailed plans or subscribe. The section should work within the existing homepage layout without disrupting navigation or other key content."
+          "description": "Review and ensure the Tailwind configuration properly references all dark mode color custom properties from index.css. Verify the darkMode setting is configured correctly (likely 'class' or 'media'). Add any missing color mappings needed for dark mode support across all Tailwind utilities. Ensure color scales are complete and support dark mode variants."
         },
         {
-          "path": "frontend/src/pages/PublicOverviewPage.tsx",
+          "path": "frontend/src/components/AppLayout.tsx",
           "operation": "modify",
-          "description": "Add the PlanComparisonMatrix component to the public overview page to showcase subscription benefits and limitations to unauthenticated visitors. Position it after the feature showcase sections and before testimonials, ensuring it's prominent enough to drive conversion while maintaining the page's flow and A/B/C style variant compatibility."
+          "description": "Review and ensure the main layout component applies proper dark mode classes to header, navigation, and container elements. Verify backgrounds, text colors, borders, and interactive elements (buttons, links, menu items) all adapt correctly to dark mode. Ensure the logo and icons remain visible and properly contrasted in dark mode. Test mobile menu appearance in dark mode."
+        },
+        {
+          "path": "frontend/src/components/loss/LossProjectionChart.tsx",
+          "operation": "modify",
+          "description": "Enhance the Recharts configuration to support dark mode. Add theme-aware colors for chart lines, grid, axes, tooltips, and labels that provide excellent readability in both light and dark modes. Use CSS custom properties or conditional logic based on dark mode state. Ensure the chart maintains high contrast and legibility in dark mode without harsh colors."
+        },
+        {
+          "path": "frontend/src/components/collective/PlatformDistribution.tsx",
+          "operation": "modify",
+          "description": "Enhance the Recharts bar chart configuration to support dark mode with theme-aware colors for bars, axes, grid, and labels. Ensure proper contrast and readability in dark mode."
+        },
+        {
+          "path": "frontend/src/components/collective/ReasonDistribution.tsx",
+          "operation": "modify",
+          "description": "Enhance the Recharts pie chart configuration to support dark mode with theme-aware colors for pie segments, labels, and legend. Ensure all segments remain distinguishable in dark mode with appropriate color contrast."
+        },
+        {
+          "path": "frontend/src/components/collective/TrendChart.tsx",
+          "operation": "modify",
+          "description": "Enhance the Recharts line chart configuration to support dark mode with theme-aware colors for lines, grid, axes, and labels. Ensure proper contrast and readability in dark mode."
+        },
+        {
+          "path": "frontend/src/pages/Dashboard.tsx",
+          "operation": "modify",
+          "description": "Review and ensure all dashboard module cards and quick access buttons have proper dark mode styling. Verify card backgrounds, text, icons, borders, and hover states all adapt correctly. Ensure sufficient contrast for all interactive elements in dark mode."
+        },
+        {
+          "path": "frontend/src/pages/LossCalculatorPage.tsx",
+          "operation": "modify",
+          "description": "Review and ensure all loss calculator components (form inputs, result cards, buttons, text) have proper dark mode styling with high contrast and readability. Verify form fields, labels, and validation messages are clearly visible in dark mode."
+        },
+        {
+          "path": "frontend/src/pages/EvidenceTrackerPage.tsx",
+          "operation": "modify",
+          "description": "Review and ensure evidence tracker tabs, upload forms, timeline items, and all interactive elements have proper dark mode styling with high contrast. Verify media thumbnails and metadata displays remain legible in dark mode."
+        },
+        {
+          "path": "frontend/src/components/ProfileSetupModal.tsx",
+          "operation": "modify",
+          "description": "Review and ensure the profile setup modal has proper dark mode styling including modal background, overlay, form inputs, labels, and buttons with high contrast and readability."
+        },
+        {
+          "path": "frontend/src/components/ui/button.tsx",
+          "operation": "modify",
+          "description": "Review the Shadcn button component variants to ensure all button styles (default, primary, secondary, destructive, outline, ghost, link) have proper dark mode definitions with high contrast and clear visual feedback. Verify hover and active states work well in dark mode. Note: This file is in the immutable components/ui directory, so if modifications are not possible, document the dark mode support that exists and ensure proper usage of dark: variants in consuming components."
+        },
+        {
+          "path": "frontend/src/components/ui/card.tsx",
+          "operation": "modify",
+          "description": "Review the Shadcn card component to ensure proper dark mode styling for card backgrounds, borders, headers, and content areas with appropriate contrast. Note: This file is in the immutable components/ui directory, so if modifications are not possible, document the dark mode support and ensure proper usage of dark: classes where cards are used."
+        },
+        {
+          "path": "frontend/src/components/ui/input.tsx",
+          "operation": "modify",
+          "description": "Review the Shadcn input component to ensure form inputs have proper dark mode styling with high contrast borders, readable placeholder text, and clear focus states. Note: This file is in the immutable components/ui directory, so if modifications are not possible, document existing dark mode support and apply dark: variants in forms."
         }
       ]
     }

@@ -1,10 +1,9 @@
-import { useNavigate } from '@tanstack/react-router';
 import { useGetAllWorkSessions } from '../../hooks/useWorkSessions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Clock, MapPin, Loader2 } from 'lucide-react';
+import { Clock, MapPin, Loader2, CloudRain } from 'lucide-react';
 
 interface WorkSessionsListProps {
   activeSessionId: number | null;
@@ -12,7 +11,6 @@ interface WorkSessionsListProps {
 
 export default function WorkSessionsList({ activeSessionId }: WorkSessionsListProps) {
   const { data: sessions = [], isLoading } = useGetAllWorkSessions();
-  const navigate = useNavigate();
 
   if (isLoading) {
     return (
@@ -36,10 +34,6 @@ export default function WorkSessionsList({ activeSessionId }: WorkSessionsListPr
     );
   }
 
-  const handleSessionClick = (sessionId: bigint) => {
-    navigate({ to: '/sessoes/$sessionId', params: { sessionId: String(sessionId) } });
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -48,11 +42,14 @@ export default function WorkSessionsList({ activeSessionId }: WorkSessionsListPr
       <CardContent className="space-y-3">
         {sessions.map((session) => {
           const isActive = Number(session.id) === activeSessionId;
+          const duration = session.endTime
+            ? Math.floor((Number(session.endTime) - Number(session.startTime)) / 1000000000 / 60)
+            : null;
+
           return (
             <Card
               key={Number(session.id)}
-              className="transition-all hover:shadow-md cursor-pointer"
-              onClick={() => handleSessionClick(session.id)}
+              className="transition-all hover:shadow-md"
             >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between gap-4">
@@ -66,16 +63,25 @@ export default function WorkSessionsList({ activeSessionId }: WorkSessionsListPr
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-muted-foreground">
-                      {format(new Date(Number(session.startTime) / 1000000), "dd/MM/yyyy 'às' HH:mm", {
-                        locale: ptBR,
-                      })}
-                      {session.endTime &&
-                        ` - ${format(new Date(Number(session.endTime) / 1000000), 'HH:mm', { locale: ptBR })}`}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {session.weatherSamples.length} amostra(s) climática(s)
-                    </p>
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Clock className="h-4 w-4" />
+                      <span>
+                        {format(new Date(Number(session.startTime) / 1000000), "dd/MM/yyyy 'às' HH:mm", {
+                          locale: ptBR,
+                        })}
+                        {session.endTime &&
+                          ` - ${format(new Date(Number(session.endTime) / 1000000), 'HH:mm', { locale: ptBR })}`}
+                      </span>
+                    </div>
+                    {duration !== null && (
+                      <p className="text-sm text-muted-foreground">
+                        Duração: {Math.floor(duration / 60)}h {duration % 60}min
+                      </p>
+                    )}
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <CloudRain className="h-4 w-4" />
+                      <span>{session.weatherSamples.length} amostra(s) climática(s)</span>
+                    </div>
                   </div>
                 </div>
               </CardContent>

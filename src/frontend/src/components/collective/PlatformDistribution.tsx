@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Platform, Region } from '../../types/backend-extended';
+import { Platform } from '../../types/backend-extended';
 import { CollectiveReport } from '../../types/backend-extended';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 
@@ -27,12 +27,38 @@ export default function PlatformDistribution({ reports }: PlatformDistributionPr
       <CardContent>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="platform" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="count" fill="hsl(var(--primary))" name="Relatos" />
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              className="stroke-border dark:stroke-border/50"
+            />
+            <XAxis 
+              dataKey="platform"
+              className="text-muted-foreground"
+              stroke="currentColor"
+            />
+            <YAxis 
+              className="text-muted-foreground"
+              stroke="currentColor"
+            />
+            <Tooltip 
+              contentStyle={{
+                backgroundColor: 'hsl(var(--popover))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '8px',
+                color: 'hsl(var(--popover-foreground))',
+              }}
+            />
+            <Legend 
+              wrapperStyle={{
+                color: 'hsl(var(--foreground))',
+              }}
+            />
+            <Bar 
+              dataKey="count" 
+              fill="hsl(var(--primary))" 
+              name="Relatos"
+              radius={[8, 8, 0, 0]}
+            />
           </BarChart>
         </ResponsiveContainer>
       </CardContent>

@@ -1,7 +1,7 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T21:28:07.572Z",
+  "generatedAt": "2026-02-21T21:56:47.398Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
@@ -12,76 +12,87 @@
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Create a simplified transparent checkout cart component that displays selected plan details, price breakdown, and payment options in a clean, objective interface without excessive navigation steps",
+        "summary": "Create a comprehensive financial loss calculator that allows drivers to input their daily earnings, work days per week, and deactivation date to calculate weekly, monthly, and accumulated losses",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/payments/TransparentCheckoutCart.tsx",
-          "frontend/src/pages/CheckoutPage.tsx"
+          "frontend/src/components/loss/LossProfileForm.tsx",
+          "frontend/src/components/loss/LossResultsCards.tsx",
+          "frontend/src/components/loss/LossProjectionChart.tsx",
+          "frontend/src/lib/lossCalculations.ts",
+          "frontend/src/pages/LossCalculatorPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/payments/TransparentCheckoutCart.tsx",
-          "frontend/src/pages/CheckoutPage.tsx"
+          "frontend/src/components/loss/LossResultsCards.tsx",
+          "frontend/src/components/loss/LossProjectionChart.tsx",
+          "frontend/src/pages/LossCalculatorPage.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Update subscription plan configuration to Free (24h access, 1 defense), PRO Monthly R$29.99 (5 defenses per month), and PRO Annual R$119.99 (67% discount, unlimited everything)",
+        "summary": "Enhance the existing loss calculator with PDF export functionality that generates a downloadable financial loss report including all calculated values, platform information, and a summary of the driver's situation",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/lib/subscriptions/plans.ts",
-          "frontend/src/pages/PlansBillingPage.tsx",
-          "frontend/src/pages/PlansDashboardPage.tsx"
+          "frontend/src/lib/pdfReport.ts",
+          "frontend/src/components/loss/LossReportActions.tsx",
+          "frontend/src/pages/LossCalculatorPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/lib/subscriptions/plans.ts",
-          "frontend/src/pages/PlansBillingPage.tsx",
-          "frontend/src/pages/PlansDashboardPage.tsx"
+          "frontend/src/lib/pdfReport.ts",
+          "frontend/src/components/loss/LossReportActions.tsx",
+          "frontend/src/pages/LossCalculatorPage.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Redesign the home page plan comparison section to visually showcase benefits and limitations of each plan with clear feature matrices highlighting what's included and excluded per tier",
+        "summary": "Implement a comprehensive dark mode theme optimized specifically for drivers, ensuring all pages and components have excellent contrast, readability, and reduced eye strain during nighttime work",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/subscription/PlanComparisonMatrix.tsx",
-          "frontend/src/pages/HomePage.tsx",
-          "frontend/src/pages/PublicOverviewPage.tsx"
+          "frontend/src/index.css",
+          "frontend/tailwind.config.js",
+          "frontend/src/components/AppLayout.tsx",
+          "frontend/src/components/loss/LossProjectionChart.tsx",
+          "frontend/src/components/collective/PlatformDistribution.tsx",
+          "frontend/src/components/collective/ReasonDistribution.tsx",
+          "frontend/src/components/collective/TrendChart.tsx",
+          "frontend/src/pages/Dashboard.tsx",
+          "frontend/src/pages/LossCalculatorPage.tsx",
+          "frontend/src/pages/EvidenceTrackerPage.tsx",
+          "frontend/src/components/ProfileSetupModal.tsx",
+          "frontend/src/components/ui/button.tsx",
+          "frontend/src/components/ui/card.tsx",
+          "frontend/src/components/ui/input.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/components/subscription/PlanComparisonMatrix.tsx",
-          "frontend/src/pages/HomePage.tsx",
-          "frontend/src/pages/PublicOverviewPage.tsx"
+          "frontend/src/index.css",
+          "frontend/src/components/AppLayout.tsx",
+          "frontend/src/components/loss/LossProjectionChart.tsx",
+          "frontend/src/components/collective/PlatformDistribution.tsx",
+          "frontend/src/components/collective/ReasonDistribution.tsx",
+          "frontend/src/components/collective/TrendChart.tsx",
+          "frontend/src/pages/LossCalculatorPage.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/payments/TransparentCheckoutCart.tsx",
-    "frontend/src/components/subscription/PlanComparisonMatrix.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useAdmin.ts",
-    "frontend/src/hooks/useGatewayPayment.ts",
-    "frontend/src/hooks/usePagBankPayment.ts",
-    "frontend/src/hooks/useSubscription.ts",
-    "frontend/src/hooks/useTestimonials.ts",
-    "frontend/src/lib/payments/checkoutState.ts",
-    "frontend/src/lib/subscriptions/plans.ts",
-    "frontend/src/lib/subscriptions/rules.ts",
-    "frontend/src/pages/CheckoutPage.tsx",
-    "frontend/src/pages/HomePage.tsx",
-    "frontend/src/pages/PlansBillingPage.tsx",
-    "frontend/src/pages/PlansDashboardPage.tsx",
-    "frontend/src/pages/PublicOverviewPage.tsx",
-    "frontend/src/types/backend-extended.ts",
+    "frontend/src/App.tsx",
+    "frontend/src/components/AppLayout.tsx",
+    "frontend/src/components/collective/PlatformDistribution.tsx",
+    "frontend/src/components/collective/ReasonDistribution.tsx",
+    "frontend/src/components/collective/TrendChart.tsx",
+    "frontend/src/components/loss/LossProjectionChart.tsx",
+    "frontend/src/components/loss/LossReportActions.tsx",
+    "frontend/src/components/loss/LossResultsCards.tsx",
+    "frontend/src/components/sessions/WorkSessionsList.tsx",
+    "frontend/src/index.css",
+    "frontend/src/lib/pdfReport.ts",
+    "frontend/src/pages/LossCalculatorPage.tsx",
+    "frontend/src/pages/WorkSessionDetailPage.tsx",
+    "frontend/src/types/jspdf.d.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

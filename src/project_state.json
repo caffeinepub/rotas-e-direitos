@@ -1,33 +1,30 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "E-commerce or subscription-based application with payment system and defense credits",
-  "architectural_notes": [
-    "Application uses a defense credit system (defesas) tied to subscription plans",
-    "Payment system redesign in progress toward simplified checkout experience"
-  ],
+  "summary": "Motorista app: calculadora de perdas financeiras, gerador de defesa jurídica com IA e exportação em PDF, dark mode otimizado",
+  "architectural_notes": [],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-create-a-simplified-transparent-checkout-cart-component-that-displays-selected-plan-details-price-breakdown-and-payment-options-in-a-clean-objective-interface-without-excessive-navigation-steps",
-      "title": "Create a simplified transparent checkout cart component that displays selected plan details, price breakdown, and payment options in a clean, objective interface without excessive navigation steps",
+      "id": "feature-create-a-comprehensive-financial-loss-calculator-that-allows-drivers-to-input-their-daily-earnings-work-days-per-week-and-deactivation-date-to-calculate-weekly-monthly-and-accumulated-losses",
+      "title": "Create a comprehensive financial loss calculator that allows drivers to input their daily earnings, work days per week, and deactivation date to calculate weekly, monthly, and accumulated losses",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
     },
     {
-      "id": "feature-update-subscription-plan-configuration-to-free-24h-access-1-defense-pro-monthly-r-29-99-5-defenses-per-month-and-pro-annual-r-119-99-67-discount-unlimited-everything",
-      "title": "Update subscription plan configuration to Free (24h access, 1 defense), PRO Monthly R$29.99 (5 defenses per month), and PRO Annual R$119.99 (67% discount, unlimited everything)",
+      "id": "feature-enhance-the-existing-loss-calculator-with-pdf-export-functionality-that-generates-a-downloadable-financial-loss-report-including-all-calculated-values-platform-information-and-a-summary-of-the-driver-s-situation",
+      "title": "Enhance the existing loss calculator with PDF export functionality that generates a downloadable financial loss report including all calculated values, platform information, and a summary of the driver's situation",
       "reqIds": [
         "REQ-2"
       ],
       "version": 1
     },
     {
-      "id": "feature-redesign-the-home-page-plan-comparison-section-to-visually-showcase-benefits-and-limitations-of-each-plan-with-clear-feature-matrices-highlighting-what-s-included-and-excluded-per-tier",
-      "title": "Redesign the home page plan comparison section to visually showcase benefits and limitations of each plan with clear feature matrices highlighting what's included and excluded per tier",
+      "id": "feature-implement-a-comprehensive-dark-mode-theme-optimized-specifically-for-drivers-ensuring-all-pages-and-components-have-excellent-contrast-readability-and-reduced-eye-strain-during-nighttime-work",
+      "title": "Implement a comprehensive dark mode theme optimized specifically for drivers, ensuring all pages and components have excellent contrast, readability, and reduced eye strain during nighttime work",
       "reqIds": [
         "REQ-3"
       ],
@@ -37,12 +34,29 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Create simplified transparent checkout cart system",
+      "summary": "Calculadora de perdas financeiras",
       "reqIds": [],
-      "status": "in_progress"
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "Gerador de defesa jurídica com IA",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Exportação em PDF",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Dark mode otimizado para motoristas",
+      "reqIds": [],
+      "status": "pending"
     }
   ],
-  "gameProjectType": "none",
   "projectName": "Rotas e Direitos",
   "clarification_mode": "instant",
   "clarification_rounds": 0

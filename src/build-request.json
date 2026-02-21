@@ -1,79 +1,86 @@
 {
   "kind": "build_request",
-  "title": "Simplify checkout with transparent cart and update subscription plans",
+  "title": "Add financial loss calculator for drivers",
   "projectName": "Rotas e Direitos",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Create a simplified transparent checkout cart component that displays selected plan details, price breakdown, and payment options in a clean, objective interface without excessive navigation steps",
+      "text": "Create a comprehensive financial loss calculator that allows drivers to input their daily earnings, work days per week, and deactivation date to calculate weekly, monthly, and accumulated losses",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-checkout-request"
+          "msg-10"
         ],
         "quotes": [
-          "CRIE UM CARRINHO COMO UM CHECKOUT TRANSPARENTE DE FORMA MAIS SIMPLES E OBJETIVA"
+          "calculadora de perdas financeiras"
         ]
       },
       "acceptanceCriteria": [
-        "Cart displays selected plan name and price clearly",
-        "Payment method selection is integrated directly in the cart view",
-        "No multi-step wizard; all information visible in one screen",
-        "Smooth transition from plan selection to payment completion"
+        "Calculator displays input fields for daily earnings, work days per week, and deactivation date",
+        "System calculates and displays weekly loss amount in BRL",
+        "System calculates and displays monthly loss amount in BRL",
+        "System calculates and displays accumulated total loss in BRL",
+        "Calculator shows a projection chart visualizing loss over time (up to 90 days)",
+        "All calculations are accurate based on the input values"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Update subscription plan configuration to Free (24h access, 1 defense), PRO Monthly R$29.99 (5 defenses per month), and PRO Annual R$119.99 (67% discount, unlimited everything)",
-      "target": "both",
+      "text": "Enhance the existing loss calculator with PDF export functionality that generates a downloadable financial loss report including all calculated values, platform information, and a summary of the driver's situation",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-checkout-request"
+          "msg-10"
         ],
         "quotes": [
-          "Planos atualizados: Gratuito (24h, 1 defesa), PRO Mensal R$29,99 (5 defesas/mês), PRO Anual R$119,99 (67% OFF, tudo ilimitado)"
+          "exportação em PDF"
         ]
       },
       "acceptanceCriteria": [
-        "Free plan grants 24 hours of access with 1 defense credit",
-        "PRO Monthly costs R$29.99 and provides 5 defenses per month",
-        "PRO Annual costs R$119.99 with 67% discount badge displayed",
-        "PRO Annual includes unlimited defenses and all features",
-        "Plan data structure in frontend/src/lib/subscriptions/plans.ts reflects new pricing and limits",
-        "Backend subscription logic enforces defense credit limits per plan"
+        "User can click a button to generate and download a PDF report of their financial losses",
+        "PDF includes driver's platform, deactivation date, daily earnings, and work schedule",
+        "PDF displays all calculated loss values (weekly, monthly, accumulated)",
+        "PDF includes the loss projection over time",
+        "PDF is properly formatted and readable",
+        "Download initiates immediately upon button click"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Redesign the home page plan comparison section to visually showcase benefits and limitations of each plan with clear feature matrices highlighting what's included and excluded per tier",
+      "text": "Implement a comprehensive dark mode theme optimized specifically for drivers, ensuring all pages and components have excellent contrast, readability, and reduced eye strain during nighttime work",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-user-checkout-request"
+          "msg-10"
         ],
         "quotes": [
-          "Home agora mostra visual comparativo dos planos com benefícios e limitações de cada um"
+          "dark mode otimizado para motoristas"
         ]
       },
       "acceptanceCriteria": [
-        "Plan comparison table or cards display all three plans side-by-side",
-        "Each plan clearly lists included features with checkmarks or similar indicators",
-        "Limitations and restrictions are explicitly shown (e.g., '1 defense only' for Free)",
-        "Visual hierarchy emphasizes PRO Annual as best value with discount badge",
-        "Comparison section is prominent on the home/landing page"
+        "All pages and components render properly in dark mode",
+        "Text has high contrast against dark backgrounds for readability",
+        "Interactive elements (buttons, inputs, links) are clearly visible in dark mode",
+        "Color scheme avoids harsh whites and uses softer tones to reduce eye strain",
+        "Important information and warnings remain clearly distinguishable",
+        "Dark mode is consistently applied across the entire application",
+        "Charts and visualizations remain legible with appropriate color adjustments"
       ]
     }
   ],
   "constraints": [
-    "Do not change authentication system or Internet Identity integration",
-    "Preserve existing payment provider integration (Gateway and PagBank)",
-    "Maintain existing subscription entitlement logic structure"
+    "Do not modify the backend schema or Motoko actor structure",
+    "Do not edit immutable frontend paths: useInternetIdentity.ts, useInternetIdentity.tsx, useActor.ts, main.tsx, and components/ui",
+    "Use only React, Tailwind CSS, Shadcn, and React Query for frontend implementation",
+    "Do not integrate external AI APIs (OpenAI, Anthropic, etc.) for the legal defense generator"
   ],
   "nonGoals": [
-    "Implementing new payment providers beyond existing Gateway and PagBank",
-    "Changing backend actor architecture or state management patterns",
-    "Modifying evidence storage or IndexedDB structure"
+    "Integration with external AI services for legal defense generation",
+    "Real-time collaboration features",
+    "Multi-language support beyond Portuguese",
+    "Mobile app development (PWA only)",
+    "Backend migration or schema changes"
   ],
   "imageRequirements": {
     "required": [],

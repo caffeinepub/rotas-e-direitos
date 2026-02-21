@@ -1,11 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Simplify the checkout experience with a transparent cart and update subscription plans to reflect new pricing and limits.
+**Goal:** Add a financial loss calculator with PDF export and implement dark mode for the Rotas e Direitos platform.
 
 **Planned changes:**
-- Create a simplified transparent checkout cart that displays plan details, price breakdown, and payment options in a single screen without multi-step navigation
-- Update subscription plans: Free (24h access, 1 defense), PRO Monthly R$29.99 (5 defenses/month), PRO Annual R$119.99 (67% discount, unlimited everything)
-- Redesign home page plan comparison section to showcase benefits and limitations of each plan with clear feature matrices
+- Create a financial loss calculator that allows drivers to input daily earnings, work days per week, and deactivation date
+- Display calculated weekly, monthly, and accumulated losses in BRL
+- Add a projection chart visualizing losses over time (up to 90 days)
+- Implement PDF export functionality that generates a downloadable report with all calculated values and platform information
+- Apply comprehensive dark mode theme across all pages and components with optimized contrast and readability for nighttime driving work
 
-**User-visible outcome:** Users can view and compare updated subscription plans on the home page with clear feature differences, then proceed through a streamlined single-screen checkout process to complete their purchase.
+**User-visible outcome:** Drivers can calculate their financial losses from platform deactivation, visualize projected losses over time, export a detailed PDF report, and use the entire application in dark mode with reduced eye strain.

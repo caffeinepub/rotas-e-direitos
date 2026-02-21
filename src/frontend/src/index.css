@@ -6,30 +6,30 @@
     :root {
         --radius: 0.5rem;
         /* 
-         * Modern Professional Design System
-         * Primary: Sophisticated Emerald Green (oklch(0.65 0.18 165))
-         * Secondary: Warm Coral/Terracotta (oklch(0.68 0.16 35))
-         * Accent: Rich Teal (oklch(0.58 0.15 195))
-         * Background: Clean light with subtle warmth
+         * Optimized for Drivers - Dark Mode First
+         * Primary: Warm Orange (oklch(0.75 0.15 55))
+         * Secondary: Deep Navy Blue (oklch(0.30 0.08 240))
+         * Accent: Bright Amber (oklch(0.78 0.16 70))
+         * Background: Soft warm light
          */
-        --background: 0.98 0.01 90;
-        --foreground: 0.15 0.02 165;
+        --background: 0.98 0.01 55;
+        --foreground: 0.20 0.03 240;
         --card: 1.0 0.0 0;
-        --card-foreground: 0.15 0.02 165;
+        --card-foreground: 0.20 0.03 240;
         --popover: 1.0 0.0 0;
-        --popover-foreground: 0.15 0.02 165;
-        /* Emerald green - primary brand color */
-        --primary: 0.65 0.18 165;
-        --primary-foreground: 0.98 0.01 165;
-        /* Warm coral - secondary accent */
-        --secondary: 0.68 0.16 35;
-        --secondary-foreground: 0.98 0.01 35;
-        /* Muted tones with subtle green tint */
-        --muted: 0.92 0.02 165;
-        --muted-foreground: 0.48 0.06 165;
-        /* Rich teal accent */
-        --accent: 0.58 0.15 195;
-        --accent-foreground: 0.98 0.01 195;
+        --popover-foreground: 0.20 0.03 240;
+        /* Warm orange - primary brand color */
+        --primary: 0.75 0.15 55;
+        --primary-foreground: 0.98 0.01 55;
+        /* Deep navy - secondary */
+        --secondary: 0.30 0.08 240;
+        --secondary-foreground: 0.98 0.01 240;
+        /* Muted tones with subtle warmth */
+        --muted: 0.92 0.02 55;
+        --muted-foreground: 0.48 0.06 240;
+        /* Bright amber accent */
+        --accent: 0.78 0.16 70;
+        --accent-foreground: 0.20 0.03 70;
         /* Destructive - warm red */
         --destructive: 0.58 0.22 15;
         --destructive-foreground: 0.98 0.01 15;
@@ -37,53 +37,53 @@
         --success: 0.68 0.20 150;
         --success-foreground: 0.98 0.01 150;
         /* Borders and inputs with subtle tint */
-        --border: 0.88 0.02 165;
-        --input: 0.88 0.02 165;
-        --ring: 0.65 0.18 165;
+        --border: 0.88 0.02 55;
+        --input: 0.88 0.02 55;
+        --ring: 0.75 0.15 55;
         /* Chart colors harmonized with brand palette */
-        --chart-1: 0.65 0.18 165;
-        --chart-2: 0.68 0.16 35;
-        --chart-3: 0.58 0.15 195;
-        --chart-4: 0.72 0.18 280;
-        --chart-5: 0.70 0.16 120;
+        --chart-1: 0.75 0.15 55;
+        --chart-2: 0.30 0.08 240;
+        --chart-3: 0.78 0.16 70;
+        --chart-4: 0.68 0.20 150;
+        --chart-5: 0.58 0.22 15;
     }
 
     .dark {
-        /* Dark mode with enhanced brand colors */
-        --background: 0.12 0.02 165;
-        --foreground: 0.95 0.02 165;
-        --card: 0.16 0.03 165;
-        --card-foreground: 0.95 0.02 165;
-        --popover: 0.18 0.03 165;
-        --popover-foreground: 0.95 0.02 165;
-        /* Brighter emerald for dark mode visibility */
-        --primary: 0.70 0.20 165;
-        --primary-foreground: 0.12 0.02 165;
-        /* Elevated coral for dark mode */
-        --secondary: 0.72 0.18 35;
-        --secondary-foreground: 0.12 0.02 35;
-        /* Balanced muted tones */
-        --muted: 0.22 0.04 165;
-        --muted-foreground: 0.65 0.10 165;
-        /* Vibrant teal for dark */
-        --accent: 0.62 0.18 195;
-        --accent-foreground: 0.12 0.02 195;
-        /* Softer destructive for dark */
-        --destructive: 0.62 0.20 15;
-        --destructive-foreground: 0.95 0.02 15;
+        /* Dark mode optimized for nighttime driving - reduced eye strain */
+        --background: 0.15 0.02 240;
+        --foreground: 0.92 0.02 55;
+        --card: 0.18 0.03 240;
+        --card-foreground: 0.92 0.02 55;
+        --popover: 0.20 0.03 240;
+        --popover-foreground: 0.92 0.02 55;
+        /* Brighter orange for dark mode visibility */
+        --primary: 0.78 0.17 55;
+        --primary-foreground: 0.15 0.02 240;
+        /* Elevated navy for dark mode */
+        --secondary: 0.40 0.10 240;
+        --secondary-foreground: 0.92 0.02 240;
+        /* Balanced muted tones - softer for eyes */
+        --muted: 0.25 0.04 240;
+        --muted-foreground: 0.68 0.08 55;
+        /* Vibrant amber for dark */
+        --accent: 0.80 0.18 70;
+        --accent-foreground: 0.15 0.02 70;
+        /* Softer destructive for dark - less harsh */
+        --destructive: 0.65 0.20 15;
+        --destructive-foreground: 0.92 0.02 15;
         /* Success for dark */
         --success: 0.72 0.22 150;
-        --success-foreground: 0.12 0.02 150;
-        /* Subtle borders */
-        --border: 0.28 0.05 165;
-        --input: 0.28 0.05 165;
-        --ring: 0.70 0.20 165;
-        /* Chart colors optimized for dark */
-        --chart-1: 0.70 0.20 165;
-        --chart-2: 0.72 0.18 35;
-        --chart-3: 0.62 0.18 195;
-        --chart-4: 0.75 0.20 280;
-        --chart-5: 0.73 0.18 120;
+        --success-foreground: 0.15 0.02 150;
+        /* Subtle borders - not too bright */
+        --border: 0.30 0.05 240;
+        --input: 0.30 0.05 240;
+        --ring: 0.78 0.17 55;
+        /* Chart colors optimized for dark - high contrast but not harsh */
+        --chart-1: 0.78 0.17 55;
+        --chart-2: 0.65 0.15 240;
+        --chart-3: 0.80 0.18 70;
+        --chart-4: 0.72 0.22 150;
+        --chart-5: 0.65 0.20 15;
     }
 
     /* Style B Variant - Teal Emphasis */

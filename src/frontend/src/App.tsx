@@ -1,43 +1,44 @@
-import { createRouter, RouterProvider, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
-import { useInternetIdentity } from './hooks/useInternetIdentity';
+import { RouterProvider, createRouter, createRoute, createRootRoute } from '@tanstack/react-router';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from '@/components/ui/sonner';
+import { ThemeProvider } from 'next-themes';
 import AppLayout from './components/AppLayout';
 import HomePage from './pages/HomePage';
 import Dashboard from './pages/Dashboard';
-import PublicOverviewPage from './pages/PublicOverviewPage';
 import EvidenceTrackerPage from './pages/EvidenceTrackerPage';
-import EvidenceDetailPage from './pages/EvidenceDetailPage';
-import WorkSessionDetailPage from './pages/WorkSessionDetailPage';
 import LossCalculatorPage from './pages/LossCalculatorPage';
 import AppealGeneratorPage from './pages/AppealGeneratorPage';
 import CollectiveInsightsPage from './pages/CollectiveInsightsPage';
+import EvidenceDetailPage from './pages/EvidenceDetailPage';
+import ProfilePage from './pages/ProfilePage';
 import PlansBillingPage from './pages/PlansBillingPage';
 import PlansDashboardPage from './pages/PlansDashboardPage';
 import PaymentsPage from './pages/PaymentsPage';
 import CheckoutPage from './pages/CheckoutPage';
-import ProfilePage from './pages/ProfilePage';
 import QuickProcessLookupPage from './pages/QuickProcessLookupPage';
-import QuickAccessPage from './pages/QuickAccessPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import DataPolicyPage from './pages/DataPolicyPage';
+import PublicOverviewPage from './pages/PublicOverviewPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
+import QuickAccessPage from './pages/QuickAccessPage';
 import ProfileSetupModal from './components/ProfileSetupModal';
 
-function RootComponent() {
-  const { identity } = useInternetIdentity();
-  const isAuthenticated = !!identity;
-
-  return (
-    <>
-      <AppLayout>
-        <Outlet />
-      </AppLayout>
-      {isAuthenticated && <ProfileSetupModal />}
-    </>
-  );
-}
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
 const rootRoute = createRootRoute({
-  component: RootComponent,
+  component: () => (
+    <AppLayout>
+      <ProfileSetupModal />
+      <RouterProvider router={router} />
+    </AppLayout>
+  ),
 });
 
 const indexRoute = createRoute({
@@ -64,13 +65,7 @@ const evidenceDetailRoute = createRoute({
   component: EvidenceDetailPage,
 });
 
-const sessionDetailRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/sessoes/$sessionId',
-  component: WorkSessionDetailPage,
-});
-
-const lossCalculatorRoute = createRoute({
+const calculatorRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/calculadora',
   component: LossCalculatorPage,
@@ -88,7 +83,13 @@ const collectiveRoute = createRoute({
   component: CollectiveInsightsPage,
 });
 
-const plansBillingRoute = createRoute({
+const profileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/perfil',
+  component: ProfilePage,
+});
+
+const plansRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/planos',
   component: PlansBillingPage,
@@ -96,7 +97,7 @@ const plansBillingRoute = createRoute({
 
 const plansDashboardRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/dashboard-planos',
+  path: '/planos-dashboard',
   component: PlansDashboardPage,
 });
 
@@ -112,22 +113,10 @@ const checkoutRoute = createRoute({
   component: CheckoutPage,
 });
 
-const profileRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/perfil',
-  component: ProfilePage,
-});
-
-const quickLookupRoute = createRoute({
+const quickProcessRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/consulta-rapida',
   component: QuickProcessLookupPage,
-});
-
-const quickAccessRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/acesso-rapido',
-  component: QuickAccessPage,
 });
 
 const privacyRoute = createRoute({
@@ -136,10 +125,16 @@ const privacyRoute = createRoute({
   component: PrivacyPolicyPage,
 });
 
-const dataRoute = createRoute({
+const dataPolicyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/politica-dados',
   component: DataPolicyPage,
+});
+
+const publicOverviewRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/visao-geral',
+  component: PublicOverviewPage,
 });
 
 const adminRoute = createRoute({
@@ -148,25 +143,31 @@ const adminRoute = createRoute({
   component: AdminDashboardPage,
 });
 
+const quickAccessRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/acesso-rapido',
+  component: QuickAccessPage,
+});
+
 const routeTree = rootRoute.addChildren([
   indexRoute,
   dashboardRoute,
   evidenceRoute,
   evidenceDetailRoute,
-  sessionDetailRoute,
-  lossCalculatorRoute,
+  calculatorRoute,
   appealRoute,
   collectiveRoute,
-  plansBillingRoute,
+  profileRoute,
+  plansRoute,
   plansDashboardRoute,
   paymentsRoute,
   checkoutRoute,
-  profileRoute,
-  quickLookupRoute,
-  quickAccessRoute,
+  quickProcessRoute,
   privacyRoute,
-  dataRoute,
+  dataPolicyRoute,
+  publicOverviewRoute,
   adminRoute,
+  quickAccessRoute,
 ]);
 
 const router = createRouter({ routeTree });
@@ -178,5 +179,12 @@ declare module '@tanstack/react-router' {
 }
 
 export default function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <Toaster />
+      </QueryClientProvider>
+    </ThemeProvider>
+  );
 }
