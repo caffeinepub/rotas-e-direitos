@@ -72,3 +72,47 @@ export interface PublicLossProfile {
   deactivationDate: bigint;
   platform: BackendPlatform;
 }
+
+// Subscription types - not exported from backend
+export type SubscriptionPlan = 'free_24h' | 'pro_monthly' | 'pro_annual';
+
+export interface SubscriptionStatus {
+  currentPlan: SubscriptionPlan;
+  startTime: bigint | null;
+  endTime: bigint | null;
+}
+
+// Testimonial types - not exported from backend
+export enum TestimonialStatus {
+  pending = 'pending',
+  approved = 'approved',
+  rejected = 'rejected',
+}
+
+export interface Testimonial {
+  id: bigint;
+  submitter: BackendPrincipal;
+  content: string;
+  timestamp: bigint;
+  status: TestimonialStatus;
+}
+
+// Payment types - not exported from backend
+export interface PaymentCheckoutResponse {
+  checkoutUrl: string | null;
+  paymentId: string;
+}
+
+export interface PaymentStatus {
+  paymentId: string;
+  status: string;
+  rawResponse: string;
+}
+
+// User access types - not exported from backend
+export interface UserAccessInfo {
+  principal: BackendPrincipal;
+  profile: any | null;
+  subscriptionStatus: SubscriptionStatus;
+  isBlockedByAdmin: boolean;
+}

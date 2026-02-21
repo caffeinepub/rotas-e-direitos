@@ -1,12 +1,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Loader2, Sparkles } from 'lucide-react';
+import { Check, Loader2, Sparkles, X, Zap } from 'lucide-react';
 import { useGetSubscriptionStatus } from '../hooks/useSubscription';
 import { useNavigate } from '@tanstack/react-router';
 import { PLANS } from '../lib/subscriptions/plans';
 import { evaluateEntitlement, formatExpiryDate } from '../lib/subscriptions/rules';
 import TrustBadges from '../components/trust/TrustBadges';
+import { saveSelectedPlan } from '../lib/payments/checkoutState';
 
 export default function PlansBillingPage() {
   const { data: subscriptionStatus, isLoading } = useGetSubscriptionStatus();
@@ -15,7 +16,8 @@ export default function PlansBillingPage() {
   const userEntitlement = subscriptionStatus ? evaluateEntitlement(subscriptionStatus) : null;
 
   const handleUpgrade = (planId: string) => {
-    navigate({ to: '/checkout', search: { plan: planId } });
+    saveSelectedPlan(planId as any);
+    navigate({ to: '/checkout' });
   };
 
   if (isLoading) {
@@ -70,6 +72,7 @@ export default function PlansBillingPage() {
         {PLANS.map((plan) => {
           const isCurrentPlan = subscriptionStatus?.currentPlan === plan.id;
           const isPro = plan.highlighted;
+          const hasDiscount = !!plan.discount;
 
           return (
             <Card
@@ -80,7 +83,15 @@ export default function PlansBillingPage() {
                   : 'border-border/60 shadow-md'
               }`}
             >
-              {isPro && (
+              {hasDiscount && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                  <Badge className="bg-destructive text-destructive-foreground px-4 py-1 shadow-md">
+                    <Zap className="h-3 w-3 mr-1" />
+                    {plan.discount}
+                  </Badge>
+                </div>
+              )}
+              {isPro && !hasDiscount && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                   <Badge className="bg-gradient-to-r from-primary to-accent text-primary-foreground px-4 py-1 shadow-md">
                     <Sparkles className="h-3 w-3 mr-1" />
@@ -97,6 +108,15 @@ export default function PlansBillingPage() {
                     <span className="text-muted-foreground ml-2">/ {plan.billingPeriod}</span>
                   )}
                 </div>
+                {plan.defensesLimit && (
+                  <div className="mt-2">
+                    <Badge variant="outline" className="text-xs">
+                      {plan.defensesLimit === 'unlimited' 
+                        ? 'Defesas Ilimitadas' 
+                        : `${plan.defensesLimit} defesa${plan.defensesLimit > 1 ? 's' : ''}`}
+                    </Badge>
+                  </div>
+                )}
               </CardHeader>
               <CardContent className="space-y-4">
                 <ul className="space-y-3">
@@ -107,6 +127,16 @@ export default function PlansBillingPage() {
                     </li>
                   ))}
                 </ul>
+                {plan.limitations && plan.limitations.length > 0 && (
+                  <div className="pt-3 border-t space-y-2">
+                    {plan.limitations.map((limitation, index) => (
+                      <div key={index} className="flex items-start gap-2">
+                        <X className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                        <span className="text-xs text-muted-foreground">{limitation}</span>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 <Button
                   className="w-full shadow-sm hover:shadow-md transition-all"
                   variant={isPro ? 'default' : 'outline'}

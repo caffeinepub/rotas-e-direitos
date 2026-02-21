@@ -1,4 +1,4 @@
-import { SubscriptionPlan } from '../../backend';
+import { SubscriptionPlan } from '../../types/backend-extended';
 
 export interface PlanDefinition {
   id: SubscriptionPlan;
@@ -8,7 +8,10 @@ export interface PlanDefinition {
   billingPeriod: string;
   description: string;
   features: string[];
+  limitations?: string[];
   highlighted?: boolean;
+  discount?: string;
+  defensesLimit?: number | 'unlimited';
 }
 
 export const PLANS: PlanDefinition[] = [
@@ -18,47 +21,54 @@ export const PLANS: PlanDefinition[] = [
     price: 'R$ 0,00',
     priceValue: 0,
     billingPeriod: '24 horas',
-    description: 'Teste todas as funcionalidades por 24 horas',
+    description: 'Teste básico por 24 horas',
+    defensesLimit: 1,
     features: [
-      'Acesso completo por 24 horas',
+      'Acesso por 24 horas',
+      '1 defesa incluída',
       'Rastreador de evidências',
       'Calculadora de perdas',
-      'Gerador de recursos',
-      'Dados coletivos',
-      'Suporte básico',
+    ],
+    limitations: [
+      'Apenas 1 defesa',
+      'Acesso limitado a 24h',
+      'Sem armazenamento ilimitado',
     ],
   },
   {
     id: 'pro_monthly' as SubscriptionPlan,
-    name: 'Pro Mensal',
+    name: 'PRO Mensal',
     price: 'R$ 29,99',
     priceValue: 29.99,
     billingPeriod: 'por mês',
-    description: 'Acesso ilimitado com renovação mensal',
+    description: 'Ideal para uso regular',
+    defensesLimit: 5,
     features: [
-      'Todos os recursos liberados',
-      'Armazenamento ilimitado de evidências',
-      'Exportação de relatórios',
-      'Geração ilimitada de recursos',
-      'Acesso prioritário a novos recursos',
+      '5 defesas por mês',
+      'Gerador de recursos ilimitado',
+      'Armazenamento de evidências',
+      'Calculadora de perdas avançada',
+      'Acesso a dados coletivos',
       'Suporte prioritário',
     ],
     highlighted: true,
   },
   {
     id: 'pro_annual' as SubscriptionPlan,
-    name: 'Pro Anual',
-    price: 'R$ 329,90',
-    priceValue: 329.90,
+    name: 'PRO Anual',
+    price: 'R$ 119,99',
+    priceValue: 119.99,
     billingPeriod: 'por ano',
-    description: 'Melhor valor - economize mais de 8%',
+    description: 'Melhor custo-benefício',
+    discount: '67% OFF',
+    defensesLimit: 'unlimited',
     features: [
-      'Todos os recursos Pro Mensal',
-      'Economia de R$ 29,98 por ano',
-      'Garantia de preço por 12 meses',
-      'Acesso vitalício a recursos lançados no período',
+      'Tudo ilimitado',
+      'Defesas ilimitadas',
+      'Todos os recursos PRO',
+      'Armazenamento ilimitado',
       'Suporte premium',
-      'Consultoria jurídica básica (em breve)',
+      'Economia de R$ 239,89/ano',
     ],
   },
 ];

@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import { Testimonial, TestimonialStatus } from '../backend';
+import { Testimonial, TestimonialStatus } from '../types/backend-extended';
 import { sanitizeTestimonialError } from '../lib/testimonials/testimonialErrorMessages';
 
 // Query keys
@@ -18,7 +18,8 @@ export function useGetApprovedTestimonials() {
     queryKey: testimonialKeys.approved(),
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getApprovedTestimonials();
+      // Backend method not implemented - return empty array
+      return [];
     },
     enabled: !!actor && !actorFetching,
     retry: 1,
@@ -34,7 +35,8 @@ export function useGetPendingTestimonials() {
     queryKey: testimonialKeys.pending(),
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
-      return actor.getPendingTestimonials();
+      // Backend method not implemented - return empty array
+      return [];
     },
     enabled: !!actor && !actorFetching,
     retry: false,

@@ -1,43 +1,84 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Update app color scheme to match logo tonality",
+  "title": "Simplify checkout with transparent cart and update subscription plans",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Update the application's color palette in frontend/index.css to use the same tonality as the logo colors, replacing the current warm orange primary and deep navy blue secondary colors while maintaining OKLCH color space and accessibility standards",
+      "summary": "Create a simplified transparent checkout cart component that displays selected plan details, price breakdown, and payment options in a clean, objective interface without excessive navigation steps",
       "acceptanceCriteria": [
-        "The primary and secondary color variables in the CSS use tonalities matching the logo",
-        "All color references throughout the app reflect the new palette",
-        "Text remains readable with appropriate contrast against backgrounds",
-        "Dark mode color variants are updated to maintain consistency"
+        "Cart displays selected plan name and price clearly",
+        "Payment method selection is integrated directly in the cart view",
+        "No multi-step wizard; all information visible in one screen",
+        "Smooth transition from plan selection to payment completion"
       ],
       "file_operations": [
         {
-          "path": "frontend/index.css",
+          "path": "frontend/src/components/payments/TransparentCheckoutCart.tsx",
+          "operation": "create",
+          "description": "Create a new transparent checkout cart component that displays the selected subscription plan (name, price, features), payment method selector (PIX, credit card, bank slip), and payment action button all in a single view without multi-step navigation. The component should read the selected plan from checkout state and provide a streamlined flow to complete payment."
+        },
+        {
+          "path": "frontend/src/pages/CheckoutPage.tsx",
           "operation": "modify",
-          "description": "Update the CSS custom properties defining the color palette to match the logo's tonality. Extract colors from frontend/public/assets/generated/logo-rotas-e-direitos.dim_512x512.png and frontend/public/assets/generated/logo.dim_400x400.png. Replace the current warm orange primary colors (--color-primary, --color-primary-foreground) and deep navy blue secondary colors (--color-secondary, --color-secondary-foreground) with OKLCH values that match the logo's visual identity. Update all color variants including accent, muted, card, popover, and their dark mode counterparts to maintain visual consistency with the new palette. Ensure all color changes preserve WCAG AA contrast ratios for text and interactive elements. Maintain the existing OKLCH color space format and structure of the CSS variables. Do not modify the overall layout, typography, or component styling beyond color values."
+          "description": "Replace the existing checkout flow with the new TransparentCheckoutCart component. Remove any multi-step wizards or complex navigation, and ensure the cart component is prominently displayed with all payment information visible at once. Keep existing payment provider logic (Gateway and PagBank) and status tracking, but simplify the layout to show cart, payment options, and status in a single cohesive view."
         }
       ]
     },
     {
       "id": "REQ-2",
-      "summary": "Update the theme color in frontend/index.html and frontend/public/manifest.webmanifest to match the updated primary color from the new palette, ensuring consistency across browser UI elements and PWA theming",
+      "summary": "Update subscription plan configuration to Free (24h access, 1 defense), PRO Monthly R$29.99 (5 defenses per month), and PRO Annual R$119.99 (67% discount, unlimited everything)",
       "acceptanceCriteria": [
-        "The theme-color meta tag in index.html reflects the new primary color",
-        "The theme_color in manifest.webmanifest matches the updated palette",
-        "Browser UI chrome displays the correct brand color"
+        "Free plan grants 24 hours of access with 1 defense credit",
+        "PRO Monthly costs R$29.99 and provides 5 defenses per month",
+        "PRO Annual costs R$119.99 with 67% discount badge displayed",
+        "PRO Annual includes unlimited defenses and all features",
+        "Plan data structure in frontend/src/lib/subscriptions/plans.ts reflects new pricing and limits",
+        "Backend subscription logic enforces defense credit limits per plan"
       ],
       "file_operations": [
         {
-          "path": "frontend/index.html",
+          "path": "frontend/src/lib/subscriptions/plans.ts",
           "operation": "modify",
-          "description": "Update the theme-color meta tag to use the new primary color value that matches the logo tonality. Convert the OKLCH primary color value from frontend/index.css to a hex color code for the meta tag. Ensure the color value is consistent with the updated palette from REQ-1."
+          "description": "Update the subscription plan definitions to reflect the new pricing and features: Free plan with 24-hour access and 1 defense credit, PRO Monthly at R$29.99 with 5 defenses per month, and PRO Annual at R$119.99 with 67% discount badge and unlimited defenses. Update the plan configuration objects to include these new limits, pricing, and feature descriptions that will be displayed throughout the UI."
         },
         {
-          "path": "frontend/public/manifest.webmanifest",
+          "path": "frontend/src/pages/PlansBillingPage.tsx",
           "operation": "modify",
-          "description": "Update the theme_color field in the PWA manifest to match the new primary color from the updated palette. Convert the OKLCH primary color value from frontend/index.css to a hex color code. Ensure consistency with the theme-color meta tag in frontend/index.html and the overall brand identity from the logo."
+          "description": "Update the plan comparison cards to display the new pricing (Free 24h/1 defense, PRO Monthly R$29.99/5 defenses, PRO Annual R$119.99/unlimited with 67% discount badge). Ensure the discount badge is visually prominent on the PRO Annual plan and that feature lists clearly communicate the defense credit limits for each tier."
+        },
+        {
+          "path": "frontend/src/pages/PlansDashboardPage.tsx",
+          "operation": "modify",
+          "description": "Update the subscription management dashboard to reflect the new plan structure and pricing. Display current subscription details with the updated plan names and limits, and ensure the side-by-side plan comparison shows Free (24h, 1 defense), PRO Monthly (R$29.99, 5 defenses), and PRO Annual (R$119.99, 67% OFF, unlimited) accurately."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Redesign the home page plan comparison section to visually showcase benefits and limitations of each plan with clear feature matrices highlighting what's included and excluded per tier",
+      "acceptanceCriteria": [
+        "Plan comparison table or cards display all three plans side-by-side",
+        "Each plan clearly lists included features with checkmarks or similar indicators",
+        "Limitations and restrictions are explicitly shown (e.g., '1 defense only' for Free)",
+        "Visual hierarchy emphasizes PRO Annual as best value with discount badge",
+        "Comparison section is prominent on the home/landing page"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/subscription/PlanComparisonMatrix.tsx",
+          "operation": "create",
+          "description": "Create a new plan comparison matrix component that displays all three subscription tiers (Free, PRO Monthly, PRO Annual) side-by-side with clear visual indicators for included features (checkmarks) and limitations (explicit restrictions like '1 defense only'). Use visual hierarchy to emphasize PRO Annual as the best value with a prominent 67% discount badge. The matrix should include rows for key features: access duration, defense credits, appeal generation, evidence storage, loss calculator, and collective data access."
+        },
+        {
+          "path": "frontend/src/pages/HomePage.tsx",
+          "operation": "modify",
+          "description": "Integrate the new PlanComparisonMatrix component into the home page in a prominent position after the hero section and main feature cards. Ensure the comparison section is visually distinct and easily scannable, with a clear call-to-action to view detailed plans or subscribe. The section should work within the existing homepage layout without disrupting navigation or other key content."
+        },
+        {
+          "path": "frontend/src/pages/PublicOverviewPage.tsx",
+          "operation": "modify",
+          "description": "Add the PlanComparisonMatrix component to the public overview page to showcase subscription benefits and limitations to unauthenticated visitors. Position it after the feature showcase sections and before testimonials, ensuring it's prominent enough to drive conversion while maintaining the page's flow and A/B/C style variant compatibility."
         }
       ]
     }

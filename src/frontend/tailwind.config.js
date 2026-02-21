@@ -16,7 +16,8 @@ export default {
         },
         extend: {
             fontFamily: {
-                sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif']
+                sans: ['Outfit', 'Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+                display: ['Outfit', 'Inter', 'system-ui', 'sans-serif']
             },
             colors: {
                 border: 'oklch(var(--border))',
@@ -73,35 +74,50 @@ export default {
                     border: 'oklch(var(--sidebar-border))',
                     ring: 'oklch(var(--sidebar-ring))'
                 },
-                orange: {
-                    DEFAULT: 'oklch(0.75 0.15 55)',
-                    light: 'oklch(0.78 0.18 55)',
-                    dark: 'oklch(0.70 0.12 55)',
-                    50: 'oklch(0.95 0.05 55)',
-                    100: 'oklch(0.90 0.08 55)',
-                    200: 'oklch(0.85 0.12 55)',
-                    300: 'oklch(0.80 0.14 55)',
-                    400: 'oklch(0.75 0.15 55)',
-                    500: 'oklch(0.70 0.15 55)',
-                    600: 'oklch(0.65 0.14 55)',
-                    700: 'oklch(0.60 0.12 55)',
-                    800: 'oklch(0.50 0.10 55)',
-                    900: 'oklch(0.40 0.08 55)'
+                emerald: {
+                    DEFAULT: 'oklch(0.65 0.18 165)',
+                    light: 'oklch(0.70 0.20 165)',
+                    dark: 'oklch(0.60 0.16 165)',
+                    50: 'oklch(0.96 0.04 165)',
+                    100: 'oklch(0.92 0.08 165)',
+                    200: 'oklch(0.85 0.12 165)',
+                    300: 'oklch(0.75 0.16 165)',
+                    400: 'oklch(0.65 0.18 165)',
+                    500: 'oklch(0.60 0.18 165)',
+                    600: 'oklch(0.55 0.16 165)',
+                    700: 'oklch(0.48 0.14 165)',
+                    800: 'oklch(0.40 0.12 165)',
+                    900: 'oklch(0.32 0.10 165)'
                 },
-                navy: {
-                    DEFAULT: 'oklch(0.30 0.08 240)',
-                    light: 'oklch(0.35 0.10 240)',
-                    dark: 'oklch(0.25 0.06 240)',
-                    50: 'oklch(0.95 0.02 240)',
-                    100: 'oklch(0.85 0.03 240)',
-                    200: 'oklch(0.70 0.05 240)',
-                    300: 'oklch(0.55 0.08 240)',
-                    400: 'oklch(0.40 0.10 240)',
-                    500: 'oklch(0.30 0.08 240)',
-                    600: 'oklch(0.25 0.06 240)',
-                    700: 'oklch(0.22 0.05 240)',
-                    800: 'oklch(0.18 0.04 240)',
-                    900: 'oklch(0.15 0.03 240)'
+                coral: {
+                    DEFAULT: 'oklch(0.68 0.16 35)',
+                    light: 'oklch(0.72 0.18 35)',
+                    dark: 'oklch(0.64 0.14 35)',
+                    50: 'oklch(0.96 0.04 35)',
+                    100: 'oklch(0.92 0.08 35)',
+                    200: 'oklch(0.85 0.12 35)',
+                    300: 'oklch(0.75 0.14 35)',
+                    400: 'oklch(0.68 0.16 35)',
+                    500: 'oklch(0.64 0.16 35)',
+                    600: 'oklch(0.58 0.14 35)',
+                    700: 'oklch(0.52 0.12 35)',
+                    800: 'oklch(0.44 0.10 35)',
+                    900: 'oklch(0.36 0.08 35)'
+                },
+                teal: {
+                    DEFAULT: 'oklch(0.58 0.15 195)',
+                    light: 'oklch(0.62 0.18 195)',
+                    dark: 'oklch(0.54 0.13 195)',
+                    50: 'oklch(0.96 0.03 195)',
+                    100: 'oklch(0.90 0.06 195)',
+                    200: 'oklch(0.82 0.10 195)',
+                    300: 'oklch(0.70 0.14 195)',
+                    400: 'oklch(0.58 0.15 195)',
+                    500: 'oklch(0.54 0.15 195)',
+                    600: 'oklch(0.48 0.13 195)',
+                    700: 'oklch(0.42 0.11 195)',
+                    800: 'oklch(0.35 0.09 195)',
+                    900: 'oklch(0.28 0.07 195)'
                 }
             },
             borderRadius: {
@@ -110,12 +126,13 @@ export default {
                 sm: 'calc(var(--radius) - 4px)'
             },
             boxShadow: {
-                xs: '0 1px 2px 0 rgba(0,0,0,0.05)',
-                sm: '0 2px 4px 0 rgba(0,0,0,0.06)',
-                md: '0 4px 8px 0 rgba(0,0,0,0.08), 0 2px 4px 0 rgba(0,0,0,0.04)',
-                lg: '0 8px 16px 0 rgba(0,0,0,0.10), 0 4px 8px 0 rgba(0,0,0,0.06)',
-                xl: '0 16px 32px 0 rgba(0,0,0,0.12), 0 8px 16px 0 rgba(0,0,0,0.08)',
-                '2xl': '0 24px 48px 0 rgba(0,0,0,0.14), 0 12px 24px 0 rgba(0,0,0,0.10)'
+                xs: '0 1px 2px 0 rgba(0,0,0,0.04)',
+                sm: '0 2px 6px 0 rgba(0,0,0,0.06)',
+                md: '0 4px 12px 0 rgba(0,0,0,0.08), 0 2px 4px 0 rgba(0,0,0,0.04)',
+                lg: '0 8px 20px 0 rgba(0,0,0,0.10), 0 4px 8px 0 rgba(0,0,0,0.06)',
+                xl: '0 16px 36px 0 rgba(0,0,0,0.12), 0 8px 16px 0 rgba(0,0,0,0.08)',
+                '2xl': '0 24px 56px 0 rgba(0,0,0,0.14), 0 12px 24px 0 rgba(0,0,0,0.10)',
+                'inner-lg': 'inset 0 2px 8px 0 rgba(0,0,0,0.06)'
             },
             keyframes: {
                 'accordion-down': {
@@ -125,11 +142,21 @@ export default {
                 'accordion-up': {
                     from: { height: 'var(--radix-accordion-content-height)' },
                     to: { height: '0' }
+                },
+                'fade-in': {
+                    from: { opacity: '0', transform: 'translateY(10px)' },
+                    to: { opacity: '1', transform: 'translateY(0)' }
+                },
+                'slide-in': {
+                    from: { transform: 'translateX(-100%)' },
+                    to: { transform: 'translateX(0)' }
                 }
             },
             animation: {
                 'accordion-down': 'accordion-down 0.2s ease-out',
-                'accordion-up': 'accordion-up 0.2s ease-out'
+                'accordion-up': 'accordion-up 0.2s ease-out',
+                'fade-in': 'fade-in 0.4s ease-out',
+                'slide-in': 'slide-in 0.3s ease-out'
             }
         }
     },

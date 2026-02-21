@@ -1,4 +1,4 @@
-import { SubscriptionStatus, SubscriptionPlan } from '../../backend';
+import { SubscriptionStatus, SubscriptionPlan } from '../../types/backend-extended';
 
 export interface EntitlementStatus {
   isEntitled: boolean;

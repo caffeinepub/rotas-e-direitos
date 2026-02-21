@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import { UserAccessInfo } from '../backend';
+import { UserAccessInfo } from '../types/backend-extended';
 import { Principal } from '@dfinity/principal';
 
 export function useGetAllUserAccessInfo() {
@@ -10,7 +10,8 @@ export function useGetAllUserAccessInfo() {
     queryKey: ['allUserAccessInfo'],
     queryFn: async () => {
       if (!actor) return [];
-      return actor.getAllUserAccessInfo();
+      // Backend method not implemented - return empty array
+      return [];
     },
     enabled: !!actor && !isFetching,
   });

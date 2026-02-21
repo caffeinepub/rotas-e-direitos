@@ -1,4 +1,4 @@
-import { SubscriptionPlan } from '../../backend';
+import { SubscriptionPlan } from '../../types/backend-extended';
 
 const CHECKOUT_PLAN_KEY = 'checkout_selected_plan';
 

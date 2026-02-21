@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { FileText, Calculator, MessageSquare, BarChart3, ArrowRight, Shield, Users, TrendingUp } from 'lucide-react';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import PlanComparisonMatrix from '../components/subscription/PlanComparisonMatrix';
 
 export default function HomePage() {
   const { identity } = useInternetIdentity();
@@ -65,6 +66,13 @@ export default function HomePage() {
     <div className="space-y-12">
       {/* Hero Section */}
       <div className="text-center space-y-6 py-8">
+        <div className="flex justify-center mb-6">
+          <img 
+            src="/assets/generated/nova-logo.dim_256x256.png" 
+            alt="Nova Logo" 
+            className="h-32 w-auto object-contain"
+          />
+        </div>
         <h1 className="text-5xl md:text-6xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-secondary bg-clip-text text-transparent">
           Rotas e Direitos
         </h1>
@@ -114,6 +122,11 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Plan Comparison Section */}
+      <div className="py-8">
+        <PlanComparisonMatrix />
+      </div>
+
       {/* Benefits Section */}
       <div className="space-y-6">
         <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
@@ -148,7 +161,7 @@ export default function HomePage() {
               Acesse o dashboard para explorar todas as funcionalidades
             </p>
             <Button size="lg" asChild className="shadow-md">
-              <Link to="/">
+              <Link to="/dashboard">
                 Ir para Dashboard
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>

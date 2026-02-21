@@ -1,50 +1,87 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-02-21T19:30:52.058Z",
+  "generatedAt": "2026-02-21T21:28:07.572Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 3,
+    "implemented": 3,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Update the application's color palette in frontend/index.css to use the same tonality as the logo colors. Replace the current warm orange primary and deep navy blue secondary colors with colors that match the logo's visual identity while maintaining appropriate contrast ratios for accessibility.",
+        "summary": "Create a simplified transparent checkout cart component that displays selected plan details, price breakdown, and payment options in a clean, objective interface without excessive navigation steps",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/index.css"
+          "frontend/src/components/payments/TransparentCheckoutCart.tsx",
+          "frontend/src/pages/CheckoutPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/index.css"
+          "frontend/src/components/payments/TransparentCheckoutCart.tsx",
+          "frontend/src/pages/CheckoutPage.tsx"
         ]
       },
       {
         "id": "REQ-2",
-        "summary": "Update the theme color in frontend/index.html and frontend/public/manifest.webmanifest to match the updated primary color from the new palette, ensuring consistency across browser UI elements and PWA theming.",
+        "summary": "Update subscription plan configuration to Free (24h access, 1 defense), PRO Monthly R$29.99 (5 defenses per month), and PRO Annual R$119.99 (67% discount, unlimited everything)",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/index.html",
-          "frontend/public/manifest.webmanifest"
+          "frontend/src/lib/subscriptions/plans.ts",
+          "frontend/src/pages/PlansBillingPage.tsx",
+          "frontend/src/pages/PlansDashboardPage.tsx"
         ],
         "matchedFiles": [
-          "frontend/index.html",
-          "frontend/public/manifest.webmanifest"
+          "frontend/src/lib/subscriptions/plans.ts",
+          "frontend/src/pages/PlansBillingPage.tsx",
+          "frontend/src/pages/PlansDashboardPage.tsx"
+        ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Redesign the home page plan comparison section to visually showcase benefits and limitations of each plan with clear feature matrices highlighting what's included and excluded per tier",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/subscription/PlanComparisonMatrix.tsx",
+          "frontend/src/pages/HomePage.tsx",
+          "frontend/src/pages/PublicOverviewPage.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/subscription/PlanComparisonMatrix.tsx",
+          "frontend/src/pages/HomePage.tsx",
+          "frontend/src/pages/PublicOverviewPage.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/index.css",
-    "frontend/index.html",
-    "frontend/public/manifest.webmanifest",
-    "frontend/tailwind.config.js",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/payments/TransparentCheckoutCart.tsx",
+    "frontend/src/components/subscription/PlanComparisonMatrix.tsx",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useAdmin.ts",
+    "frontend/src/hooks/useGatewayPayment.ts",
+    "frontend/src/hooks/usePagBankPayment.ts",
+    "frontend/src/hooks/useSubscription.ts",
+    "frontend/src/hooks/useTestimonials.ts",
+    "frontend/src/lib/payments/checkoutState.ts",
+    "frontend/src/lib/subscriptions/plans.ts",
+    "frontend/src/lib/subscriptions/rules.ts",
+    "frontend/src/pages/CheckoutPage.tsx",
+    "frontend/src/pages/HomePage.tsx",
+    "frontend/src/pages/PlansBillingPage.tsx",
+    "frontend/src/pages/PlansDashboardPage.tsx",
+    "frontend/src/pages/PublicOverviewPage.tsx",
+    "frontend/src/types/backend-extended.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

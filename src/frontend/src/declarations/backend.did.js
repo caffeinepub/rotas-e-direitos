@@ -24,26 +24,6 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
-export const PaymentStatus = IDL.Record({
-  'status' : IDL.Text,
-  'paymentId' : IDL.Text,
-  'rawResponse' : IDL.Text,
-});
-export const SubscriptionPlan = IDL.Variant({
-  'free_24h' : IDL.Null,
-  'pro_monthly' : IDL.Null,
-  'pro_annual' : IDL.Null,
-});
-export const PaymentCheckoutResponse = IDL.Record({
-  'paymentId' : IDL.Text,
-  'checkoutUrl' : IDL.Opt(IDL.Text),
-});
-export const Principal = IDL.Principal;
-export const SubscriptionStatus = IDL.Record({
-  'startTime' : IDL.Opt(IDL.Int),
-  'endTime' : IDL.Opt(IDL.Int),
-  'currentPlan' : SubscriptionPlan,
-});
 export const Region = IDL.Variant({
   'maracanau' : IDL.Null,
   'caucaia' : IDL.Null,
@@ -61,24 +41,6 @@ export const UserProfile = IDL.Record({
   'platform' : IDL.Opt(Platform),
   'email' : IDL.Opt(IDL.Text),
   'phone' : IDL.Opt(IDL.Text),
-});
-export const UserAccessInfo = IDL.Record({
-  'principal' : Principal,
-  'isBlockedByAdmin' : IDL.Bool,
-  'subscriptionStatus' : SubscriptionStatus,
-  'profile' : IDL.Opt(UserProfile),
-});
-export const TestimonialStatus = IDL.Variant({
-  'pending' : IDL.Null,
-  'approved' : IDL.Null,
-  'rejected' : IDL.Null,
-});
-export const Testimonial = IDL.Record({
-  'id' : IDL.Nat,
-  'status' : TestimonialStatus,
-  'content' : IDL.Text,
-  'submitter' : Principal,
-  'timestamp' : IDL.Int,
 });
 export const PagBankReturnWebhookUrlConfig = IDL.Record({
   'returnUrl' : IDL.Text,
@@ -98,6 +60,7 @@ export const PublicPaymentConfig = IDL.Record({
   'gatewayProvider' : PublicPaymentProviderConfig,
   'pagbankProvider' : PublicPagBankConfig,
 });
+export const Principal = IDL.Principal;
 export const PagBankWebhookPayload = IDL.Record({
   'status' : IDL.Text,
   'signature' : IDL.Text,
@@ -146,6 +109,11 @@ export const PaymentConfig = IDL.Record({
   'gatewayProvider' : PaymentProviderConfig,
   'pagbankProvider' : PagBankConfig,
 });
+export const TestimonialStatus = IDL.Variant({
+  'pending' : IDL.Null,
+  'approved' : IDL.Null,
+  'rejected' : IDL.Null,
+});
 
 export const idlService = IDL.Service({
   '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -176,19 +144,6 @@ export const idlService = IDL.Service({
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'checkPaymentStatus' : IDL.Func([IDL.Text], [PaymentStatus], []),
-  'createPagBankPaymentSession' : IDL.Func(
-      [SubscriptionPlan],
-      [PaymentCheckoutResponse],
-      [],
-    ),
-  'createPaymentSession' : IDL.Func(
-      [SubscriptionPlan],
-      [PaymentCheckoutResponse],
-      [],
-    ),
-  'getAllUserAccessInfo' : IDL.Func([], [IDL.Vec(UserAccessInfo)], ['query']),
-  'getApprovedTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getPagBankReturnWebhookUrls' : IDL.Func(
@@ -201,9 +156,7 @@ export const idlService = IDL.Service({
       [IDL.Opt(PagBankTransparentCheckoutConfig)],
       ['query'],
     ),
-  'getPendingTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
   'getPublicPaymentConfig' : IDL.Func([], [PublicPaymentConfig], ['query']),
-  'getSubscriptionStatus' : IDL.Func([], [SubscriptionStatus], ['query']),
   'getUserProfile' : IDL.Func([Principal], [IDL.Opt(UserProfile)], ['query']),
   'handlePagBankWebhook' : IDL.Func([PagBankWebhookPayload], [], []),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
@@ -248,26 +201,6 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
-  const PaymentStatus = IDL.Record({
-    'status' : IDL.Text,
-    'paymentId' : IDL.Text,
-    'rawResponse' : IDL.Text,
-  });
-  const SubscriptionPlan = IDL.Variant({
-    'free_24h' : IDL.Null,
-    'pro_monthly' : IDL.Null,
-    'pro_annual' : IDL.Null,
-  });
-  const PaymentCheckoutResponse = IDL.Record({
-    'paymentId' : IDL.Text,
-    'checkoutUrl' : IDL.Opt(IDL.Text),
-  });
-  const Principal = IDL.Principal;
-  const SubscriptionStatus = IDL.Record({
-    'startTime' : IDL.Opt(IDL.Int),
-    'endTime' : IDL.Opt(IDL.Int),
-    'currentPlan' : SubscriptionPlan,
-  });
   const Region = IDL.Variant({
     'maracanau' : IDL.Null,
     'caucaia' : IDL.Null,
@@ -285,24 +218,6 @@ export const idlFactory = ({ IDL }) => {
     'platform' : IDL.Opt(Platform),
     'email' : IDL.Opt(IDL.Text),
     'phone' : IDL.Opt(IDL.Text),
-  });
-  const UserAccessInfo = IDL.Record({
-    'principal' : Principal,
-    'isBlockedByAdmin' : IDL.Bool,
-    'subscriptionStatus' : SubscriptionStatus,
-    'profile' : IDL.Opt(UserProfile),
-  });
-  const TestimonialStatus = IDL.Variant({
-    'pending' : IDL.Null,
-    'approved' : IDL.Null,
-    'rejected' : IDL.Null,
-  });
-  const Testimonial = IDL.Record({
-    'id' : IDL.Nat,
-    'status' : TestimonialStatus,
-    'content' : IDL.Text,
-    'submitter' : Principal,
-    'timestamp' : IDL.Int,
   });
   const PagBankReturnWebhookUrlConfig = IDL.Record({
     'returnUrl' : IDL.Text,
@@ -322,6 +237,7 @@ export const idlFactory = ({ IDL }) => {
     'gatewayProvider' : PublicPaymentProviderConfig,
     'pagbankProvider' : PublicPagBankConfig,
   });
+  const Principal = IDL.Principal;
   const PagBankWebhookPayload = IDL.Record({
     'status' : IDL.Text,
     'signature' : IDL.Text,
@@ -370,6 +286,11 @@ export const idlFactory = ({ IDL }) => {
     'gatewayProvider' : PaymentProviderConfig,
     'pagbankProvider' : PagBankConfig,
   });
+  const TestimonialStatus = IDL.Variant({
+    'pending' : IDL.Null,
+    'approved' : IDL.Null,
+    'rejected' : IDL.Null,
+  });
   
   return IDL.Service({
     '_caffeineStorageBlobIsLive' : IDL.Func(
@@ -400,19 +321,6 @@ export const idlFactory = ({ IDL }) => {
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'checkPaymentStatus' : IDL.Func([IDL.Text], [PaymentStatus], []),
-    'createPagBankPaymentSession' : IDL.Func(
-        [SubscriptionPlan],
-        [PaymentCheckoutResponse],
-        [],
-      ),
-    'createPaymentSession' : IDL.Func(
-        [SubscriptionPlan],
-        [PaymentCheckoutResponse],
-        [],
-      ),
-    'getAllUserAccessInfo' : IDL.Func([], [IDL.Vec(UserAccessInfo)], ['query']),
-    'getApprovedTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getPagBankReturnWebhookUrls' : IDL.Func(
@@ -425,9 +333,7 @@ export const idlFactory = ({ IDL }) => {
         [IDL.Opt(PagBankTransparentCheckoutConfig)],
         ['query'],
       ),
-    'getPendingTestimonials' : IDL.Func([], [IDL.Vec(Testimonial)], ['query']),
     'getPublicPaymentConfig' : IDL.Func([], [PublicPaymentConfig], ['query']),
-    'getSubscriptionStatus' : IDL.Func([], [SubscriptionStatus], ['query']),
     'getUserProfile' : IDL.Func([Principal], [IDL.Opt(UserProfile)], ['query']),
     'handlePagBankWebhook' : IDL.Func([PagBankWebhookPayload], [], []),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),

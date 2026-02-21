@@ -2,7 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Calendar, CreditCard } from 'lucide-react';
+import { Check, Calendar, CreditCard, X, Zap, Sparkles } from 'lucide-react';
 import { PLANS } from '../lib/subscriptions/plans';
 import { useEntitlement } from '../hooks/useSubscription';
 import { formatExpiryDate } from '../lib/subscriptions/rules';
@@ -73,34 +73,72 @@ export default function PlansDashboardPage() {
       <div className="space-y-4">
         <h2 className="text-2xl font-bold">Compare os Planos</h2>
         <div className="grid gap-6 md:grid-cols-3">
-          {PLANS.map((plan) => (
-            <Card key={plan.id} className={plan.highlighted ? 'border-primary' : ''}>
-              <CardHeader>
-                <CardTitle className="text-xl">{plan.name}</CardTitle>
-                <div className="text-3xl font-bold">{plan.price}</div>
-                <CardDescription>{plan.billingPeriod}</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <ul className="space-y-2">
-                  {plan.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm">
-                      <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-                {plan.id !== 'free_24h' && (
-                  <Button
-                    className="w-full"
-                    variant={plan.highlighted ? 'default' : 'outline'}
-                    onClick={() => handleUpgrade(plan.id)}
-                  >
-                    Selecionar Plano
-                  </Button>
+          {PLANS.map((plan) => {
+            const hasDiscount = !!plan.discount;
+            const isPro = plan.highlighted;
+
+            return (
+              <Card key={plan.id} className={isPro ? 'border-primary' : ''}>
+                {hasDiscount && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge className="bg-destructive text-destructive-foreground px-3 py-1">
+                      <Zap className="h-3 w-3 mr-1" />
+                      {plan.discount}
+                    </Badge>
+                  </div>
                 )}
-              </CardContent>
-            </Card>
-          ))}
+                {isPro && !hasDiscount && (
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                    <Badge className="bg-primary text-primary-foreground px-3 py-1">
+                      <Sparkles className="h-3 w-3 mr-1" />
+                      Popular
+                    </Badge>
+                  </div>
+                )}
+                <CardHeader>
+                  <CardTitle className="text-xl">{plan.name}</CardTitle>
+                  <div className="text-3xl font-bold">{plan.price}</div>
+                  <CardDescription>{plan.billingPeriod}</CardDescription>
+                  {plan.defensesLimit && (
+                    <Badge variant="outline" className="text-xs w-fit mt-2">
+                      {plan.defensesLimit === 'unlimited' 
+                        ? 'Defesas Ilimitadas' 
+                        : `${plan.defensesLimit} defesa${plan.defensesLimit > 1 ? 's' : ''}`}
+                    </Badge>
+                  )}
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <ul className="space-y-2">
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-2 text-sm">
+                        <Check className="h-4 w-4 text-primary shrink-0 mt-0.5" />
+                        <span>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  {plan.limitations && plan.limitations.length > 0 && (
+                    <div className="pt-2 border-t space-y-2">
+                      {plan.limitations.map((limitation, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <X className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                          <span className="text-xs text-muted-foreground">{limitation}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  {plan.id !== 'free_24h' && (
+                    <Button
+                      className="w-full"
+                      variant={isPro ? 'default' : 'outline'}
+                      onClick={() => handleUpgrade(plan.id)}
+                    >
+                      Selecionar Plano
+                    </Button>
+                  )}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
     </div>

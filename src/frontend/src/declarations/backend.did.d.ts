@@ -41,20 +41,11 @@ export interface PagBankWebhookPayload {
   'paymentId' : string,
   'rawData' : string,
 }
-export interface PaymentCheckoutResponse {
-  'paymentId' : string,
-  'checkoutUrl' : [] | [string],
-}
 export interface PaymentConfig {
   'gatewayProvider' : PaymentProviderConfig,
   'pagbankProvider' : PagBankConfig,
 }
 export interface PaymentProviderConfig { 'enabled' : boolean }
-export interface PaymentStatus {
-  'status' : string,
-  'paymentId' : string,
-  'rawResponse' : string,
-}
 export type Platform = { 'uber' : null } |
   { 'ninetyNine' : null } |
   { 'ifood' : null } |
@@ -69,31 +60,10 @@ export interface PublicPaymentProviderConfig { 'enabled' : boolean }
 export type Region = { 'maracanau' : null } |
   { 'caucaia' : null } |
   { 'fortaleza' : null };
-export type SubscriptionPlan = { 'free_24h' : null } |
-  { 'pro_monthly' : null } |
-  { 'pro_annual' : null };
-export interface SubscriptionStatus {
-  'startTime' : [] | [bigint],
-  'endTime' : [] | [bigint],
-  'currentPlan' : SubscriptionPlan,
-}
-export interface Testimonial {
-  'id' : bigint,
-  'status' : TestimonialStatus,
-  'content' : string,
-  'submitter' : Principal,
-  'timestamp' : bigint,
-}
 export type TestimonialStatus = { 'pending' : null } |
   { 'approved' : null } |
   { 'rejected' : null };
 export type Time = bigint;
-export interface UserAccessInfo {
-  'principal' : Principal,
-  'isBlockedByAdmin' : boolean,
-  'subscriptionStatus' : SubscriptionStatus,
-  'profile' : [] | [UserProfile],
-}
 export interface UserProfile {
   'region' : [] | [Region],
   'name' : string,
@@ -154,17 +124,6 @@ export interface _SERVICE {
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  'checkPaymentStatus' : ActorMethod<[string], PaymentStatus>,
-  'createPagBankPaymentSession' : ActorMethod<
-    [SubscriptionPlan],
-    PaymentCheckoutResponse
-  >,
-  'createPaymentSession' : ActorMethod<
-    [SubscriptionPlan],
-    PaymentCheckoutResponse
-  >,
-  'getAllUserAccessInfo' : ActorMethod<[], Array<UserAccessInfo>>,
-  'getApprovedTestimonials' : ActorMethod<[], Array<Testimonial>>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
   'getPagBankReturnWebhookUrls' : ActorMethod<
@@ -175,9 +134,7 @@ export interface _SERVICE {
     [],
     [] | [PagBankTransparentCheckoutConfig]
   >,
-  'getPendingTestimonials' : ActorMethod<[], Array<Testimonial>>,
   'getPublicPaymentConfig' : ActorMethod<[], PublicPaymentConfig>,
-  'getSubscriptionStatus' : ActorMethod<[], SubscriptionStatus>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'handlePagBankWebhook' : ActorMethod<[PagBankWebhookPayload], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,

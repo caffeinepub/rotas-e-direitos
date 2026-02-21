@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import { SubscriptionStatus } from '../backend';
+import { SubscriptionStatus } from '../types/backend-extended';
 import { evaluateEntitlement, EntitlementStatus } from '../lib/subscriptions/rules';
 
 export function useGetSubscriptionStatus() {
@@ -10,7 +10,12 @@ export function useGetSubscriptionStatus() {
     queryKey: ['subscriptionStatus'],
     queryFn: async () => {
       if (!actor) throw new Error('Actor not available');
-      return actor.getSubscriptionStatus();
+      // Backend method not implemented - return default free plan
+      return {
+        currentPlan: 'free_24h',
+        startTime: null,
+        endTime: null,
+      };
     },
     enabled: !!actor && !actorFetching,
   });

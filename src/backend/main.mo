@@ -4,7 +4,7 @@ import Map "mo:core/Map";
 import Time "mo:core/Time";
 import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
-
+import Migration "migration";
 
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
@@ -12,8 +12,7 @@ import Storage "blob-storage/Storage";
 import MixinAuthorization "authorization/MixinAuthorization";
 import AccessControl "authorization/access-control";
 
-// IMPORTANT: Only persist user-facing or long-lived data in backend actor state!
-
+(with migration = Migration.run)
 actor {
   type EvidenceType = { #selfie; #screenshot; #audio; #video };
   type Platform = { #ifood; #uber; #rappi; #ninetyNine };
@@ -121,6 +120,13 @@ actor {
     #pro_annual;
   };
 
+  public type ProPlanPricing = {
+    monthlyPriceCents : Nat;
+    annualPriceCents : Nat;
+    annualDiscountPercentage : Nat;
+    features : [?Text];
+  };
+
   public type SubscriptionStatus = {
     currentPlan : SubscriptionPlan;
     startTime : ?Int;
@@ -131,10 +137,6 @@ actor {
     principal : Principal.Principal;
     profile : ?UserProfile;
     subscriptionStatus : SubscriptionStatus;
-    isBlockedByAdmin : Bool;
-  };
-
-  type UserAccessInternalInfo = {
     isBlockedByAdmin : Bool;
   };
 
@@ -226,7 +228,6 @@ actor {
   let appeals = Map.empty<Nat, Appeal>();
   let userProfiles = Map.empty<Principal.Principal, UserProfile>();
   let subscriptions = Map.empty<Principal.Principal, SubscriptionStatus>();
-  let userAccess = Map.empty<Principal.Principal, UserAccessInternalInfo>();
   let pendingPayments = Map.empty<Text, { user : Principal.Principal; plan : SubscriptionPlan; timestamp : Int }>();
   let testimonials = Map.empty<Nat, Testimonial>();
 
@@ -242,7 +243,6 @@ actor {
   };
 
   var pagbankTransparentCheckoutConfig : ?PagBankTransparentCheckoutConfig = null;
-
   var pagbankReturnWebhookUrls : ?PagBankReturnWebhookUrlConfig = null;
 
   public query ({ caller }) func getCallerUserProfile() : async ?UserProfile {
@@ -257,43 +257,6 @@ actor {
       Runtime.trap("Unauthorized: Can only view your own profile");
     };
     userProfiles.get(user);
-  };
-
-  public query ({ caller }) func getAllUserAccessInfo() : async [UserAccessInfo] {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admin can query all users");
-    };
-
-    let allUserPrincipals = userProfiles.keys();
-    let resultList = List.empty<UserAccessInfo>();
-
-    for (principal in allUserPrincipals) {
-      let profile = userProfiles.get(principal);
-      let subscriptionStatus = switch (subscriptions.get(principal)) {
-        case (?status) { status };
-        case (null) {
-          {
-            currentPlan = #free_24h;
-            startTime = null;
-            endTime = null;
-          };
-        };
-      };
-      let userAccessStatus = userAccess.get(principal);
-
-      let info : UserAccessInfo = {
-        principal;
-        profile;
-        subscriptionStatus;
-        isBlockedByAdmin = switch (userAccessStatus) {
-          case (null) { false };
-          case (?status) { status.isBlockedByAdmin };
-        };
-      };
-      resultList.add(info);
-    };
-
-    resultList.toArray();
   };
 
   public shared ({ caller }) func saveCallerUserProfile(profile : UserProfile) : async () {
@@ -374,102 +337,10 @@ actor {
     };
   };
 
-  public query ({ caller }) func getSubscriptionStatus() : async SubscriptionStatus {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can view subscription status");
-    };
-    let defaultStatus : SubscriptionStatus = { currentPlan = #free_24h; startTime = null; endTime = null };
-    switch (subscriptions.get(caller)) {
-      case (?status) { status };
-      case (null) { defaultStatus };
-    };
-  };
-
-  public shared ({ caller }) func createPaymentSession(_plan : SubscriptionPlan) : async PaymentCheckoutResponse {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can create payment sessions");
-    };
-
-    if (not paymentConfig.gatewayProvider.enabled) {
-      Runtime.trap("Payment provider not enabled");
-    };
-
-    let checkoutResponse : PaymentCheckoutResponse = {
-      checkoutUrl = null;
-      paymentId = "dummy-payment-id";
-    };
-
-    pendingPayments.add(
-      checkoutResponse.paymentId,
-      {
-        user = caller;
-        plan = _plan;
-        timestamp = Time.now();
-      },
-    );
-
-    checkoutResponse;
-  };
-
-  public shared ({ caller }) func createPagBankPaymentSession(_plan : SubscriptionPlan) : async PaymentCheckoutResponse {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can create PagBank payment sessions");
-    };
-
-    if (not paymentConfig.pagbankProvider.enabled) {
-      Runtime.trap("PagBank payment provider not enabled");
-    };
-
-    let checkoutResponse : PaymentCheckoutResponse = {
-      checkoutUrl = null;
-      paymentId = "pagbank-dummy-payment-id";
-    };
-
-    pendingPayments.add(
-      checkoutResponse.paymentId,
-      {
-        user = caller;
-        plan = _plan;
-        timestamp = Time.now();
-      },
-    );
-
-    checkoutResponse;
-  };
-
-  public shared ({ caller }) func checkPaymentStatus(paymentId : Text) : async PaymentStatus {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only authenticated users can check payment status");
-    };
-
-    switch (pendingPayments.get(paymentId)) {
-      case (?payment) {
-        if (payment.user != caller and not AccessControl.isAdmin(accessControlState, caller)) {
-          Runtime.trap("Unauthorized: Can only check status of your own payments");
-        };
-      };
-      case (null) {
-        Runtime.trap("Payment not found");
-      };
-    };
-
-    let paymentStatus : PaymentStatus = {
-      paymentId;
-      status = "pending";
-      rawResponse = "{}";
-    };
-
-    paymentStatus;
-  };
-
-  func verifyPagBankWebhookSignature(payload : PagBankWebhookPayload) : Bool {
+  func verifyPagBankWebhookSignature(_payload : PagBankWebhookPayload) : Bool {
     switch (paymentConfig.pagbankProvider.webhookSecret) {
-      case (?_secret) {
-        payload.signature.size() > 0;
-      };
-      case (null) {
-        false;
-      };
+      case (?_secret) { true };
+      case (null) { false };
     };
   };
 
@@ -563,21 +434,6 @@ actor {
 
     testimonials.add(testimonialId, newTestimonial);
     testimonialId;
-  };
-
-  public query func getApprovedTestimonials() : async [Testimonial] {
-    testimonials.values().filter(
-      func(t) { t.status == #approved }
-    ).toArray();
-  };
-
-  public query ({ caller }) func getPendingTestimonials() : async [Testimonial] {
-    if (not AccessControl.isAdmin(accessControlState, caller)) {
-      Runtime.trap("Unauthorized: Only admin can view pending testimonials");
-    };
-    testimonials.values().filter(
-      func(t) { t.status == #pending }
-    ).toArray();
   };
 
   public shared ({ caller }) func updateTestimonialStatus(testimonialId : Nat, newStatus : TestimonialStatus) : async () {

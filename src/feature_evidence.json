@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-application-s-color-palette-in-frontend-index-css-to-use-the-same-tonality-as-the-logo-colors-replace-the-current-warm-orange-primary-and-deep-navy-blue-secondary-colors-with-colors-that-match-the-logo-s-visual-identity-while-maintaining-appropriate-contrast-ratios-for-accessibility",
-      "featureTitle": "Update the application's color palette in frontend/index.css to use the same tonality as the logo colors. Replace the current warm orange primary and deep navy blue secondary colors with colors that match the logo's visual identity while maintaining appropriate contrast ratios for accessibility.",
+      "featureId": "feature-create-a-simplified-transparent-checkout-cart-component-that-displays-selected-plan-details-price-breakdown-and-payment-options-in-a-clean-objective-interface-without-excessive-navigation-steps",
+      "featureTitle": "Create a simplified transparent checkout cart component that displays selected plan details, price breakdown, and payment options in a clean, objective interface without excessive navigation steps",
       "files": [
-        "frontend/index.css"
+        "frontend/src/components/payments/TransparentCheckoutCart.tsx",
+        "frontend/src/pages/CheckoutPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -25,11 +26,12 @@
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-the-theme-color-in-frontend-index-html-and-frontend-public-manifest-webmanifest-to-match-the-updated-primary-color-from-the-new-palette-ensuring-consistency-across-browser-ui-elements-and-pwa-theming",
-      "featureTitle": "Update the theme color in frontend/index.html and frontend/public/manifest.webmanifest to match the updated primary color from the new palette, ensuring consistency across browser UI elements and PWA theming.",
+      "featureId": "feature-update-subscription-plan-configuration-to-free-24h-access-1-defense-pro-monthly-r-29-99-5-defenses-per-month-and-pro-annual-r-119-99-67-discount-unlimited-everything",
+      "featureTitle": "Update subscription plan configuration to Free (24h access, 1 defense), PRO Monthly R$29.99 (5 defenses per month), and PRO Annual R$119.99 (67% discount, unlimited everything)",
       "files": [
-        "frontend/index.html",
-        "frontend/public/manifest.webmanifest"
+        "frontend/src/lib/subscriptions/plans.ts",
+        "frontend/src/pages/PlansBillingPage.tsx",
+        "frontend/src/pages/PlansDashboardPage.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -45,6 +47,31 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-redesign-the-home-page-plan-comparison-section-to-visually-showcase-benefits-and-limitations-of-each-plan-with-clear-feature-matrices-highlighting-what-s-included-and-excluded-per-tier",
+      "featureTitle": "Redesign the home page plan comparison section to visually showcase benefits and limitations of each plan with clear feature matrices highlighting what's included and excluded per tier",
+      "files": [
+        "frontend/src/components/subscription/PlanComparisonMatrix.tsx",
+        "frontend/src/pages/HomePage.tsx",
+        "frontend/src/pages/PublicOverviewPage.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0",
+        "camera@1.0.0",
+        "http-outcalls@3.0.0",
+        "blob-storage@4.0.0",
+        "qr-code@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
       ],
       "confidence": "high"
     }

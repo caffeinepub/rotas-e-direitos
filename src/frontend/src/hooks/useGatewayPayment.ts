@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import { SubscriptionPlan, PaymentCheckoutResponse, PaymentStatus } from '../backend';
+import { SubscriptionPlan, PaymentCheckoutResponse, PaymentStatus } from '../types/backend-extended';
 import { useState } from 'react';
 
 export type PaymentFlowState = 'idle' | 'initiating' | 'pending' | 'completed' | 'failed';
@@ -28,7 +28,8 @@ export function useGatewayPayment() {
   const createSessionMutation = useMutation<PaymentCheckoutResponse, Error, SubscriptionPlan>({
     mutationFn: async (plan: SubscriptionPlan) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.createPaymentSession(plan);
+      // Backend method not implemented
+      throw new Error('Payment gateway not yet implemented in backend');
     },
     onMutate: () => {
       setFlowStatus({
@@ -57,7 +58,8 @@ export function useGatewayPayment() {
   const checkStatusMutation = useMutation<PaymentStatus, Error, string>({
     mutationFn: async (paymentId: string) => {
       if (!actor) throw new Error('Actor not available');
-      return actor.checkPaymentStatus(paymentId);
+      // Backend method not implemented
+      throw new Error('Payment status check not yet implemented in backend');
     },
     onSuccess: (status) => {
       if (status.status === 'approved' || status.status === 'completed') {

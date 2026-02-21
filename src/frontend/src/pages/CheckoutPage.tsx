@@ -1,26 +1,24 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from '@tanstack/react-router';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, Info, CreditCard, Check, Sparkles } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2 } from 'lucide-react';
 import { usePublicPaymentConfig } from '../hooks/usePublicPaymentConfig';
 import { useGatewayPayment } from '../hooks/useGatewayPayment';
 import { usePagBankPayment } from '../hooks/usePagBankPayment';
 import { getSelectedPlan, clearSelectedPlan } from '../lib/payments/checkoutState';
 import { getActiveProvider } from '../lib/payments/providerConfig';
-import { PLANS } from '../lib/subscriptions/plans';
+import { getPlanById } from '../lib/subscriptions/plans';
 import { sanitizeGatewayError } from '../lib/payments/gatewayErrorMessages';
 import { sanitizePagBankError } from '../lib/payments/pagbankErrorMessages';
-import TrustBadges from '../components/trust/TrustBadges';
 import PaymentStatusPanel from '../components/payments/PaymentStatusPanel';
 import PixQrCodeDisplay from '../components/payments/PixQrCodeDisplay';
+import TransparentCheckoutCart from '../components/payments/TransparentCheckoutCart';
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const selectedPlan = getSelectedPlan();
-  const plan = selectedPlan ? PLANS.find((p) => p.id === selectedPlan) : null;
+  const plan = selectedPlan ? getPlanById(selectedPlan) : null;
 
   const { data: publicConfig, isLoading: configLoading } = usePublicPaymentConfig();
   const activeProvider = getActiveProvider(publicConfig);
@@ -49,12 +47,12 @@ export default function CheckoutPage() {
   }, [flowStatus.state]);
 
   const handleInitiatePayment = async () => {
-    if (!plan) return;
+    if (!plan || !selectedPlan) return;
     
     setErrorMessage(null);
     
     try {
-      await startPayment(plan.id);
+      await startPayment(selectedPlan);
     } catch (error: any) {
       const sanitized = activeProvider === 'pagbank' 
         ? sanitizePagBankError(error)
@@ -81,7 +79,7 @@ export default function CheckoutPage() {
     setErrorMessage(null);
   };
 
-  if (!plan) {
+  if (!plan || !selectedPlan) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
@@ -123,105 +121,15 @@ export default function CheckoutPage() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-4xl font-bold tracking-tight bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">
-          Finalizar Assinatura
+          Checkout Simplificado
         </h1>
-        <p className="text-muted-foreground mt-2">Complete seu pagamento e comece a usar todos os recursos</p>
+        <p className="text-muted-foreground mt-2">Finalize sua assinatura de forma rápida e segura</p>
       </div>
 
       {/* Two-column layout on desktop, single column on mobile */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column - Main Content */}
+        {/* Left Column - Transparent Checkout Cart */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Plans Comparison */}
-          <Card className="border-2 shadow-lg">
-            <CardHeader>
-              <CardTitle className="text-2xl">Planos Disponíveis</CardTitle>
-              <CardDescription>Compare os benefícios de cada plano</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                {PLANS.map((p) => (
-                  <div
-                    key={p.id}
-                    className={`relative rounded-lg border-2 p-4 transition-all ${
-                      p.id === selectedPlan
-                        ? 'border-primary bg-primary/5 shadow-md'
-                        : 'border-border bg-card hover:border-muted-foreground/30'
-                    }`}
-                  >
-                    {p.id === selectedPlan && (
-                      <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground">
-                        Selecionado
-                      </Badge>
-                    )}
-                    {p.highlighted && p.id !== selectedPlan && (
-                      <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground">
-                        <Sparkles className="h-3 w-3 mr-1" />
-                        Popular
-                      </Badge>
-                    )}
-                    <div className="text-center mb-4">
-                      <h3 className="font-bold text-lg mb-1">{p.name}</h3>
-                      <div className="text-3xl font-bold text-primary mb-1">{p.price}</div>
-                      <div className="text-xs text-muted-foreground">{p.billingPeriod}</div>
-                    </div>
-                    <ul className="space-y-2 text-sm">
-                      {p.features.slice(0, 4).map((feature, idx) => (
-                        <li key={idx} className="flex items-start gap-2">
-                          <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
-                          <span className="text-muted-foreground">{feature}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Order Summary */}
-          <Card className="border-2 shadow-lg">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <CreditCard className="h-5 w-5 text-primary" />
-                Resumo do Pedido
-              </CardTitle>
-              <CardDescription>Revise os detalhes da sua assinatura</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg">
-                <div>
-                  <div className="font-semibold text-lg">{plan.name}</div>
-                  <div className="text-sm text-muted-foreground">{plan.description}</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-bold text-2xl text-primary">{plan.price}</div>
-                  <div className="text-xs text-muted-foreground">{plan.billingPeriod}</div>
-                </div>
-              </div>
-
-              <Alert>
-                <Info className="h-4 w-4" />
-                <AlertDescription>
-                  Provedor de pagamento: <strong>{activeProvider === 'pagbank' ? 'PagBank' : 'Gateway'}</strong>
-                </AlertDescription>
-              </Alert>
-
-              <div className="pt-4 border-t">
-                <h4 className="font-semibold mb-3">Recursos inclusos:</h4>
-                <ul className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                  {plan.features.map((feature, idx) => (
-                    <li key={idx} className="flex items-start gap-2 text-sm">
-                      <Check className="h-4 w-4 text-success shrink-0 mt-0.5" />
-                      <span>{feature}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Payment Status or Alternative Payment */}
           {flowStatus.state !== 'idle' ? (
             <PaymentStatusPanel
               flowStatus={flowStatus}
@@ -231,45 +139,13 @@ export default function CheckoutPage() {
               provider={activeProvider}
             />
           ) : (
-            <Card className="border-2 shadow-lg">
-              <CardHeader>
-                <CardTitle>Outras Formas de Pagamento</CardTitle>
-                <CardDescription>
-                  Prefere pagar com cartão? Use a opção abaixo
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {errorMessage && (
-                  <Alert variant="destructive">
-                    <AlertDescription>{errorMessage}</AlertDescription>
-                  </Alert>
-                )}
-
-                <Button
-                  onClick={handleInitiatePayment}
-                  disabled={isInitiating}
-                  variant="outline"
-                  className="w-full"
-                  size="lg"
-                >
-                  {isInitiating ? (
-                    <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Iniciando...
-                    </>
-                  ) : (
-                    <>
-                      <CreditCard className="h-4 w-4 mr-2" />
-                      {activeProvider === 'pagbank' 
-                        ? 'Pagar com PagBank (Cartão)' 
-                        : 'Pagar com Cartão'}
-                    </>
-                  )}
-                </Button>
-
-                <TrustBadges />
-              </CardContent>
-            </Card>
+            <TransparentCheckoutCart
+              selectedPlan={selectedPlan}
+              onPayWithCard={handleInitiatePayment}
+              isProcessing={isInitiating}
+              errorMessage={errorMessage}
+              provider={activeProvider}
+            />
           )}
         </div>
 

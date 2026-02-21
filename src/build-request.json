@@ -1,49 +1,79 @@
 {
   "kind": "build_request",
-  "title": "Update app color scheme to match logo tonality",
+  "title": "Simplify checkout with transparent cart and update subscription plans",
+  "projectName": "Rotas e Direitos",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Update the application's color palette in frontend/index.css to use the same tonality as the logo colors. Replace the current warm orange primary and deep navy blue secondary colors with colors that match the logo's visual identity while maintaining appropriate contrast ratios for accessibility.",
+      "text": "Create a simplified transparent checkout cart component that displays selected plan details, price breakdown, and payment options in a clean, objective interface without excessive navigation steps",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-user-checkout-request"
+        ],
+        "quotes": [
+          "CRIE UM CARRINHO COMO UM CHECKOUT TRANSPARENTE DE FORMA MAIS SIMPLES E OBJETIVA"
         ]
       },
       "acceptanceCriteria": [
-        "The primary and secondary color variables in the CSS use tonalities matching the logo",
-        "All color references throughout the app reflect the new palette",
-        "Text remains readable with appropriate contrast against backgrounds",
-        "Dark mode color variants are updated to maintain consistency"
+        "Cart displays selected plan name and price clearly",
+        "Payment method selection is integrated directly in the cart view",
+        "No multi-step wizard; all information visible in one screen",
+        "Smooth transition from plan selection to payment completion"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Update the theme color in frontend/index.html and frontend/public/manifest.webmanifest to match the updated primary color from the new palette, ensuring consistency across browser UI elements and PWA theming.",
-      "target": "frontend",
+      "text": "Update subscription plan configuration to Free (24h access, 1 defense), PRO Monthly R$29.99 (5 defenses per month), and PRO Annual R$119.99 (67% discount, unlimited everything)",
+      "target": "both",
       "source": {
         "messageIds": [
-          "msg-6"
+          "msg-user-checkout-request"
+        ],
+        "quotes": [
+          "Planos atualizados: Gratuito (24h, 1 defesa), PRO Mensal R$29,99 (5 defesas/mês), PRO Anual R$119,99 (67% OFF, tudo ilimitado)"
         ]
       },
       "acceptanceCriteria": [
-        "The theme-color meta tag in index.html reflects the new primary color",
-        "The theme_color in manifest.webmanifest matches the updated palette",
-        "Browser UI chrome displays the correct brand color"
+        "Free plan grants 24 hours of access with 1 defense credit",
+        "PRO Monthly costs R$29.99 and provides 5 defenses per month",
+        "PRO Annual costs R$119.99 with 67% discount badge displayed",
+        "PRO Annual includes unlimited defenses and all features",
+        "Plan data structure in frontend/src/lib/subscriptions/plans.ts reflects new pricing and limits",
+        "Backend subscription logic enforces defense credit limits per plan"
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Redesign the home page plan comparison section to visually showcase benefits and limitations of each plan with clear feature matrices highlighting what's included and excluded per tier",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-user-checkout-request"
+        ],
+        "quotes": [
+          "Home agora mostra visual comparativo dos planos com benefícios e limitações de cada um"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Plan comparison table or cards display all three plans side-by-side",
+        "Each plan clearly lists included features with checkmarks or similar indicators",
+        "Limitations and restrictions are explicitly shown (e.g., '1 defense only' for Free)",
+        "Visual hierarchy emphasizes PRO Annual as best value with discount badge",
+        "Comparison section is prominent on the home/landing page"
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files in frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useInternetIdentity.tsx, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
-    "Maintain WCAG AA contrast ratio standards for text and interactive elements",
-    "Preserve the OKLCH color space system already in use"
+    "Do not change authentication system or Internet Identity integration",
+    "Preserve existing payment provider integration (Gateway and PagBank)",
+    "Maintain existing subscription entitlement logic structure"
   ],
   "nonGoals": [
-    "Creating or modifying the logo file itself",
-    "Changing the overall layout or component structure",
-    "Modifying backend color-related configurations"
+    "Implementing new payment providers beyond existing Gateway and PagBank",
+    "Changing backend actor architecture or state management patterns",
+    "Modifying evidence storage or IndexedDB structure"
   ],
   "imageRequirements": {
     "required": [],

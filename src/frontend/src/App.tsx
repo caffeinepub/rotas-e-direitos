@@ -16,6 +16,7 @@ import PaymentsPage from './pages/PaymentsPage';
 import CheckoutPage from './pages/CheckoutPage';
 import ProfilePage from './pages/ProfilePage';
 import QuickProcessLookupPage from './pages/QuickProcessLookupPage';
+import QuickAccessPage from './pages/QuickAccessPage';
 import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import DataPolicyPage from './pages/DataPolicyPage';
 import AdminDashboardPage from './pages/AdminDashboardPage';
@@ -123,6 +124,12 @@ const quickLookupRoute = createRoute({
   component: QuickProcessLookupPage,
 });
 
+const quickAccessRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/acesso-rapido',
+  component: QuickAccessPage,
+});
+
 const privacyRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/privacidade',
@@ -156,6 +163,7 @@ const routeTree = rootRoute.addChildren([
   checkoutRoute,
   profileRoute,
   quickLookupRoute,
+  quickAccessRoute,
   privacyRoute,
   dataRoute,
   adminRoute,
